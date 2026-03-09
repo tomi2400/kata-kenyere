@@ -17,7 +17,7 @@ function formatDatum(datum: string): string {
   return d.toLocaleDateString("hu-HU", { month: "long", day: "numeric" });
 }
 
-export default function DaySelector({ days }: { days: OrderDay[] }) {
+export default function DaySelector({ days, redirectTo = "/valasztas" }: { days: OrderDay[]; redirectTo?: string }) {
   const [selected, setSelected] = useState<string[]>([]);
   const { setSelectedDays } = useCartStore();
   const router = useRouter();
@@ -34,7 +34,7 @@ export default function DaySelector({ days }: { days: OrderDay[] }) {
       .filter((d) => selected.includes(d.datum))
       .map((d) => ({ nap: d.nap, datum: d.datum }));
     setSelectedDays(chosenDays);
-    router.push("/termekek");
+    router.push(redirectTo);
   };
 
   if (days.length === 0) {
