@@ -1,8 +1,24 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { MapPin, Clock, Star, Wheat, Flame, Leaf, Heart } from "lucide-react";
 import { TERMEKEK } from "@/lib/products";
+
+export const metadata: Metadata = {
+  title: "Kézműves kovászos pékség Pécsett – Kata Kenyere",
+  description:
+    "Pécs kézműves kovászos pékségéből rendelhetsz előre friss kenyeret, csigát, kiflit. Adalékanyagmentes, természetes kovász. Kedd–Péntek, Salakhegyi út 14.",
+  alternates: {
+    canonical: "https://katakenyere.hu",
+  },
+  openGraph: {
+    title: "Kata Kenyere – Kovászos kenyér Pécs, előrendelésre",
+    description:
+      "Kézzel formázott, kovásszal kelesztett pékáruk frissen. Rendelj online, vedd át személyesen Pécsett.",
+    url: "https://katakenyere.hu",
+  },
+};
 
 const REVIEWS = [
   {
@@ -64,7 +80,7 @@ export default function Home() {
 
         <div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-16 md:pb-20">
           <p className="font-sans text-xs tracking-[0.2em] text-gold uppercase mb-4">
-            Kata Kenyere · Pécs
+            Kézműves kovászos pékség · Pécs
           </p>
           <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl text-cream leading-[1.05] mb-4 max-w-2xl">
             Frissen,
@@ -74,8 +90,8 @@ export default function Home() {
             szeretettel.
           </h1>
           <p className="font-sans text-cream/75 text-lg max-w-md mb-8 leading-relaxed">
-            Kovásszal kelesztve, kézzel formázva –
-            mindennap frissen sütjük amit előrendeltek.
+            Kovásszal kelesztett, kézzel formázott kenyerek és péksütemények –
+            minden nap frissen sütve, előrendelésre.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link

@@ -3,8 +3,17 @@ import Navbar from "@/components/Navbar";
 import { AlertTriangle } from "lucide-react";
 
 export const metadata = {
-  title: "Alapanyagok – Kata Kenyere",
-  description: "Tudd meg miből sütjük a kenyereket. Természetes alapanyagok, adalékanyag nélkül.",
+  title: "Adalékanyagmentes kovászos kenyér – Alapanyagaink",
+  description:
+    "Kovász, liszt, víz, só – ennyi. Tudd meg pontosan miből sütjük a kenyerünket. Természetes alapanyagok, tartósítószer és javítószer nélkül. Kata Kenyere, Pécs.",
+  alternates: {
+    canonical: "https://katakenyere.hu/alapanyagok",
+  },
+  openGraph: {
+    title: "Természetes alapanyagok – Kata Kenyere kovászos pékség",
+    description: "Kovász, liszt, víz, só. Semmi más. Tudd pontosan mi van a kenyeredben.",
+    url: "https://katakenyere.hu/alapanyagok",
+  },
 };
 
 const ALAPANYAGOK = [

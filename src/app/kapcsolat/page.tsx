@@ -3,8 +3,17 @@ import Navbar from "@/components/Navbar";
 import { MapPin, Clock, Phone, Mail } from "lucide-react";
 
 export const metadata = {
-  title: "Kapcsolat – Kata Kenyere",
-  description: "Lépj kapcsolatba a Kata Kenyere pékséggel. Cím, telefonszám, email.",
+  title: "Kapcsolat és elérhetőségek – Pécs, Salakhegyi út 14.",
+  description:
+    "Kata Kenyere pékség elérhetőségei: cím (Pécs, Salakhegyi út 14.), nyitvatartás (K–P 8–17h), telefon, email. Kérdéssel fordulj hozzánk bátran!",
+  alternates: {
+    canonical: "https://katakenyere.hu/kapcsolat",
+  },
+  openGraph: {
+    title: "Kapcsolat – Kata Kenyere, Pécs",
+    description: "Pécs, Salakhegyi út 14. · Kedd–Péntek 8:00–17:00",
+    url: "https://katakenyere.hu/kapcsolat",
+  },
 };
 
 export default function KapcsolatPage() {

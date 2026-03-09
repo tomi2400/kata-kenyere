@@ -5,8 +5,17 @@ import { getAvailableOrderDays } from "@/lib/deadline";
 import { MapPin, Clock, ShoppingBag } from "lucide-react";
 
 export const metadata = {
-  title: "Előrendelés – Kata Kenyere",
-  description: "Rendeld meg előre kedvenc kovászos kenyered! Válaszd ki a napot és állítsd össze a kosarad.",
+  title: "Kovászos kenyér előrendelés online – Pécs",
+  description:
+    "Rendeld meg előre kedvenc kovászos kenyered Pécsről! Válassz napot, állítsd össze a kosarad, mi frissen kisütjük. Átvétel: Salakhegyi út 14., K–P 8–17h.",
+  alternates: {
+    canonical: "https://katakenyere.hu/elorendeles",
+  },
+  openGraph: {
+    title: "Kovászos kenyér előrendelés – Kata Kenyere, Pécs",
+    description: "Válassz napot, állítsd össze a kosarad – mi frissen kisütjük neked.",
+    url: "https://katakenyere.hu/elorendeles",
+  },
 };
 
 export default function ElorendelesPage() {

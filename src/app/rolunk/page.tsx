@@ -4,8 +4,17 @@ import Navbar from "@/components/Navbar";
 import { MapPin, Clock, Phone, Mail, Clock3, Wheat, Flame, Leaf, Heart } from "lucide-react";
 
 export const metadata = {
-  title: "Rólunk – Kata Kenyere",
-  description: "Ismerd meg Kata Kenyere történetét – kézműves kovászos pékség Pécsről.",
+  title: "Kézműves kovászos pékség Pécsről – A mi történetünk",
+  description:
+    "Kata és csapata minden reggel 4-kor kezd, hogy te reggel friss kenyeret kaphass. Ismerd meg a pécsi kézműves kovászos pékség mögött álló embereket és értékeket.",
+  alternates: {
+    canonical: "https://katakenyere.hu/rolunk",
+  },
+  openGraph: {
+    title: "Rólunk – Kata Kenyere kovászos pékség Pécs",
+    description: "A kovász, az idő és a kéz munkája – ez a Kata Kenyere.",
+    url: "https://katakenyere.hu/rolunk",
+  },
 };
 
 export default function RolunkPage() {

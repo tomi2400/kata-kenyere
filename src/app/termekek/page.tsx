@@ -1,7 +1,23 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getTermekekByKategoria } from "@/lib/products";
 import Navbar from "@/components/Navbar";
+
+export const metadata: Metadata = {
+  title: "Kovászos kenyerek és péksütemények – Kínálatunk",
+  description:
+    "Fehér kovászos kenyér, rozsos cipó, kakaós csiga, fahéjas batyu, kifli és sok más kézműves pékáru. Természetes alapanyagok, adalékanyag nélkül. Pécs, Salakhegyi út 14.",
+  alternates: {
+    canonical: "https://katakenyere.hu/termekek",
+  },
+  openGraph: {
+    title: "Kata Kenyere kínálata – Kovászos kenyerek és péksütemények",
+    description:
+      "Kézzel formázott kovászos kenyerek, csigák, kiflik és különlegességek. Minden nap frissen sütve.",
+    url: "https://katakenyere.hu/termekek",
+  },
+};
 
 export default function TermekekPage() {
   const termekekByKategoria = getTermekekByKategoria();
