@@ -10,40 +10,6 @@
   }
 }
 
-/* ─── Kata Kenyere animations ─── */
-@keyframes kk-fade-in-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes kk-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.hero-fade  { animation: kk-fade-in 1.4s ease both; }
-.hero-tag   { animation: kk-fade-in-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.15s; }
-.hero-title { animation: kk-fade-in-up 0.75s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.3s; }
-.hero-body  { animation: kk-fade-in-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.5s; }
-.hero-cta   { animation: kk-fade-in-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.65s; }
-
-@media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.reveal-d1 { transition-delay: 0.08s; }
-.reveal-d2 { transition-delay: 0.18s; }
-.reveal-d3 { transition-delay: 0.28s; }
-.reveal-d4 { transition-delay: 0.38s; }
-
 @layer base {
   :root {
     /* Kata Kenyere brand */
