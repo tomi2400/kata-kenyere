@@ -6,7 +6,7 @@ import { MapPin, Clock, Star, Wheat, Flame, Leaf, Heart } from "lucide-react";
 import { TERMEKEK } from "@/lib/products";
 
 export const metadata: Metadata = {
-  title: "Kézműves kovászos pékség Pécsett – Kata Kenyere",
+  title: "Kata Kenyere – Kézműves pékség Pécsett",
   description:
     "Pécs kézműves kovászos pékségéből rendelhetsz előre friss kenyeret, csigát, kiflit. Adalékanyagmentes, természetes kovász. Kedd–Péntek, Salakhegyi út 14.",
   alternates: {

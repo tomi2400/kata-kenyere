@@ -18,7 +18,7 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://katakenyere.hu"),
   title: {
-    default: "Kata Kenyere – Kézműves kovászos pékség, Pécs",
+    default: "Kata Kenyere – Kézműves pékség Pécsett",
     template: "%s – Kata Kenyere",
   },
   description:
