@@ -145,7 +145,10 @@ export default function Home() {
                 <em className="text-gold not-italic">benne van a munkánk.</em>
               </h2>
               <p className="font-sans text-brown/70 leading-relaxed mb-6">
-                Amit mi csinálunk, az kicsit több idő. De megéri. Kenyereinket természetes kovásszal kelesztjük, kézzel formázzuk – péksüteményeinket pedig ugyanezzel a gondossággal készítjük. Nincs benne semmi trükk, csak türelem és jó alapanyag. Ezt az első falat után te is érezni fogod.
+                Amit mi csinálunk, az kicsit több idő. De megéri.<br />
+                Kenyereinket természetes kovásszal kelesztjük, kézzel formázzuk<br />
+                – péksüteményeinket pedig ugyanezzel a gondossággal készítjük.<br />
+                Nincs benne semmi trükk, csak türelem és jó alapanyag.
               </p>
               <Link
                 href="/rolunk"
@@ -159,7 +162,7 @@ export default function Home() {
                 { Icon: Wheat, cim: "Természetes kovász", szoveg: "Időt adunk a tésztának, nem adalékanyagot" },
                 { Icon: Leaf, cim: "Kézzel, szívvel", szoveg: "Úgy készítjük, mintha a családunknak adnánk" },
                 { Icon: Flame, cim: "Mindig frissen sütve", szoveg: "Csak annyit készítünk, amennyit rendeltek" },
-                { Icon: Heart, cim: "Tiszta alapanyagok.", szoveg: "Nálunk nincs mit rejtegetni" },
+                { Icon: Heart, cim: "Tiszta alapanyagok", szoveg: "Nálunk nincs mit rejtegetni" },
               ].map(({ Icon, cim, szoveg }) => (
                 <div key={cim} className="bg-cream-dark rounded-xl p-4">
                   <Icon className="w-5 h-5 text-gold mb-3" />

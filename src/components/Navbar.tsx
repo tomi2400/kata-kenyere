@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,15 +14,24 @@ const LINKS = [
 
 export default function Navbar({ transparent = false }: { transparent?: boolean }) {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (!transparent) return;
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [transparent]);
 
   return (
     <>
       <header className={`
-        fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow] duration-300
-        ${transparent && !open
+        fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow] duration-500
+        ${transparent && !open && !scrolled
           ? "bg-transparent"
-          : "bg-cream/95 backdrop-blur-sm border-b border-gold/20 shadow-sm"
+          : "bg-cream border-b border-gold/30 shadow-md"
         }
       `}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -33,9 +42,9 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
               alt="Kata Kenyere"
               width={38}
               height={38}
-              className={transparent && !open ? "brightness-0 invert" : ""}
+              className={transparent && !open && !scrolled ? "brightness-0 invert" : ""}
             />
-            <span className={`font-serif text-base hidden sm:block ${transparent && !open ? "text-cream" : "text-brown-dark"}`}>
+            <span className={`font-serif text-base hidden sm:block ${transparent && !open && !scrolled ? "text-cream" : "text-brown-dark"}`}>
               Kata Kenyere
             </span>
           </Link>
@@ -51,7 +60,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:ring-offset-1 px-1 py-0.5
                   ${pathname === l.href
                     ? "text-gold font-medium"
-                    : transparent
+                    : transparent && !scrolled
                       ? "text-cream/80 hover:text-cream"
                       : "text-brown/70 hover:text-brown-dark"
                   }
@@ -77,7 +86,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
             {/* Hamburger */}
             <button
               onClick={() => setOpen((v) => !v)}
-              className={`md:hidden p-2 rounded-lg cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 ${transparent && !open ? "text-cream" : "text-brown-dark"}`}
+              className={`md:hidden p-2 rounded-lg cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 ${transparent && !open && !scrolled ? "text-cream" : "text-brown-dark"}`}
               aria-label={open ? "Menü bezárása" : "Menü megnyitása"}
               aria-expanded={open}
             >
