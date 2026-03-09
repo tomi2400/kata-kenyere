@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
-import { Star } from "lucide-react";
 import { TERMEKEK } from "@/lib/products";
 
 export const metadata: Metadata = {
