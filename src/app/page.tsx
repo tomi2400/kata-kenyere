@@ -77,10 +77,11 @@ export default function Home() {
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brown-dark/95 via-brown-dark/50 to-brown-dark/10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brown-dark/40 via-transparent to-transparent" />
 
         <div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-16 md:pb-20">
           <p className="font-sans text-xs tracking-[0.2em] text-gold uppercase mb-4">
-            Kézműves kovászos pékség · Pécs
+            Kézműves pékség · Pécs
           </p>
           <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl text-cream leading-[1.05] mb-4 max-w-2xl">
             Frissen,
@@ -90,8 +91,8 @@ export default function Home() {
             szeretettel.
           </h1>
           <p className="font-sans text-cream/75 text-lg max-w-md mb-8 leading-relaxed">
-            Kovásszal kelesztett, kézzel formázott kenyerek és péksütemények –
-            minden nap frissen sütve, előrendelésre.
+            Kovásszal kelesztett kenyerek és kézzel formázott pékáruk –
+            minden nap frissen sütve.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
@@ -139,12 +140,12 @@ export default function Home() {
             <div>
               <div className="w-10 h-px bg-gold mb-5" />
               <h2 className="font-serif text-4xl text-brown-dark mb-5 leading-tight">
-                Minden kenyérben
+                Minden termékben
                 <br />
                 <em className="text-gold not-italic">benne van a munkánk.</em>
               </h2>
               <p className="font-sans text-brown/70 leading-relaxed mb-6">
-                Nem futószalagon, nem gyorsítva – minden cipót kézzel formázunk, természetes kovásszal kelesztünk. Ez több időt vesz igénybe, de az eredmény más. Ezt akkor érted meg, amikor beleharapsz.
+                Amit mi csinálunk, az kicsit több idő. De megéri. Kenyereinket természetes kovásszal kelesztjük, kézzel formázzuk – péksüteményeinket pedig ugyanezzel a gondossággal készítjük. Nincs benne semmi trükk, csak türelem és jó alapanyag. Ezt az első falat után te is érezni fogod.
               </p>
               <Link
                 href="/rolunk"
@@ -155,10 +156,10 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { Icon: Wheat, cim: "Kovászos kelesztés", szoveg: "Természetes kovász, adalékanyag nélkül" },
-                { Icon: Leaf, cim: "Kézzel formázva", szoveg: "Gép nem érinti a tésztát" },
-                { Icon: Flame, cim: "Naponta frissen", szoveg: "Csak annyit sütünk amennyit rendeltek" },
-                { Icon: Heart, cim: "Tiszta alapanyag", szoveg: "Tudjuk mi van benne – te is tudhatod" },
+                { Icon: Wheat, cim: "Természetes kovász", szoveg: "Időt adunk a tésztának, nem adalékanyagot" },
+                { Icon: Leaf, cim: "Kézzel, szívvel", szoveg: "Úgy készítjük, mintha a családunknak adnánk" },
+                { Icon: Flame, cim: "Mindig frissen sütve", szoveg: "Csak annyit készítünk, amennyit rendeltek" },
+                { Icon: Heart, cim: "Tiszta alapanyagok.", szoveg: "Nálunk nincs mit rejtegetni" },
               ].map(({ Icon, cim, szoveg }) => (
                 <div key={cim} className="bg-cream-dark rounded-xl p-4">
                   <Icon className="w-5 h-5 text-gold mb-3" />
@@ -233,7 +234,7 @@ export default function Home() {
           <div className="text-center mb-10">
             <div className="w-10 h-px bg-gold mx-auto mb-5" />
             <h2 className="font-serif text-3xl text-cream mb-2">
-              Mit mondanak rólunk?
+              Amit vendégeink írtak
             </h2>
             <div className="flex items-center justify-center gap-2 mt-3">
               <StarRating n={5} />
@@ -282,12 +283,12 @@ export default function Home() {
             className="mx-auto mb-6 opacity-80"
           />
           <h2 className="font-serif text-4xl text-brown-dark mb-4">
-            Rendeld meg
+            Rendeld meg előre,
             <br />
-            <em className="text-gold not-italic">holnap reggeli kenyered.</em>
+            <em className="text-gold not-italic">mi frissen kisütjük.</em>
           </h2>
           <p className="font-sans text-brown/60 mb-8 leading-relaxed">
-            Válaszd ki a napot, állítsd össze a rendelésedet – mi frissen kisütjük neked.
+            Válaszd ki a napot, állítsd össze a rendelésed!
           </p>
           <Link
             href="/elorendeles"
