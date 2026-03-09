@@ -29,8 +29,10 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
 
   return (
     <div className={`
-      rounded-xl overflow-hidden border-2 transition-all duration-200
-      ${isSelected ? "border-gold shadow-md" : "border-cream-dark hover:border-gold/50"}
+      rounded-xl overflow-hidden border-2
+      transition-[transform,box-shadow,border-color] duration-200
+      hover:-translate-y-0.5
+      ${isSelected ? "border-gold shadow-lg" : "border-cream-dark hover:border-gold/40 hover:shadow-md"}
     `}>
       {/* Fotó */}
       <div className="relative aspect-[4/3] bg-cream-dark">
@@ -63,7 +65,7 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
           {qty === 0 ? (
             <button
               onClick={() => change(1)}
-              className="w-full py-2 text-xs font-sans font-semibold rounded-lg bg-brown-dark text-cream hover:bg-brown transition-colors"
+              className="w-full py-2 text-xs font-sans font-semibold rounded-lg bg-brown-dark text-cream hover:bg-brown transition-colors cursor-pointer"
             >
               + Hozzáadom
             </button>
@@ -71,14 +73,16 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
             <div className="flex items-center gap-2 w-full justify-between">
               <button
                 onClick={() => change(-1)}
-                className="w-8 h-8 rounded-lg bg-cream-dark hover:bg-gold/20 text-brown-dark font-bold text-base flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-lg bg-cream-dark hover:bg-gold/20 text-brown-dark font-bold text-base flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Kevesebb"
               >
                 −
               </button>
               <span className="font-sans font-bold text-brown-dark text-sm">{qty} db</span>
               <button
                 onClick={() => change(1)}
-                className="w-8 h-8 rounded-lg bg-brown-dark hover:bg-brown text-cream font-bold text-base flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-lg bg-brown-dark hover:bg-brown text-cream font-bold text-base flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Több"
               >
                 +
               </button>

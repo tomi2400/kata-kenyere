@@ -19,7 +19,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
   return (
     <>
       <header className={`
-        fixed top-0 left-0 right-0 z-50 transition-all duration-300
+        fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow] duration-300
         ${transparent && !open
           ? "bg-transparent"
           : "bg-cream/95 backdrop-blur-sm border-b border-gold/20 shadow-sm"
@@ -47,7 +47,8 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                 key={l.href}
                 href={l.href}
                 className={`
-                  font-sans text-sm transition-colors
+                  font-sans text-sm transition-colors rounded
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:ring-offset-1 px-1 py-0.5
                   ${pathname === l.href
                     ? "text-gold font-medium"
                     : transparent
@@ -76,8 +77,9 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
             {/* Hamburger */}
             <button
               onClick={() => setOpen((v) => !v)}
-              className={`md:hidden p-2 rounded-lg ${transparent && !open ? "text-cream" : "text-brown-dark"}`}
-              aria-label="Menü"
+              className={`md:hidden p-2 rounded-lg cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 ${transparent && !open ? "text-cream" : "text-brown-dark"}`}
+              aria-label={open ? "Menü bezárása" : "Menü megnyitása"}
+              aria-expanded={open}
             >
               {open ? (
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

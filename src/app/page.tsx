@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
-import { MapPin, Clock, Star, Wheat, Flame, Leaf, Heart } from "lucide-react";
+import ScrollReveal from "@/components/ScrollReveal";
+import { MapPin, Clock, Star } from "lucide-react";
 import { TERMEKEK } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -68,35 +69,35 @@ export default function Home() {
       <Navbar transparent />
 
       {/* ═══ HERO ═══ */}
-      <section className="relative min-h-[85vh] flex items-end">
+      <section className="relative min-h-[90vh] flex items-end">
         <Image
           src="/images/termek-placeholder.jpg"
           alt="Kata Kenyere kovászos kenyér"
           fill
-          className="object-cover"
+          className="object-cover hero-fade"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-brown-dark/95 via-brown-dark/50 to-brown-dark/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-brown-dark via-brown-dark/60 to-brown-dark/5" />
 
-        <div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-16 md:pb-20">
-          <p className="font-sans text-xs tracking-[0.2em] text-gold uppercase mb-4">
+        <div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20 md:pb-28">
+          <p className="hero-tag font-sans text-[0.65rem] tracking-[0.25em] text-gold/80 uppercase mb-5">
             Kézműves kovászos pékség · Pécs
           </p>
-          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl text-cream leading-[1.05] mb-4 max-w-2xl">
+          <h1 className="hero-title font-serif text-[clamp(3rem,8vw,5.5rem)] text-cream leading-[0.95] mb-5 max-w-xl">
             Frissen,
             <br />
-            <em className="text-gold not-italic">kézzel,</em>
+            <em className="text-gold italic">kézzel,</em>
             <br />
             szeretettel.
           </h1>
-          <p className="font-sans text-cream/75 text-lg max-w-md mb-8 leading-relaxed">
-            Kovásszal kelesztett, kézzel formázott kenyerek és péksütemények –
+          <p className="hero-body font-sans text-cream/65 text-base sm:text-lg max-w-sm mb-9 leading-relaxed">
+            Kovásszal kelesztett, kézzel formázott kenyerek –
             minden nap frissen sütve, előrendelésre.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="hero-cta flex flex-wrap gap-3">
             <Link
               href="/elorendeles"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-sans font-bold text-base bg-gold text-brown-dark hover:bg-gold-light transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-sans font-bold text-sm bg-gold text-brown-dark hover:bg-gold-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             >
               Előrendelés
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -105,7 +106,7 @@ export default function Home() {
             </Link>
             <Link
               href="/termekek"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-sans font-semibold text-base border-2 border-cream/30 text-cream hover:border-cream/60 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-sans font-semibold text-sm border border-cream/25 text-cream/80 hover:border-cream/50 hover:text-cream transition-colors"
             >
               Kínálatunk
             </Link>
@@ -133,38 +134,45 @@ export default function Home() {
       </section>
 
       {/* ═══ MIÉRT MI ═══ */}
-      <section className="py-20 px-6">
+      <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="w-10 h-px bg-gold mb-5" />
-              <h2 className="font-serif text-4xl text-brown-dark mb-5 leading-tight">
+          <div className="grid md:grid-cols-2 gap-16 items-start">
+            <ScrollReveal className="md:sticky md:top-28">
+              <div className="w-10 h-px bg-gold mb-6" />
+              <h2 className="font-serif text-[clamp(2rem,4vw,2.75rem)] text-brown-dark mb-6 leading-[1.1]">
                 Minden kenyérben
                 <br />
-                <em className="text-gold not-italic">benne van a munkánk.</em>
+                <em className="text-gold italic">benne van a munkánk.</em>
               </h2>
-              <p className="font-sans text-brown/70 leading-relaxed mb-6">
+              <p className="font-sans text-brown/65 leading-relaxed mb-8 text-[0.9375rem]">
                 Nem futószalagon, nem gyorsítva – minden cipót kézzel formázunk, természetes kovásszal kelesztünk. Ez több időt vesz igénybe, de az eredmény más. Ezt akkor érted meg, amikor beleharapsz.
               </p>
               <Link
                 href="/rolunk"
-                className="inline-flex items-center gap-2 font-sans text-sm font-semibold text-brown-dark border-b-2 border-gold pb-0.5 hover:border-brown-dark transition-colors"
+                className="inline-flex items-center gap-2 font-sans text-sm font-semibold text-brown-dark border-b border-gold pb-px hover:border-brown-dark transition-colors"
               >
                 Ismerd meg történetünket →
               </Link>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
+            </ScrollReveal>
+
+            <div className="divide-y divide-gold/10">
               {[
-                { Icon: Wheat, cim: "Kovászos kelesztés", szoveg: "Természetes kovász, adalékanyag nélkül" },
-                { Icon: Leaf, cim: "Kézzel formázva", szoveg: "Gép nem érinti a tésztát" },
-                { Icon: Flame, cim: "Naponta frissen", szoveg: "Csak annyit sütünk amennyit rendeltek" },
-                { Icon: Heart, cim: "Tiszta alapanyag", szoveg: "Tudjuk mi van benne – te is tudhatod" },
-              ].map(({ Icon, cim, szoveg }) => (
-                <div key={cim} className="bg-cream-dark rounded-xl p-4">
-                  <Icon className="w-5 h-5 text-gold mb-3" />
-                  <p className="font-serif text-sm font-semibold text-brown-dark mb-1">{cim}</p>
-                  <p className="font-sans text-xs text-brown/60 leading-relaxed">{szoveg}</p>
-                </div>
+                { num: "01", cim: "Kovászos kelesztés", szoveg: "Természetes kovász, adalékanyag nélkül – ahogy évszázadokig csinálták." },
+                { num: "02", cim: "Kézzel formázva", szoveg: "Gép nem érinti a tésztát. Minden cipót két kéz formáz meg." },
+                { num: "03", cim: "Naponta frissen", szoveg: "Csak annyit sütünk, amennyit rendeltek. Nincs fölösleg, nincs maradék." },
+                { num: "04", cim: "Tiszta alapanyag", szoveg: "Tudjuk mi van benne – és szívesen el is mondjuk." },
+              ].map(({ num, cim, szoveg }, i) => (
+                <ScrollReveal key={num} delay={(i + 1) as 1 | 2 | 3 | 4}>
+                  <div className="flex items-start gap-6 py-7">
+                    <span className="font-serif text-4xl leading-none text-gold/20 w-12 shrink-0 select-none pt-0.5">
+                      {num}
+                    </span>
+                    <div className="flex-1 pt-1">
+                      <p className="font-serif text-lg text-brown-dark mb-1.5">{cim}</p>
+                      <p className="font-sans text-sm text-brown/60 leading-relaxed">{szoveg}</p>
+                    </div>
+                  </div>
+                </ScrollReveal>
               ))}
             </div>
           </div>
@@ -172,136 +180,149 @@ export default function Home() {
       </section>
 
       {/* ═══ TERMÉK ELŐNÉZET ═══ */}
-      <section className="py-16 px-6 bg-cream-dark">
+      <section className="py-20 px-6 bg-cream-dark">
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <div className="w-10 h-px bg-gold mb-4" />
-              <h2 className="font-serif text-3xl text-brown-dark">Kínálatunkból</h2>
-            </div>
-            <Link
-              href="/termekek"
-              className="font-sans text-sm text-brown/60 hover:text-brown-dark transition-colors hidden sm:block"
-            >
-              Teljes kínálat →
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-            {KINALAT_PREVIEW.map((termek) => (
-              <div key={termek.id} className="rounded-xl overflow-hidden bg-cream">
-                <div className="relative aspect-[4/3]">
-                  <Image
-                    src={termek.foto}
-                    alt={termek.nev}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 50vw, 25vw"
-                  />
-                </div>
-                <div className="p-3">
-                  <p className="font-serif text-sm font-semibold text-brown-dark">{termek.nev}</p>
-                  <p className="font-sans text-xs text-brown/50">{termek.egyseg}</p>
-                  <p className="font-sans text-sm font-bold text-brown-dark mt-1">
-                    {termek.ar.toLocaleString("hu-HU")} Ft
-                  </p>
-                </div>
+          <ScrollReveal>
+            <div className="flex items-end justify-between mb-10">
+              <div>
+                <div className="w-10 h-px bg-gold mb-4" />
+                <h2 className="font-serif text-[clamp(1.75rem,4vw,2.5rem)] text-brown-dark">Kínálatunkból</h2>
               </div>
+              <Link
+                href="/termekek"
+                className="font-sans text-sm text-brown/50 hover:text-brown-dark transition-colors hidden sm:block"
+              >
+                Teljes kínálat →
+              </Link>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            {KINALAT_PREVIEW.map((termek, i) => (
+              <ScrollReveal key={termek.id} delay={(Math.min(i + 1, 4)) as 1 | 2 | 3 | 4}>
+                <div className="rounded-xl overflow-hidden bg-cream group transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={termek.foto}
+                      alt={termek.nev}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      sizes="(max-width: 640px) 50vw, 25vw"
+                    />
+                  </div>
+                  <div className="p-3">
+                    <p className="font-serif text-sm font-semibold text-brown-dark leading-snug">{termek.nev}</p>
+                    <p className="font-sans text-xs text-brown/45 mt-0.5">{termek.egyseg}</p>
+                    <p className="font-sans text-sm font-bold text-brown-dark mt-1.5">
+                      {termek.ar.toLocaleString("hu-HU")} Ft
+                    </p>
+                  </div>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
 
-          <div className="flex gap-3">
-            <Link
-              href="/termekek"
-              className="flex-1 sm:flex-none py-3 px-6 rounded-xl font-sans font-semibold text-sm border-2 border-brown-dark/20 text-brown-dark hover:border-brown-dark transition-colors text-center"
-            >
-              Teljes kínálat →
-            </Link>
-            <Link
-              href="/elorendeles"
-              className="flex-1 sm:flex-none py-3 px-6 rounded-xl font-sans font-bold text-sm bg-gold text-brown-dark hover:bg-gold-light transition-colors text-center"
-            >
-              Előrendelés →
-            </Link>
-          </div>
+          <ScrollReveal>
+            <div className="flex gap-3">
+              <Link
+                href="/termekek"
+                className="flex-1 sm:flex-none py-3 px-6 rounded-xl font-sans font-semibold text-sm border border-brown-dark/20 text-brown-dark hover:border-brown-dark transition-colors text-center"
+              >
+                Teljes kínálat →
+              </Link>
+              <Link
+                href="/elorendeles"
+                className="flex-1 sm:flex-none py-3 px-6 rounded-xl font-sans font-bold text-sm bg-gold text-brown-dark hover:bg-gold-light transition-colors text-center"
+              >
+                Előrendelés →
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* ═══ GOOGLE REVIEWS ═══ */}
-      <section className="py-20 px-6 bg-brown-dark">
+      <section className="py-24 px-6 bg-brown-dark">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <div className="w-10 h-px bg-gold mx-auto mb-5" />
-            <h2 className="font-serif text-3xl text-cream mb-2">
+          <ScrollReveal className="text-center mb-14">
+            <div className="w-10 h-px bg-gold/50 mx-auto mb-6" />
+            <h2 className="font-serif text-[clamp(1.75rem,4vw,2.5rem)] text-cream mb-3">
               Mit mondanak rólunk?
             </h2>
-            <div className="flex items-center justify-center gap-2 mt-3">
+            <div className="flex items-center justify-center gap-2">
               <StarRating n={5} />
-              <span className="font-sans text-cream/60 text-sm">5,0 · 4 Google értékelés</span>
+              <span className="font-sans text-cream/45 text-sm">5,0 · 4 Google értékelés</span>
             </div>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid sm:grid-cols-2 gap-4 mb-8">
-            {REVIEWS.filter(r => r.szoveg !== "Hamarosan...").map((review) => (
-              <div key={review.nev} className="bg-cream/5 border border-cream/10 rounded-2xl p-5">
-                <StarRating n={review.csillag} />
-                <p className="font-sans text-cream/80 text-sm leading-relaxed mt-3 mb-4 italic">
-                  &bdquo;{review.szoveg}&rdquo;
-                </p>
-                <div className="flex items-center justify-between">
-                  <p className="font-sans text-sm font-semibold text-cream">{review.nev}</p>
-                  {review.datum && (
-                    <p className="font-sans text-xs text-cream/40">{review.datum}</p>
-                  )}
+          <div className="grid sm:grid-cols-2 gap-5 mb-10">
+            {REVIEWS.filter(r => r.szoveg !== "Hamarosan...").map((review, i) => (
+              <ScrollReveal key={review.nev} delay={(i + 1) as 1 | 2}>
+                <div className="relative bg-cream/[0.06] rounded-2xl p-7 pt-9">
+                  <span className="absolute top-4 left-6 font-serif text-6xl leading-none text-gold/15 select-none" aria-hidden="true">
+                    &ldquo;
+                  </span>
+                  <p className="font-sans text-cream/70 text-[0.9rem] leading-relaxed mb-5 relative">
+                    {review.szoveg}
+                  </p>
+                  <div className="flex items-center justify-between pt-4 border-t border-cream/10">
+                    <div>
+                      <p className="font-sans text-sm font-semibold text-cream">{review.nev}</p>
+                      <StarRating n={review.csillag} />
+                    </div>
+                    {review.datum && (
+                      <p className="font-sans text-xs text-cream/30">{review.datum}</p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
 
-          <div className="text-center">
+          <ScrollReveal className="text-center">
             <a
               href="https://g.page/r/kata-kenyere/review"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 font-sans text-sm text-gold hover:text-gold-light transition-colors"
+              className="inline-flex items-center gap-2 font-sans text-sm text-gold/70 hover:text-gold transition-colors"
             >
               Írj te is véleményt a Google-n →
             </a>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* ═══ CTA SZEKCIÓ ═══ */}
-      <section className="py-20 px-6 bg-cream text-center">
-        <div className="max-w-xl mx-auto">
+      <section className="py-28 px-6 bg-cream text-center">
+        <ScrollReveal className="max-w-xl mx-auto">
           <Image
             src="/images/logo.png"
             alt="Kata Kenyere"
-            width={56}
-            height={56}
-            className="mx-auto mb-6 opacity-80"
+            width={48}
+            height={48}
+            className="mx-auto mb-8 opacity-60"
           />
-          <h2 className="font-serif text-4xl text-brown-dark mb-4">
+          <h2 className="font-serif text-[clamp(2rem,5vw,3rem)] text-brown-dark mb-5 leading-[1.1]">
             Rendeld meg
             <br />
-            <em className="text-gold not-italic">holnap reggeli kenyered.</em>
+            <em className="text-gold italic">holnap reggeli kenyered.</em>
           </h2>
-          <p className="font-sans text-brown/60 mb-8 leading-relaxed">
+          <p className="font-sans text-brown/55 mb-10 leading-relaxed max-w-sm mx-auto">
             Válaszd ki a napot, állítsd össze a rendelésedet – mi frissen kisütjük neked.
           </p>
           <Link
             href="/elorendeles"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-sans font-bold text-base bg-brown-dark text-cream hover:bg-brown transition-colors"
+            className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl font-sans font-bold text-sm bg-brown-dark text-cream hover:bg-brown transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brown-dark focus-visible:ring-offset-2"
           >
             Előrendelés indítása
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </Link>
-          <p className="font-sans text-xs text-brown/30 mt-4">
+          <p className="font-sans text-xs text-brown/30 mt-5">
             Átvétel személyesen · Pécs, Salakhegyi út 14.
           </p>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* ═══ FOOTER ═══ */}
