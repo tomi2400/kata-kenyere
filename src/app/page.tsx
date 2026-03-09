@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
-import { MapPin, Clock, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { TERMEKEK } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -77,7 +77,9 @@ export default function Home() {
           className="object-cover hero-fade"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-brown-dark via-brown-dark/60 to-brown-dark/5" />
+        {/* Gradient alulról és felülről is – navbar területe is sötét */}
+        <div className="absolute inset-0 bg-gradient-to-t from-brown-dark via-brown-dark/55 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brown-dark/50 via-transparent to-transparent" />
 
         <div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20 md:pb-28">
           <p className="hero-tag font-sans text-[0.65rem] tracking-[0.25em] text-gold/80 uppercase mb-5">
@@ -91,8 +93,8 @@ export default function Home() {
             szeretettel.
           </h1>
           <p className="hero-body font-sans text-cream/65 text-base sm:text-lg max-w-sm mb-9 leading-relaxed">
-            Kovásszal kelesztett, kézzel formázott kenyerek –
-            minden nap frissen sütve, előrendelésre.
+            Előrendelhetsz online, vagy beugorhatsz személyesen –
+            K–P minden nap frissen sütünk.
           </p>
           <div className="hero-cta flex flex-wrap gap-3">
             <Link
@@ -115,21 +117,13 @@ export default function Home() {
       </section>
 
       {/* ═══ INFO SÁV ═══ */}
-      <section className="bg-brown-dark text-cream">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap gap-y-3 items-center justify-between">
-          {[
-            { Icon: MapPin, label: "Helyszín", value: "Pécs, Salakhegyi út 14." },
-            { Icon: Clock, label: "Nyitvatartás", value: "K–P: 8:00–17:00" },
-            { Icon: Star, label: "Google értékelés", value: "5,0 · 4 vélemény" },
-          ].map(({ Icon, label, value }) => (
-            <div key={label} className="flex items-center gap-3">
-              <Icon className="w-4 h-4 text-gold shrink-0" />
-              <div>
-                <p className="text-xs text-cream/40 uppercase tracking-wider font-sans">{label}</p>
-                <p className="font-sans text-sm font-medium">{value}</p>
-              </div>
-            </div>
-          ))}
+      <section className="bg-brown-dark border-b border-cream/10">
+        <div className="max-w-5xl mx-auto px-6 py-3 flex flex-wrap items-center gap-x-5 gap-y-1">
+          <span className="font-sans text-xs text-cream/55">Pécs, Salakhegyi út 14.</span>
+          <span className="text-cream/20 text-xs hidden sm:block">·</span>
+          <span className="font-sans text-xs text-cream/55">Kedd–Péntek&nbsp;&nbsp;8:00–17:00</span>
+          <span className="text-cream/20 text-xs hidden sm:block">·</span>
+          <span className="font-sans text-xs text-gold/70">Online előrendelés és személyes vétel</span>
         </div>
       </section>
 
@@ -155,27 +149,40 @@ export default function Home() {
               </Link>
             </ScrollReveal>
 
-            <div className="divide-y divide-gold/10">
+            <div className="grid grid-cols-2 gap-5">
               {[
-                { num: "01", cim: "Kovászos kelesztés", szoveg: "Természetes kovász, adalékanyag nélkül – ahogy évszázadokig csinálták." },
-                { num: "02", cim: "Kézzel formázva", szoveg: "Gép nem érinti a tésztát. Minden cipót két kéz formáz meg." },
-                { num: "03", cim: "Naponta frissen", szoveg: "Csak annyit sütünk, amennyit rendeltek. Nincs fölösleg, nincs maradék." },
-                { num: "04", cim: "Tiszta alapanyag", szoveg: "Tudjuk mi van benne – és szívesen el is mondjuk." },
-              ].map(({ num, cim, szoveg }, i) => (
-                <ScrollReveal key={num} delay={(i + 1) as 1 | 2 | 3 | 4}>
-                  <div className="flex items-start gap-6 py-7">
-                    <span className="font-serif text-4xl leading-none text-gold/20 w-12 shrink-0 select-none pt-0.5">
-                      {num}
-                    </span>
-                    <div className="flex-1 pt-1">
-                      <p className="font-serif text-lg text-brown-dark mb-1.5">{cim}</p>
-                      <p className="font-sans text-sm text-brown/60 leading-relaxed">{szoveg}</p>
-                    </div>
+                { cim: "Kovászos kelesztés", szoveg: "Természetes kovász, élesztő és adalékanyag nélkül." },
+                { cim: "Kézzel formázva", szoveg: "Gép nem érinti a tésztát – minden cipó kézzel kerül formájába." },
+                { cim: "Naponta frissen", szoveg: "Előrendelésre és személyes vásárlásra egyaránt sütünk K–P." },
+                { cim: "Tiszta alapanyag", szoveg: "Tudjuk, mi van benne. Kérdezz bátran." },
+              ].map(({ cim, szoveg }, i) => (
+                <ScrollReveal key={cim} delay={(i + 1) as 1 | 2 | 3 | 4}>
+                  <div className="border-l-2 border-gold/35 pl-4 py-1">
+                    <p className="font-serif text-[0.9375rem] text-brown-dark mb-1.5 leading-snug">{cim}</p>
+                    <p className="font-sans text-xs text-brown/55 leading-relaxed">{szoveg}</p>
                   </div>
                 </ScrollReveal>
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ═══ SZÁMOK ═══ */}
+      <section className="bg-brown-dark py-14 px-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-3 gap-6 sm:gap-12">
+          {[
+            { szam: "~300", szoveg: "kenyér naponta" },
+            { szam: "100%", szoveg: "természetes alapanyag" },
+            { szam: "2 nap", szoveg: "előre rendelhető" },
+          ].map(({ szam, szoveg }, i) => (
+            <ScrollReveal key={szoveg} delay={(i + 1) as 1 | 2 | 3}>
+              <div className="text-center sm:text-left">
+                <p className="font-serif text-[clamp(2rem,5vw,3.5rem)] text-cream leading-none mb-2">{szam}</p>
+                <p className="font-sans text-[0.65rem] text-cream/35 uppercase tracking-widest">{szoveg}</p>
+              </div>
+            </ScrollReveal>
+          ))}
         </div>
       </section>
 
@@ -247,7 +254,7 @@ export default function Home() {
           <ScrollReveal className="text-center mb-14">
             <div className="w-10 h-px bg-gold/50 mx-auto mb-6" />
             <h2 className="font-serif text-[clamp(1.75rem,4vw,2.5rem)] text-cream mb-3">
-              Mit mondanak rólunk?
+              Amit vendégeink írtak
             </h2>
             <div className="flex items-center justify-center gap-2">
               <StarRating n={5} />
@@ -303,12 +310,12 @@ export default function Home() {
             className="mx-auto mb-8 opacity-60"
           />
           <h2 className="font-serif text-[clamp(2rem,5vw,3rem)] text-brown-dark mb-5 leading-[1.1]">
-            Rendeld meg
+            Rendeld meg előre –
             <br />
-            <em className="text-gold italic">holnap reggeli kenyered.</em>
+            <em className="text-gold italic">mi frissen kisütjük.</em>
           </h2>
           <p className="font-sans text-brown/55 mb-10 leading-relaxed max-w-sm mx-auto">
-            Válaszd ki a napot, állítsd össze a rendelésedet – mi frissen kisütjük neked.
+            Add le a rendelésed legalább két nappal korábban – az átvétel reggelén sütjük ki.
           </p>
           <Link
             href="/elorendeles"

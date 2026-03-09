@@ -40,7 +40,7 @@ export default function ElorendelesPage() {
           <div className="w-10 h-px bg-gold mx-auto mb-6" />
           <h1 className="font-serif text-4xl text-brown-dark mb-3">
             Melyik napra<br />
-            <em className="text-gold not-italic">rendelsz?</em>
+            <em className="text-gold italic">rendelsz?</em>
           </h1>
           <p className="font-sans text-brown/60 text-sm leading-relaxed">
             Válassz egy vagy több napot – a termékeket<br className="hidden sm:block" /> a következő lépésben választhatod ki.
