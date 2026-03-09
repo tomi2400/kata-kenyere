@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { MapPin, Clock, Phone, Mail } from "lucide-react";
 
 export const metadata = {
   title: "Kapcsolat – Kata Kenyere",
@@ -22,31 +23,33 @@ export default function KapcsolatPage() {
         <section className="space-y-6 mb-12">
           {[
             {
-              icon: "📍",
+              Icon: MapPin,
               title: "Cím",
               lines: ["Pécs, Salakhegyi út 14.", "7624 Pécs"],
             },
             {
-              icon: "🕐",
+              Icon: Clock,
               title: "Nyitvatartás",
               lines: ["Kedd – Péntek: 8:00–17:00", "Hétvégén zárva"],
             },
             {
-              icon: "📞",
+              Icon: Phone,
               title: "Telefon",
               lines: ["+36 ....."],
             },
             {
-              icon: "✉️",
+              Icon: Mail,
               title: "Email",
               lines: ["hello@katakenyere.hu"],
             },
-          ].map((item) => (
-            <div key={item.title} className="flex items-start gap-5 p-5 bg-cream-dark rounded-xl">
-              <span className="text-2xl mt-0.5">{item.icon}</span>
+          ].map(({ Icon, title, lines }) => (
+            <div key={title} className="flex items-start gap-5 p-5 bg-cream-dark rounded-xl">
+              <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center shrink-0 mt-0.5">
+                <Icon className="w-4 h-4 text-gold" />
+              </div>
               <div>
-                <p className="font-sans text-xs text-brown/40 uppercase tracking-wider mb-1">{item.title}</p>
-                {item.lines.map((line) => (
+                <p className="font-sans text-xs text-brown/40 uppercase tracking-wider mb-1">{title}</p>
+                {lines.map((line) => (
                   <p key={line} className="font-sans text-sm text-brown-dark font-medium">{line}</p>
                 ))}
               </div>

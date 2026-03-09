@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { AlertTriangle } from "lucide-react";
 
 export const metadata = {
   title: "Alapanyagok – Kata Kenyere",
@@ -11,31 +12,26 @@ const ALAPANYAGOK = [
     nev: "Kovász",
     leiras:
       "Az egyetlen kelesztőszer amit használunk. A mi kovászunk évek óta él – naponta etetjük, gondozzuk. Természetes erjedés útján teszi könnyebbé a kenyeret és adja azt az egyedi savanykás ízt.",
-    icon: "🫙",
   },
   {
     nev: "Liszt",
     leiras:
       "Magyar malmok lisztjét használjuk. A fehér kenyereinkhez BL-80 kenyérlisztet, a teljes kiőrlésű termékekhez 100%-os tönköly- vagy búzalisztet. Minden termékünknél feltüntetjük.",
-    icon: "🌾",
   },
   {
     nev: "Víz",
     leiras:
       "Semmi különös – csapvíz. De a hőmérséklete és a mennyisége pontosan kiszámított. A tészta hidratációja határozza meg a bélzet szerkezetét.",
-    icon: "💧",
   },
   {
     nev: "Só",
     leiras:
       "Tengeri só, adalékanyag nélkül. Az ízért és a gluténszerkezet erősítéséért van benne – semmi más.",
-    icon: "🧂",
   },
   {
     nev: "Magvak & feltétek",
     leiras:
       "A magvas kenyereinkbe napraforgó, len, tökmag, szezám kerül – mind nyersen, előkészítve. A csigákba házi lekvár, kakaó és fahéj.",
-    icon: "🌻",
   },
 ];
 
@@ -66,10 +62,12 @@ export default function AlapanyagokPage() {
 
       {/* ÖSSZETEVŐK */}
       <section className="px-6 pb-16">
-        <div className="max-w-3xl mx-auto space-y-5">
-          {ALAPANYAGOK.map((item) => (
+        <div className="max-w-3xl mx-auto space-y-4">
+          {ALAPANYAGOK.map((item, i) => (
             <div key={item.nev} className="flex gap-5 bg-cream-dark rounded-xl p-6">
-              <div className="text-3xl mt-0.5 shrink-0">{item.icon}</div>
+              <div className="w-9 h-9 rounded-full border border-gold/40 flex items-center justify-center shrink-0 mt-0.5">
+                <span className="font-serif text-sm text-gold font-semibold">{i + 1}</span>
+              </div>
               <div>
                 <h3 className="font-serif text-lg font-semibold text-brown-dark mb-1">{item.nev}</h3>
                 <p className="font-sans text-sm text-brown/70 leading-relaxed">{item.leiras}</p>
@@ -105,7 +103,9 @@ export default function AlapanyagokPage() {
         <div className="max-w-3xl mx-auto">
           <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6">
             <div className="flex gap-4 items-start">
-              <span className="text-2xl mt-0.5">⚠️</span>
+              <div className="w-9 h-9 rounded-lg bg-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+                <AlertTriangle className="w-4 h-4 text-gold" />
+              </div>
               <div>
                 <h3 className="font-serif text-lg text-brown-dark mb-2">Allergének</h3>
                 <p className="font-sans text-sm text-brown/70 leading-relaxed">

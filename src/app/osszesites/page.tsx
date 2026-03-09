@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { MapPin } from "lucide-react";
 import { useCartStore } from "@/lib/store";
 import { formatAr } from "@/lib/products";
 
@@ -145,8 +146,10 @@ export default function OsszesitesPage() {
         </div>
 
         {/* Átvétel info */}
-        <div className="bg-brown-dark rounded-xl p-4 flex gap-4">
-          <span className="text-2xl">📍</span>
+        <div className="bg-brown-dark rounded-xl p-4 flex gap-4 items-start">
+          <div className="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+            <MapPin className="w-4 h-4 text-gold" />
+          </div>
           <div>
             <p className="font-sans text-sm font-semibold text-cream">Személyes átvétel</p>
             <p className="font-sans text-xs text-cream/60 mt-0.5">Pécs, Salakhegyi út 14. · K–P: 8:00–17:00</p>

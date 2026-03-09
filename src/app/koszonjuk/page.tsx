@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { MapPin, Clock } from "lucide-react";
 
 export default function KoszonjukPage() {
   return (
@@ -32,13 +33,13 @@ export default function KoszonjukPage() {
         {/* Átvétel info */}
         <div className="bg-brown-dark rounded-2xl p-6 w-full max-w-sm mb-8 text-left">
           <p className="font-sans text-xs text-cream/40 uppercase tracking-wider mb-3">Átvétel</p>
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <span className="text-gold text-lg">📍</span>
+              <MapPin className="w-4 h-4 text-gold shrink-0" />
               <span className="font-sans text-sm text-cream">Pécs, Salakhegyi út 14.</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-gold text-lg">🕐</span>
+              <Clock className="w-4 h-4 text-gold shrink-0" />
               <span className="font-sans text-sm text-cream">Kedd – Péntek: 8:00–17:00</span>
             </div>
           </div>

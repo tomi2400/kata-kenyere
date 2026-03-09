@@ -65,7 +65,7 @@ export default function DaySelector({ days, redirectTo = "/valasztas" }: { days:
               onClick={() => toggle(day.datum)}
               className={`
                 w-full text-left px-6 py-5 rounded-lg border-2 transition-all duration-200
-                flex items-center justify-between group
+                flex items-center justify-between group cursor-pointer
                 ${
                   isSelected
                     ? "border-gold bg-brown-dark text-cream"
@@ -80,8 +80,11 @@ export default function DaySelector({ days, redirectTo = "/valasztas" }: { days:
                     {formatDatum(day.datum)}
                   </span>
                 </div>
-                <div className={`text-sm mt-1 font-sans ${isSelected ? "text-gold" : "text-brown/50"}`}>
-                  ⏰ Rendelési határidő: {day.hatarido}
+                <div className={`flex items-center gap-1.5 text-sm mt-1 font-sans ${isSelected ? "text-gold" : "text-brown/50"}`}>
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <circle cx="12" cy="12" r="10" /><path strokeLinecap="round" d="M12 6v6l4 2" />
+                  </svg>
+                  Rendelési határidő: {day.hatarido}
                 </div>
               </div>
               <div className={`

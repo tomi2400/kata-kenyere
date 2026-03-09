@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { MapPin, Clock, Star, Wheat, Flame, Leaf, Heart } from "lucide-react";
 import { TERMEKEK } from "@/lib/products";
 
 const REVIEWS = [
@@ -100,15 +101,15 @@ export default function Home() {
       <section className="bg-brown-dark text-cream">
         <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap gap-y-3 items-center justify-between">
           {[
-            { icon: "📍", label: "Helyszín", value: "Pécs, Salakhegyi út 14." },
-            { icon: "🕐", label: "Nyitvatartás", value: "K–P: 8:00–17:00" },
-            { icon: "⭐", label: "Google értékelés", value: "5,0 · 4 vélemény" },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-3">
-              <span className="text-gold text-base">{item.icon}</span>
+            { Icon: MapPin, label: "Helyszín", value: "Pécs, Salakhegyi út 14." },
+            { Icon: Clock, label: "Nyitvatartás", value: "K–P: 8:00–17:00" },
+            { Icon: Star, label: "Google értékelés", value: "5,0 · 4 vélemény" },
+          ].map(({ Icon, label, value }) => (
+            <div key={label} className="flex items-center gap-3">
+              <Icon className="w-4 h-4 text-gold shrink-0" />
               <div>
-                <p className="text-xs text-cream/40 uppercase tracking-wider font-sans">{item.label}</p>
-                <p className="font-sans text-sm font-medium">{item.value}</p>
+                <p className="text-xs text-cream/40 uppercase tracking-wider font-sans">{label}</p>
+                <p className="font-sans text-sm font-medium">{value}</p>
               </div>
             </div>
           ))}
@@ -138,15 +139,15 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { icon: "🌾", cim: "Kovászos kelesztés", szoveg: "Természetes kovász, adalékanyag nélkül" },
-                { icon: "🤲", cim: "Kézzel formázva", szoveg: "Gép nem érinti a tésztát" },
-                { icon: "🔥", cim: "Naponta frissen", szoveg: "Csak annyit sütünk amennyit rendeltek" },
-                { icon: "🌿", cim: "Tiszta alapanyag", szoveg: "Tudjuk mi van benne – te is tudhatod" },
-              ].map((item) => (
-                <div key={item.cim} className="bg-cream-dark rounded-xl p-4">
-                  <div className="text-2xl mb-2">{item.icon}</div>
-                  <p className="font-serif text-sm font-semibold text-brown-dark mb-1">{item.cim}</p>
-                  <p className="font-sans text-xs text-brown/60 leading-relaxed">{item.szoveg}</p>
+                { Icon: Wheat, cim: "Kovászos kelesztés", szoveg: "Természetes kovász, adalékanyag nélkül" },
+                { Icon: Leaf, cim: "Kézzel formázva", szoveg: "Gép nem érinti a tésztát" },
+                { Icon: Flame, cim: "Naponta frissen", szoveg: "Csak annyit sütünk amennyit rendeltek" },
+                { Icon: Heart, cim: "Tiszta alapanyag", szoveg: "Tudjuk mi van benne – te is tudhatod" },
+              ].map(({ Icon, cim, szoveg }) => (
+                <div key={cim} className="bg-cream-dark rounded-xl p-4">
+                  <Icon className="w-5 h-5 text-gold mb-3" />
+                  <p className="font-serif text-sm font-semibold text-brown-dark mb-1">{cim}</p>
+                  <p className="font-sans text-xs text-brown/60 leading-relaxed">{szoveg}</p>
                 </div>
               ))}
             </div>

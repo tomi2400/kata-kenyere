@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import DaySelector from "@/components/DaySelector";
 import { getAvailableOrderDays } from "@/lib/deadline";
+import { MapPin, Clock, ShoppingBag } from "lucide-react";
 
 export const metadata = {
   title: "Előrendelés – Kata Kenyere",
@@ -42,13 +43,13 @@ export default function ElorendelesPage() {
         {/* Info kártyák */}
         <div className="mt-10 grid grid-cols-3 gap-3 text-center">
           {[
-            { icon: "📍", text: "Salakhegyi út 14." },
-            { icon: "🕐", text: "K–P 8:00–17:00" },
-            { icon: "🏠", text: "Személyes átvétel" },
-          ].map((item) => (
-            <div key={item.text} className="bg-cream-dark rounded-xl py-3 px-2">
-              <div className="text-lg mb-1">{item.icon}</div>
-              <p className="font-sans text-xs text-brown/60">{item.text}</p>
+            { Icon: MapPin, text: "Salakhegyi út 14." },
+            { Icon: Clock, text: "K–P 8:00–17:00" },
+            { Icon: ShoppingBag, text: "Személyes átvétel" },
+          ].map(({ Icon, text }) => (
+            <div key={text} className="bg-cream-dark rounded-xl py-4 px-2 flex flex-col items-center gap-2">
+              <Icon className="w-4 h-4 text-gold" />
+              <p className="font-sans text-xs text-brown/60">{text}</p>
             </div>
           ))}
         </div>

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { MapPin, Clock, Phone, Mail, Clock3, Wheat, Flame, Leaf, Heart } from "lucide-react";
 
 export const metadata = {
   title: "Rólunk – Kata Kenyere",
@@ -68,40 +69,40 @@ export default function RolunkPage() {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {[
               {
-                icon: "🌾",
+                Icon: Clock3,
                 cim: "Az idő az alapanyag",
                 szoveg: "A kovász 12–18 óra alatt érik. Nem lehet gyorsítani. Ez a titok.",
               },
               {
-                icon: "🤲",
+                Icon: Wheat,
                 cim: "Kézbe vesszük",
                 szoveg: "Minden cipót kézzel formázunk. A gép nem érzi, mikor van kész a tészta.",
               },
               {
-                icon: "🔥",
+                Icon: Flame,
                 cim: "Csak annyit sütünk",
                 szoveg: "Amennyi előrendelés érkezik, annyit sütünk. Nincs maradék, nincs hulladék.",
               },
               {
-                icon: "🌿",
+                Icon: Leaf,
                 cim: "Tudjuk mi van benne",
                 szoveg: "Liszt, víz, só, kovász. Ha kérdezed mi van a kenyeredben, tudunk válaszolni.",
               },
               {
-                icon: "📍",
+                Icon: MapPin,
                 cim: "Helyi büszkeség",
                 szoveg: "Pécsi pékség, pécsi embereknek. A helyi alapanyag is prioritás nálunk.",
               },
               {
-                icon: "💛",
+                Icon: Heart,
                 cim: "Szeretettel csináljuk",
                 szoveg: "Nem melóból sütjük. Ez a munkánk és a szenvedélyünk egyszerre.",
               },
-            ].map((item) => (
-              <div key={item.cim} className="bg-cream rounded-xl p-6">
-                <div className="text-3xl mb-3">{item.icon}</div>
-                <p className="font-serif text-base font-semibold text-brown-dark mb-2">{item.cim}</p>
-                <p className="font-sans text-sm text-brown/60 leading-relaxed">{item.szoveg}</p>
+            ].map(({ Icon, cim, szoveg }) => (
+              <div key={cim} className="bg-cream rounded-xl p-6">
+                <Icon className="w-5 h-5 text-gold mb-4" />
+                <p className="font-serif text-base font-semibold text-brown-dark mb-2">{cim}</p>
+                <p className="font-sans text-sm text-brown/60 leading-relaxed">{szoveg}</p>
               </div>
             ))}
           </div>
@@ -115,16 +116,16 @@ export default function RolunkPage() {
             <p className="font-sans text-xs text-brown/40 uppercase tracking-wider mb-4">Látogass meg minket</p>
             <div className="space-y-4">
               {[
-                { icon: "📍", label: "Cím", value: "Pécs, Salakhegyi út 14." },
-                { icon: "🕐", label: "Nyitvatartás", value: "Kedd – Péntek: 8:00–17:00" },
-                { icon: "📞", label: "Telefon", value: "+36 ....." },
-                { icon: "✉️", label: "Email", value: "hello@katakenyere.hu" },
-              ].map((item) => (
-                <div key={item.label} className="flex items-start gap-4">
-                  <span className="text-xl mt-0.5">{item.icon}</span>
+                { Icon: MapPin, label: "Cím", value: "Pécs, Salakhegyi út 14." },
+                { Icon: Clock, label: "Nyitvatartás", value: "Kedd – Péntek: 8:00–17:00" },
+                { Icon: Phone, label: "Telefon", value: "+36 ....." },
+                { Icon: Mail, label: "Email", value: "hello@katakenyere.hu" },
+              ].map(({ Icon, label, value }) => (
+                <div key={label} className="flex items-start gap-4">
+                  <Icon className="w-4 h-4 text-gold mt-0.5 shrink-0" />
                   <div>
-                    <p className="font-sans text-xs text-brown/40 uppercase tracking-wider">{item.label}</p>
-                    <p className="font-sans text-sm text-brown-dark font-medium">{item.value}</p>
+                    <p className="font-sans text-xs text-brown/40 uppercase tracking-wider">{label}</p>
+                    <p className="font-sans text-sm text-brown-dark font-medium">{value}</p>
                   </div>
                 </div>
               ))}
