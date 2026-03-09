@@ -48,7 +48,7 @@ const REVIEWS = [
   },
 ];
 
-const KINALAT_PREVIEW = TERMEKEK.slice(0, 4);
+const KINALAT_PREVIEW = TERMEKEK.slice(0, 8);
 
 function StarRating({ n }: { n: number }) {
   return (
@@ -191,16 +191,16 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <div className="flex gap-3 overflow-x-auto pb-3 -mx-6 px-6 snap-x snap-mandatory scrollbar-none mb-6">
             {KINALAT_PREVIEW.map((termek) => (
-              <div key={termek.id} className="rounded-xl overflow-hidden bg-cream">
+              <div key={termek.id} className="rounded-xl overflow-hidden bg-cream shrink-0 w-[46vw] sm:w-56 snap-start">
                 <div className="relative aspect-[4/3]">
                   <Image
                     src={termek.foto}
                     alt={termek.nev}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 640px) 50vw, 25vw"
+                    sizes="(max-width: 640px) 46vw, 224px"
                   />
                 </div>
                 <div className="p-3">
@@ -302,7 +302,11 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </Link>
-          <p className="font-sans text-xs text-brown/30 mt-4">
+          <p className="font-sans text-sm text-brown/60 mt-4 flex items-center justify-center gap-1.5">
+            <svg className="w-4 h-4 text-gold shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+            </svg>
             Átvétel személyesen · Pécs, Salakhegyi út 14.
           </p>
         </div>
