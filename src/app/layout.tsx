@@ -46,20 +46,13 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://katakenyere.hu",
     siteName: "Kata Kenyere",
-    images: [
-      {
-        url: "/images/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Kata Kenyere – Kézműves kovászos kenyerek Pécsről",
-      },
-    ],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Kata Kenyere – Kézműves pékség Pécsett" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Kata Kenyere – Kézműves kovászos pékség, Pécs",
     description: "Kovásszal kelesztett, kézzel formázott kenyerek – előrendelésre.",
-    images: ["/images/og-image.jpg"],
+    images: ["/opengraph-image"],
   },
   alternates: {
     canonical: "https://katakenyere.hu",
