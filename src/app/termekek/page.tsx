@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { getTermekekByKategoria } from "@/lib/products";
+import { type Termek, getTermekFoto, csoportositByKategoria } from "@/lib/products";
+import { supabase } from "@/lib/supabase/client";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
@@ -19,8 +20,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TermekekPage() {
-  const termekekByKategoria = getTermekekByKategoria();
+export default async function TermekekPage() {
+  const { data: kategoriak } = await supabase
+    .from("kategoriak")
+    .select("nev")
+    .order("sorrend");
+  const { data: termekekRaw } = await supabase
+    .from("termekek")
+    .select("id, slug, nev, leiras, kategoria, ar, egyseg, foto_url, sorrend")
+    .eq("aktiv", true)
+    .order("sorrend");
+
+  const kategoriaLista = kategoriak?.map((k) => k.nev) ?? [];
+  const termekek: Termek[] = termekekRaw ?? [];
+  const termekekByKategoria = csoportositByKategoria(termekek, kategoriaLista);
 
   return (
     <div className="bg-cream min-h-screen">
@@ -51,7 +64,7 @@ export default function TermekekPage() {
                 {/* Image */}
                 <div className="relative aspect-[4/3]">
                   <Image
-                    src={termek.foto}
+                    src={getTermekFoto(termek)}
                     alt={termek.nev}
                     fill
                     className="object-cover"

@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import { useCartStore } from "@/lib/store";
-import { formatAr, type Termek } from "@/lib/products";
+import { formatAr, getTermekFoto, type Termek } from "@/lib/products";
 
 export default function ProductCard({ termek, datum }: { termek: Termek; datum: string }) {
   const { carts, setQuantity } = useCartStore();
   const dayItems = carts[datum] ?? [];
-  const item = dayItems.find((i) => i.termekId === termek.id);
+  const item = dayItems.find((i) => i.termekId === termek.slug);
   const qty = item?.mennyiseg ?? 0;
 
   const change = (delta: number) => {
@@ -15,11 +15,11 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
     setQuantity(
       datum,
       {
-        termekId: termek.id,
+        termekId: termek.slug,
         nev: termek.nev,
         ar: termek.ar,
         egyseg: termek.egyseg,
-        fotoUrl: termek.foto,
+        fotoUrl: getTermekFoto(termek),
       },
       newQty
     );
@@ -37,7 +37,7 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
       {/* Fotó */}
       <div className="relative aspect-[4/3] bg-cream-dark">
         <Image
-          src={termek.foto}
+          src={getTermekFoto(termek)}
           alt={termek.nev}
           fill
           className="object-cover"

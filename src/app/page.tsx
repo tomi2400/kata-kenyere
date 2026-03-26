@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { MapPin, Clock, Star, Wheat, Flame, Leaf, Heart } from "lucide-react";
-import { TERMEKEK } from "@/lib/products";
+import { type Termek, getTermekFoto } from "@/lib/products";
+import { supabase } from "@/lib/supabase/client";
 
 export const metadata: Metadata = {
   title: "Kata Kenyere – Kézműves pékség Pécsett",
@@ -48,8 +49,6 @@ const REVIEWS = [
   },
 ];
 
-const KINALAT_PREVIEW = TERMEKEK.slice(0, 8);
-
 function StarRating({ n }: { n: number }) {
   return (
     <div className="flex gap-0.5">
@@ -62,7 +61,14 @@ function StarRating({ n }: { n: number }) {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const { data: termekekRaw } = await supabase
+    .from("termekek")
+    .select("id, slug, nev, leiras, kategoria, ar, egyseg, foto_url, sorrend")
+    .eq("aktiv", true)
+    .order("sorrend")
+    .limit(8);
+  const KINALAT_PREVIEW: Termek[] = termekekRaw ?? [];
   return (
     <div className="min-h-screen bg-cream">
       <Navbar transparent />
@@ -193,10 +199,10 @@ export default function Home() {
 
           <div className="flex gap-3 overflow-x-auto pb-3 -mx-6 px-6 snap-x snap-mandatory scrollbar-none mb-6">
             {KINALAT_PREVIEW.map((termek) => (
-              <div key={termek.id} className="rounded-xl overflow-hidden bg-cream shrink-0 w-[46vw] sm:w-56 snap-start">
+              <div key={termek.slug} className="rounded-xl overflow-hidden bg-cream shrink-0 w-[46vw] sm:w-56 snap-start">
                 <div className="relative aspect-[4/3]">
                   <Image
-                    src={termek.foto}
+                    src={getTermekFoto(termek)}
                     alt={termek.nev}
                     fill
                     className="object-cover"

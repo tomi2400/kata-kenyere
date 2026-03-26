@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/lib/store";
-import { getTermekekByKategoria, formatAr } from "@/lib/products";
+import { type Termek, csoportositByKategoria, formatAr } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import DayProgress from "@/components/DayProgress";
 
@@ -14,9 +14,20 @@ export default function TermekekPage() {
   const { selectedDays, carts, getDayTotal } = useCartStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [termekek, setTermekek] = useState<Termek[]>([]);
+  const [kategoriak, setKategoriak] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
+    fetch("/api/termekek")
+      .then((res) => res.json())
+      .then((data) => {
+        setTermekek(data.termekek);
+        setKategoriak(data.kategoriak);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   // Ha nincs kiválasztott nap, vissza a főoldalra
@@ -26,7 +37,7 @@ export default function TermekekPage() {
     }
   }, [mounted, selectedDays, router]);
 
-  if (!mounted || selectedDays.length === 0) {
+  if (!mounted || selectedDays.length === 0 || loading) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
@@ -34,7 +45,7 @@ export default function TermekekPage() {
     );
   }
 
-  const termekekByKategoria = getTermekekByKategoria();
+  const termekekByKategoria = csoportositByKategoria(termekek, kategoriak);
   const currentDay = selectedDays[currentStep];
   const isLastDay = currentStep === selectedDays.length - 1;
   const dayTotal = getDayTotal(currentDay.datum);
