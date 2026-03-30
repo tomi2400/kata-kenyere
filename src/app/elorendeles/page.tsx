@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import DaySelector from "@/components/DaySelector";
-import { getAvailableOrderDays } from "@/lib/deadline";
+import { supabaseAdmin } from "@/lib/supabase/server";
+import type { OrderDay } from "@/lib/deadline";
 import { MapPin, Clock, ShoppingBag } from "lucide-react";
 
 export const metadata = {
@@ -18,12 +19,41 @@ export const metadata = {
   },
 };
 
-export default function ElorendelesPage() {
-  const days = getAvailableOrderDays();
+function formatHatarido(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleString("hu-HU", {
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }) + "-ig";
+}
+
+export default async function ElorendelesPage() {
+  const now = new Date();
+  const todayStr = now.toISOString().split("T")[0];
+
+  const { data: napok } = await supabaseAdmin
+    .from("rendeles_napok")
+    .select("id, datum, nap, hatarido")
+    .eq("nyitott", true)
+    .gte("datum", todayStr)
+    .order("datum")
+    .limit(7);
+
+  const days: OrderDay[] = (napok ?? [])
+    .filter((nap) => nap.hatarido && new Date(nap.hatarido) > now)
+    .map((nap) => ({
+      nap: nap.nap as OrderDay["nap"],
+      datum: nap.datum,
+      hatarido: formatHatarido(nap.hatarido),
+      nyitott: true,
+    }));
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* HEADER – egyszerű, nem distract */}
+      {/* HEADER */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-gold/20">
         <Link href="/" className="flex items-center gap-2">
           <Image src="/images/logo.png" alt="Kata Kenyere" width={36} height={36} />
@@ -61,24 +91,6 @@ export default function ElorendelesPage() {
               <p className="font-sans text-xs text-brown/60">{text}</p>
             </div>
           ))}
-        </div>
-
-        {/* Rendelési határidők */}
-        <div className="mt-6 bg-brown-dark rounded-xl p-4">
-          <p className="font-sans text-xs text-cream/40 uppercase tracking-wider mb-3">Rendelési határidők</p>
-          <div className="grid grid-cols-2 gap-y-1.5 gap-x-4">
-            {[
-              { nap: "Keddre", hatarido: "vasárnap 17:00-ig" },
-              { nap: "Szerdára", hatarido: "hétfőig 17:00-ig" },
-              { nap: "Csütörtökre", hatarido: "kedd 17:00-ig" },
-              { nap: "Péntekre", hatarido: "szerdáig 17:00-ig" },
-            ].map((item) => (
-              <div key={item.nap} className="flex gap-1 items-baseline">
-                <span className="font-sans text-xs font-semibold text-cream">{item.nap}</span>
-                <span className="font-sans text-xs text-cream/40">→ {item.hatarido}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </main>
     </div>
