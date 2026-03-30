@@ -3,34 +3,27 @@ import Link from "next/link";
 import DaySelector from "@/components/DaySelector";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { MapPin, Clock, ShoppingBag } from "lucide-react";
+import { unstable_noStore as noStore } from "next/cache";
 
 export const dynamic = "force-dynamic";
-
-export const metadata = {
-  title: "Kovászos kenyér előrendelés online – Pécs",
-  description:
-    "Rendeld meg előre kedvenc kovászos kenyered Pécsről! Válassz napot, állítsd össze a kosarad, mi frissen kisütjük. Átvétel: Salakhegyi út 14., K–P 8–17h.",
-  alternates: {
-    canonical: "https://katakenyere.hu/elorendeles",
-  },
-  openGraph: {
-    title: "Kovászos kenyér előrendelés – Kata Kenyere, Pécs",
-    description: "Válassz napot, állítsd össze a kosarad – mi frissen kisütjük neked.",
-    url: "https://katakenyere.hu/elorendeles",
-  },
-};
 
 function formatHatarido(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
-  const month = d.toLocaleDateString("hu-HU", { month: "long" });
-  const day = d.getDate();
-  const hour = String(d.getHours()).padStart(2, "0");
-  const min = String(d.getMinutes()).padStart(2, "0");
-  return `${month} ${day}., ${hour}:${min}-ig`;
+  // Mindig Budapest időzónában formázzuk
+  return d.toLocaleString("hu-HU", {
+    timeZone: "Europe/Budapest",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }) + "-ig";
 }
 
 export default async function ElorendelesPage() {
+  // Next.js 14: fetch cache teljes tiltása ennél a kérésnél
+  noStore();
+
   const now = new Date();
   const todayStr = now.toISOString().split("T")[0];
 
