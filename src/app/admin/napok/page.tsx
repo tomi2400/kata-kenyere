@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 type RendelesNap = {
   id: string;
@@ -73,6 +73,8 @@ export default function NapokPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedRef = useRef<{ id: string; nyitott: boolean; hatarido: string } | null>(null);
 
   // Termékek a naphoz
   const [allTermekek, setAllTermekek] = useState<Termek[]>([]);
@@ -118,12 +120,19 @@ export default function NapokPage() {
 
   const openEditor = (nap: RendelesNap) => {
     setEditNap(nap);
-    setEditHatarido(toLocalDatetimeValue(nap.hatarido));
+    const hataridoValue = toLocalDatetimeValue(nap.hatarido);
+    setEditHatarido(hataridoValue);
     setEditNyitott(nap.nyitott);
+    lastSavedRef.current = {
+      id: nap.id,
+      nyitott: nap.nyitott,
+      hatarido: hataridoValue,
+    };
     setDeleteError("");
   };
 
-  const closeEditor = () => {
+  const closeEditor = async () => {
+    await saveEditor({ silent: true, keepalive: true });
     setEditNap(null);
     setNapiTermekIds(null);
     setDeleteError("");
@@ -144,20 +153,37 @@ export default function NapokPage() {
     }
   };
 
-  const saveEditor = async () => {
+  const saveEditor = useCallback(async (options?: { silent?: boolean; keepalive?: boolean }) => {
     if (!editNap) return;
-    setSaving(true);
+
+    const lastSaved = lastSavedRef.current;
+    const unchanged =
+      lastSaved &&
+      lastSaved.id === editNap.id &&
+      lastSaved.nyitott === editNyitott &&
+      lastSaved.hatarido === editHatarido;
+
+    if (unchanged) return;
+
+    if (!options?.silent) setSaving(true);
     const hatarisoISO = editHatarido
       ? new Date(editHatarido).toISOString()
       : null;
+
     await fetch(`/api/admin/rendeles-napok/${editNap.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nyitott: editNyitott, hatarido: hatarisoISO }),
+      keepalive: options?.keepalive,
     });
-    setSaving(false);
+    lastSavedRef.current = {
+      id: editNap.id,
+      nyitott: editNyitott,
+      hatarido: editHatarido,
+    };
+    if (!options?.silent) setSaving(false);
     fetchNapok();
-  };
+  }, [editNap, editNyitott, editHatarido, fetchNapok]);
 
   const deleteDay = async () => {
     if (!editNap) return;
@@ -245,6 +271,46 @@ export default function NapokPage() {
     if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0); }
     else setViewMonth(m => m + 1);
   };
+
+  useEffect(() => {
+    if (!editNap) return;
+
+    const lastSaved = lastSavedRef.current;
+    const changed =
+      !lastSaved ||
+      lastSaved.id !== editNap.id ||
+      lastSaved.nyitott !== editNyitott ||
+      lastSaved.hatarido !== editHatarido;
+
+    if (!changed) return;
+
+    if (autosaveTimeoutRef.current) clearTimeout(autosaveTimeoutRef.current);
+    autosaveTimeoutRef.current = setTimeout(() => {
+      saveEditor({ silent: true }).catch(() => undefined);
+    }, 700);
+
+    return () => {
+      if (autosaveTimeoutRef.current) {
+        clearTimeout(autosaveTimeoutRef.current);
+        autosaveTimeoutRef.current = null;
+      }
+    };
+  }, [editNap, editNyitott, editHatarido, saveEditor]);
+
+  useEffect(() => {
+    const flushPendingSave = () => {
+      if (!editNap) return;
+      saveEditor({ silent: true, keepalive: true }).catch(() => undefined);
+    };
+
+    window.addEventListener("pagehide", flushPendingSave);
+    window.addEventListener("beforeunload", flushPendingSave);
+
+    return () => {
+      window.removeEventListener("pagehide", flushPendingSave);
+      window.removeEventListener("beforeunload", flushPendingSave);
+    };
+  }, [editNap, saveEditor]);
 
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto">
@@ -377,7 +443,7 @@ export default function NapokPage() {
                     {new Date(editNap.datum + "T00:00:00").toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric" })}
                   </p>
                 </div>
-                <button onClick={closeEditor} className="text-brown/30 hover:text-brown-dark cursor-pointer p-1">✕</button>
+                <button onClick={() => void closeEditor()} className="text-brown/30 hover:text-brown-dark cursor-pointer p-1">✕</button>
               </div>
 
               {/* Nyitott / Zárt */}
@@ -412,14 +478,17 @@ export default function NapokPage() {
 
               {/* Mentés gomb */}
               <button
-                onClick={saveEditor}
+                onClick={() => void saveEditor()}
                 disabled={saving}
                 className="w-full py-2 rounded-lg font-sans text-sm font-semibold
                   bg-gold text-brown-dark hover:bg-gold-light transition-colors
                   disabled:opacity-50 cursor-pointer"
               >
-                {saving ? "Mentés..." : "Mentés"}
+                {saving ? "Mentés..." : "Mentés most"}
               </button>
+              <p className="font-sans text-[10px] text-brown/40 -mt-2">
+                A módosítások automatikusan mentődnek.
+              </p>
 
               {/* Termékek */}
               <div>
