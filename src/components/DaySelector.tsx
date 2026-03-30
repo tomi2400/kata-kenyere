@@ -5,12 +5,6 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/store";
 import type { OrderDay } from "@/lib/deadline";
 
-const NAP_HU: Record<string, string> = {
-  Kedd: "Kedd",
-  Szerda: "Szerda",
-  Csütörtök: "Csütörtök",
-  Péntek: "Péntek",
-};
 
 function formatDatum(datum: string): string {
   const d = new Date(datum);
@@ -75,7 +69,7 @@ export default function DaySelector({ days, redirectTo = "/valasztas" }: { days:
             >
               <div>
                 <div className={`font-serif text-xl font-semibold ${isSelected ? "text-cream" : "text-brown-dark"}`}>
-                  {NAP_HU[day.nap]}
+                  {day.nap}
                   <span className={`font-sans text-sm font-normal ml-3 ${isSelected ? "text-gold" : "text-brown/60"}`}>
                     {formatDatum(day.datum)}
                   </span>
