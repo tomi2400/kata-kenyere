@@ -26,7 +26,10 @@ const HU_MONTHS = [
 const HU_DAYS_SHORT = ["H", "K", "Sz", "Cs", "P", "Sz", "V"];
 
 function toLocalDateStr(date: Date) {
-  return date.toISOString().split("T")[0];
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function buildCalendarDays(year: number, month: number): (string | null)[] {
@@ -375,18 +378,19 @@ export default function NapokPage() {
                 const isHataridonTul = nap?.hatarido
                   ? new Date(nap.hatarido) < new Date()
                   : false;
+                const isPastWithoutNap = isPast && !nap;
 
                 let cellClass = "relative min-h-[52px] rounded-xl border-2 transition-all ";
                 if (isSelected) {
                   cellClass += "border-gold bg-gold/10 ";
+                } else if (isPastWithoutNap) {
+                  cellClass += "border-stone-200 bg-stone-100/80 cursor-pointer hover:border-stone-300 ";
                 } else if (nap) {
                   if (nap.nyitott && !isHataridonTul) {
                     cellClass += "border-green-400 bg-green-50 cursor-pointer hover:border-green-500 ";
                   } else {
                     cellClass += "border-green-200 bg-green-50/50 cursor-pointer hover:border-green-300 ";
                   }
-                } else if (isPast) {
-                  cellClass += "border-transparent bg-cream-dark/20 opacity-40 ";
                 } else {
                   cellClass += "border-cream-dark bg-white cursor-pointer hover:border-gold/50 hover:bg-gold/5 ";
                 }
@@ -394,23 +398,32 @@ export default function NapokPage() {
                 return (
                   <button
                     key={datum}
-                    disabled={isPast && !nap}
                     onClick={() => {
                       if (nap) openEditor(nap);
-                      else if (!isPast) createDay(datum);
+                      else createDay(datum);
                     }}
                     className={cellClass + "text-left p-1.5 w-full"}
                   >
                     <span className={`font-sans text-xs font-semibold block
-                      ${isToday ? "text-gold" : nap ? "text-green-800" : isPast ? "text-brown/30" : "text-brown-dark"}
+                      ${isToday ? "text-gold" : nap ? "text-green-800" : isPast ? "text-stone-500" : "text-brown-dark"}
                     `}>
                       {Number(datum.split("-")[2])}
                     </span>
+                    {isToday && (
+                      <span className="font-sans text-[9px] leading-tight block mt-0.5 text-gold font-semibold">
+                        Mai nap
+                      </span>
+                    )}
                     {nap && (
                       <span className={`font-sans text-[9px] leading-tight block mt-0.5
                         ${nap.nyitott && !isHataridonTul ? "text-green-700" : "text-green-500"}
                       `}>
                         {nap.nyitott && !isHataridonTul ? "Nyitott" : nap.nyitott ? "Lejárt" : "Zárva"}
+                      </span>
+                    )}
+                    {!nap && isPast && (
+                      <span className="font-sans text-[9px] leading-tight block mt-0.5 text-stone-500">
+                        Korábbi nap
                       </span>
                     )}
                   </button>
@@ -427,7 +440,11 @@ export default function NapokPage() {
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded bg-white border-2 border-cream-dark inline-block" />
-              Kattints a megnyitáshoz
+              Új vagy mai nap megnyitása
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded bg-stone-100 border border-stone-300 inline-block" />
+              Korábbi nap
             </span>
           </div>
         </div>
