@@ -138,11 +138,21 @@ function TermekekTab() {
     setDeleteError((prev) => ({ ...prev, [t.id]: d.error ?? "Hiba történt a törlés közben." }));
   };
 
-  const grouped: Record<string, Termek[]> = {};
-  for (const t of termekek) {
-    if (!grouped[t.kategoria]) grouped[t.kategoria] = [];
-    grouped[t.kategoria].push(t);
-  }
+  const grouped = kategoriak
+    .map((kategoria) => ({
+      kategoria,
+      items: termekek.filter((t) => t.kategoria === kategoria),
+    }))
+    .filter(({ items }) => items.length > 0);
+
+  const extraKategoriak = Array.from(new Set(termekek.map((t) => t.kategoria)))
+    .filter((kategoria) => !kategoriak.includes(kategoria))
+    .map((kategoria) => ({
+      kategoria,
+      items: termekek.filter((t) => t.kategoria === kategoria),
+    }));
+
+  const orderedGroups = [...grouped, ...extraKategoriak];
 
   return (
     <>
@@ -161,7 +171,7 @@ function TermekekTab() {
           <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        Object.entries(grouped).map(([kategoria, items]) => (
+        orderedGroups.map(({ kategoria, items }) => (
           <section key={kategoria} className="mb-8">
             <h2 className="font-serif text-base text-brown/60 mb-3 pb-2 border-b border-gold/20">
               {kategoria}
