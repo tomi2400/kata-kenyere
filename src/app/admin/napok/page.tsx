@@ -14,7 +14,9 @@ type Termek = {
   id: string;
   nev: string;
   kategoria: string;
+  egyseg: string;
   aktiv: boolean;
+  sorrend?: number;
 };
 
 const HU_MONTHS = [
@@ -74,6 +76,7 @@ export default function NapokPage() {
 
   // Termékek a naphoz
   const [allTermekek, setAllTermekek] = useState<Termek[]>([]);
+  const [kategoriak, setKategoriak] = useState<string[]>([]);
   const [napiTermekIds, setNapiTermekIds] = useState<string[] | null>(null); // null = betöltés alatt
   const [termekSaving, setTermekSaving] = useState(false);
 
@@ -98,7 +101,10 @@ export default function NapokPage() {
   useEffect(() => {
     fetch("/api/admin/termekek")
       .then((r) => r.json())
-      .then((d) => setAllTermekek((d.termekek ?? []).filter((t: Termek) => t.aktiv)));
+      .then((d) => {
+        setAllTermekek((d.termekek ?? []).filter((t: Termek) => t.aktiv));
+        setKategoriak(d.kategoriak ?? []);
+      });
   }, []);
 
   // Napi termékek betöltése, ha szerkesztő megnyílik
@@ -196,6 +202,37 @@ export default function NapokPage() {
   };
 
   const setAllTermekekOn = () => saveTermekek([]);
+
+  const getEnabledIds = () => {
+    if (napiTermekIds === null) return [];
+    return napiTermekIds.length === 0 ? allTermekek.map((t) => t.id) : napiTermekIds;
+  };
+
+  const toggleCategory = (termekIds: string[], shouldEnable: boolean) => {
+    if (napiTermekIds === null) return;
+
+    const current = new Set(getEnabledIds());
+    for (const termekId of termekIds) {
+      if (shouldEnable) current.add(termekId);
+      else current.delete(termekId);
+    }
+
+    const next = Array.from(current);
+    saveTermekek(next.length === allTermekek.length ? [] : next);
+  };
+
+  const groupedTermekek = [
+    ...kategoriak.map((kategoria) => ({
+      kategoria,
+      items: allTermekek.filter((t) => t.kategoria === kategoria),
+    })).filter(({ items }) => items.length > 0),
+    ...Array.from(new Set(allTermekek.map((t) => t.kategoria)))
+      .filter((kategoria) => !kategoriak.includes(kategoria))
+      .map((kategoria) => ({
+        kategoria,
+        items: allTermekek.filter((t) => t.kategoria === kategoria),
+      })),
+  ];
 
   const napokByDatum = Object.fromEntries(napok.map((n) => [n.datum, n]));
   const cells = buildCalendarDays(viewYear, viewMonth);
@@ -390,14 +427,21 @@ export default function NapokPage() {
                   <p className="font-sans text-xs font-semibold text-brown/60 uppercase tracking-wider">
                     Elérhető termékek
                   </p>
-                  {napiTermekIds !== null && napiTermekIds.length > 0 && (
-                    <button
-                      onClick={setAllTermekekOn}
-                      className="font-sans text-[10px] text-gold hover:underline cursor-pointer"
-                    >
-                      Mind be
-                    </button>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {napiTermekIds !== null && (
+                      <span className="font-sans text-[10px] text-brown/40">
+                        {getEnabledIds().length}/{allTermekek.length} aktív
+                      </span>
+                    )}
+                    {napiTermekIds !== null && napiTermekIds.length > 0 && (
+                      <button
+                        onClick={setAllTermekekOn}
+                        className="font-sans text-[10px] text-gold hover:underline cursor-pointer"
+                      >
+                        Mind be
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {napiTermekIds === null ? (
@@ -405,24 +449,64 @@ export default function NapokPage() {
                     <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : (
-                  <div className="space-y-1.5 max-h-56 overflow-y-auto">
-                    {allTermekek.map((t) => {
-                      const isOn = napiTermekIds.length === 0 || napiTermekIds.includes(t.id);
+                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                    {groupedTermekek.map(({ kategoria, items }) => {
+                      const enabledIds = getEnabledIds();
+                      const enabledCount = items.filter((item) => enabledIds.includes(item.id)).length;
+                      const allEnabled = enabledCount === items.length;
+
                       return (
-                        <div key={t.id} className="flex items-center justify-between gap-2">
-                          <span className={`font-sans text-xs ${isOn ? "text-brown-dark" : "text-brown/40"} truncate`}>
-                            {t.nev}
-                          </span>
-                          <button
-                            onClick={() => toggleTermek(t.id)}
-                            disabled={termekSaving}
-                            className={`flex-shrink-0 w-8 h-5 rounded-full transition-colors cursor-pointer relative
-                              ${isOn ? "bg-green-500" : "bg-gray-300"}
-                              disabled:opacity-50`}
-                          >
-                            <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform
-                              ${isOn ? "left-[14px]" : "left-0.5"}`} />
-                          </button>
+                        <div key={kategoria} className="rounded-xl border border-cream-dark p-3 bg-cream/40">
+                          <div className="flex items-center justify-between gap-3 mb-2">
+                            <div>
+                              <p className="font-sans text-xs font-semibold text-brown-dark">
+                                {kategoria}
+                              </p>
+                              <p className="font-sans text-[10px] text-brown/40">
+                                {enabledCount}/{items.length} elérhető
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => toggleCategory(items.map((item) => item.id), !allEnabled)}
+                              disabled={termekSaving}
+                              className="font-sans text-[10px] text-gold hover:underline cursor-pointer disabled:opacity-50 disabled:no-underline"
+                            >
+                              {allEnabled ? "Mind ki" : "Mind be"}
+                            </button>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            {items.map((t) => {
+                              const isOn = enabledIds.includes(t.id);
+                              return (
+                                <div
+                                  key={t.id}
+                                  className={`flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 transition-colors ${
+                                    isOn ? "bg-white" : "bg-transparent"
+                                  }`}
+                                >
+                                  <div className="min-w-0">
+                                    <p className={`font-sans text-xs truncate ${isOn ? "text-brown-dark font-medium" : "text-brown/50"}`}>
+                                      {t.nev}
+                                    </p>
+                                    <p className={`font-sans text-[10px] ${isOn ? "text-brown/50" : "text-brown/30"}`}>
+                                      {t.egyseg}
+                                    </p>
+                                  </div>
+                                  <button
+                                    onClick={() => toggleTermek(t.id)}
+                                    disabled={termekSaving}
+                                    className={`flex-shrink-0 w-8 h-5 rounded-full transition-colors cursor-pointer relative
+                                      ${isOn ? "bg-green-500" : "bg-gray-300"}
+                                      disabled:opacity-50`}
+                                  >
+                                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform
+                                      ${isOn ? "left-[14px]" : "left-0.5"}`} />
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       );
                     })}
