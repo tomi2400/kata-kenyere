@@ -8,8 +8,8 @@ export async function PATCH(
   const body = await request.json();
   const { allapot } = body;
 
-  if (!["uj", "folyamatban", "kesz", "torolve"].includes(allapot)) {
-    return NextResponse.json({ error: "Ervenytelen allapot" }, { status: 400 });
+  if (!["uj", "feldolgozva", "kesz", "atvetel", "torolve"].includes(allapot)) {
+    return NextResponse.json({ error: "Érvénytelen állapot" }, { status: 400 });
   }
 
   const { data, error } = await supabaseAdmin

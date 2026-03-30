@@ -7,9 +7,9 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 
 const NAV_ITEMS = [
-  { href: "/admin/gyartas", label: "Gyartas", icon: "clipboard" },
-  { href: "/admin/rendelesek", label: "Rendelesek", icon: "package" },
-  { href: "/admin/termekek", label: "Termekek", icon: "bread" },
+  { href: "/admin/gyartas", label: "Gyártás", icon: "clipboard" },
+  { href: "/admin/rendelesek", label: "Rendelések", icon: "package" },
+  { href: "/admin/termekek", label: "Termékek", icon: "bread" },
   { href: "/admin/napok", label: "Napok", icon: "calendar" },
   { href: "/admin/statisztika", label: "Statisztika", icon: "chart" },
 ];
@@ -172,7 +172,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
             </svg>
-            Jelszo modositas
+            Jelszó módosítás
           </Link>
           <button
             onClick={handleLogout}
@@ -181,7 +181,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
             </svg>
-            Kijelentkezes
+            Kijelentkezés
           </button>
         </div>
       </aside>

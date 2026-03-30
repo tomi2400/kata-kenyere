@@ -26,24 +26,33 @@ type Rendeles = {
 };
 
 const ALLAPOT_LABELS: Record<string, { label: string; color: string }> = {
-  uj: { label: "Uj", color: "bg-blue-100 text-blue-800" },
-  folyamatban: { label: "Folyamatban", color: "bg-yellow-100 text-yellow-800" },
-  kesz: { label: "Kesz", color: "bg-green-100 text-green-800" },
-  torolve: { label: "Torolve", color: "bg-red-100 text-red-800" },
+  uj: { label: "Új", color: "bg-blue-100 text-blue-800" },
+  feldolgozva: { label: "Feldolgozva", color: "bg-yellow-100 text-yellow-800" },
+  kesz: { label: "Kész", color: "bg-green-100 text-green-800" },
+  atvetel: { label: "Átvéve", color: "bg-purple-100 text-purple-800" },
+  torolve: { label: "Törölve", color: "bg-red-100 text-red-800" },
 };
 
-const ALLAPOT_FLOW = ["uj", "folyamatban", "kesz"];
+const ALLAPOT_FLOW = ["uj", "feldolgozva", "kesz", "atvetel"];
+
+const ALLAPOT_NEXT_LABEL: Record<string, string> = {
+  uj: "Feldolgozás",
+  feldolgozva: "Kész",
+  kesz: "Átvéve",
+};
 
 export default function RendelesekPage() {
   const [rendelesek, setRendelesek] = useState<Rendeles[]>([]);
   const [filter, setFilter] = useState("mind");
+  const [datumFilter, setDatumFilter] = useState("");
   const [loading, setLoading] = useState(true);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const fetchRendelesek = (allapot: string) => {
+  const fetchRendelesek = (allapot: string, datum: string) => {
     setLoading(true);
     const params = new URLSearchParams();
     if (allapot !== "mind") params.set("allapot", allapot);
+    if (datum) params.set("datum", datum);
 
     fetch(`/api/admin/rendelesek?${params}`)
       .then((res) => res.json())
@@ -55,8 +64,8 @@ export default function RendelesekPage() {
   };
 
   useEffect(() => {
-    fetchRendelesek(filter);
-  }, [filter]);
+    fetchRendelesek(filter, datumFilter);
+  }, [filter, datumFilter]);
 
   const updateAllapot = async (id: string, allapot: string) => {
     await fetch(`/api/admin/rendelesek/${id}`, {
@@ -64,7 +73,7 @@ export default function RendelesekPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ allapot }),
     });
-    fetchRendelesek(filter);
+    fetchRendelesek(filter, datumFilter);
   };
 
   const formatDate = (dateStr: string) => {
@@ -76,155 +85,245 @@ export default function RendelesekPage() {
     });
   };
 
+  const formatTetelDatum = (datum: string) => {
+    const d = new Date(datum + "T00:00:00");
+    return d.toLocaleDateString("hu-HU", { month: "short", day: "numeric" });
+  };
+
+  const selected = rendelesek.find((r) => r.id === selectedId) ?? null;
+
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto">
+    <div className="p-4 md:p-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="font-serif text-2xl text-brown-dark">Rendelesek</h1>
+        <h1 className="font-serif text-2xl text-brown-dark">Rendelések</h1>
         <p className="font-sans text-sm text-brown/50 mt-1">
-          Beerkezett rendelesek kezelese
+          Beérkezett rendelések kezelése
         </p>
       </div>
 
-      {/* Szuro */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        {["mind", "uj", "folyamatban", "kesz", "torolve"].map((a) => (
+      {/* Szűrők */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {["mind", "uj", "feldolgozva", "kesz", "atvetel", "torolve"].map((a) => (
+            <button
+              key={a}
+              onClick={() => setFilter(a)}
+              className={`
+                px-3 py-1.5 rounded-lg font-sans text-sm whitespace-nowrap transition-colors cursor-pointer
+                ${filter === a
+                  ? "bg-gold text-brown-dark font-semibold"
+                  : "bg-cream-dark text-brown/60 hover:bg-gold/20"
+                }
+              `}
+            >
+              {a === "mind" ? "Mind" : ALLAPOT_LABELS[a]?.label ?? a}
+            </button>
+          ))}
+        </div>
+        <input
+          type="date"
+          value={datumFilter}
+          onChange={(e) => setDatumFilter(e.target.value)}
+          className="ml-auto px-3 py-1.5 rounded-lg border border-cream-dark font-sans text-sm bg-white focus:border-gold focus:outline-none cursor-pointer"
+          title="Szűrés átvételi dátum szerint"
+        />
+        {datumFilter && (
           <button
-            key={a}
-            onClick={() => setFilter(a)}
-            className={`
-              px-4 py-2 rounded-lg font-sans text-sm whitespace-nowrap transition-colors cursor-pointer
-              ${filter === a
-                ? "bg-gold text-brown-dark font-semibold"
-                : "bg-cream-dark text-brown/60 hover:bg-gold/20"
-              }
-            `}
+            onClick={() => setDatumFilter("")}
+            className="text-brown/40 hover:text-brown-dark font-sans text-xs cursor-pointer"
           >
-            {a === "mind" ? "Mind" : ALLAPOT_LABELS[a]?.label ?? a}
+            ✕ Dátum törlése
           </button>
-        ))}
+        )}
       </div>
 
-      {/* Lista */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : rendelesek.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="font-sans text-brown/40 text-sm">Nincs rendeles</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {rendelesek.map((r) => {
-            const isExpanded = expandedId === r.id;
-            const allapotInfo = ALLAPOT_LABELS[r.allapot] ?? { label: r.allapot, color: "bg-gray-100 text-gray-800" };
-            const nextAllapot = ALLAPOT_FLOW[ALLAPOT_FLOW.indexOf(r.allapot) + 1];
+      {/* Táblázat + részletek */}
+      <div className="flex gap-6">
+        {/* Bal: táblázat */}
+        <div className="flex-1 min-w-0">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : rendelesek.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="font-sans text-brown/40 text-sm">Nincs rendelés</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-cream-dark overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-cream-dark bg-cream-dark/50">
+                    <th className="text-left font-sans text-xs font-semibold text-brown/60 px-4 py-3">Név</th>
+                    <th className="text-left font-sans text-xs font-semibold text-brown/60 px-4 py-3 hidden md:table-cell">Termékek</th>
+                    <th className="text-left font-sans text-xs font-semibold text-brown/60 px-4 py-3 hidden lg:table-cell">Dátum</th>
+                    <th className="text-left font-sans text-xs font-semibold text-brown/60 px-4 py-3">Állapot</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rendelesek.map((r, i) => {
+                    const allapotInfo = ALLAPOT_LABELS[r.allapot] ?? { label: r.allapot, color: "bg-gray-100 text-gray-800" };
+                    const isSelected = selectedId === r.id;
+                    // Termékek összefoglalója
+                    const tetelSummary = r.rendeles_tetelek
+                      .slice(0, 2)
+                      .map((t) => `${t.mennyiseg}× ${t.termek_nev}`)
+                      .join(", ") + (r.rendeles_tetelek.length > 2 ? ` +${r.rendeles_tetelek.length - 2}` : "");
+                    // Egyedi átvételi dátumok
+                    const datumok = Array.from(new Set(r.rendeles_tetelek.map((t) => t.datum))).sort();
 
-            return (
-              <div key={r.id} className="bg-white rounded-xl border border-cream-dark overflow-hidden">
-                {/* Kartya fejlec */}
+                    return (
+                      <tr
+                        key={r.id}
+                        onClick={() => setSelectedId(isSelected ? null : r.id)}
+                        className={`
+                          cursor-pointer transition-colors
+                          ${i < rendelesek.length - 1 ? "border-b border-cream-dark" : ""}
+                          ${isSelected ? "bg-gold/10" : "hover:bg-cream-dark/30"}
+                        `}
+                      >
+                        <td className="px-4 py-3">
+                          <p className="font-sans text-sm font-semibold text-brown-dark">{r.nev}</p>
+                          <p className="font-sans text-xs text-brown/40">{r.rendeles_szam}</p>
+                          {r.megjegyzes && (
+                            <p className="font-sans text-xs text-amber-600 mt-0.5 truncate max-w-[140px]" title={r.megjegyzes}>
+                              📝 {r.megjegyzes}
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 hidden md:table-cell">
+                          <p className="font-sans text-xs text-brown/70 truncate max-w-[200px]">{tetelSummary}</p>
+                        </td>
+                        <td className="px-4 py-3 hidden lg:table-cell">
+                          <p className="font-sans text-xs text-brown/60">
+                            {datumok.map(formatTetelDatum).join(", ")}
+                          </p>
+                          <p className="font-sans text-[10px] text-brown/40">{formatDate(r.created_at)}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-0.5 rounded-full font-sans text-[10px] font-semibold whitespace-nowrap ${allapotInfo.color}`}>
+                            {allapotInfo.label}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Jobb: részletek panel */}
+        {selected && (
+          <div className="w-80 flex-shrink-0">
+            <div className="bg-white rounded-xl border border-cream-dark p-5 sticky top-4 space-y-4">
+              {/* Fejléc */}
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="font-serif text-lg text-brown-dark">{selected.nev}</h2>
+                  <p className="font-sans text-xs text-brown/40">{selected.rendeles_szam}</p>
+                </div>
                 <button
-                  onClick={() => setExpandedId(isExpanded ? null : r.id)}
-                  className="w-full px-4 py-3 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-cream-dark/30 transition-colors"
+                  onClick={() => setSelectedId(null)}
+                  className="text-brown/30 hover:text-brown-dark cursor-pointer p-1"
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-sans text-sm font-bold text-brown-dark truncate">
-                        {r.nev}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-full font-sans text-[10px] font-semibold ${allapotInfo.color}`}>
-                        {allapotInfo.label}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 font-sans text-xs text-brown/50">
-                      <span>{r.rendeles_szam}</span>
-                      <span>{formatDate(r.created_at)}</span>
-                      <span className="font-semibold text-brown-dark">
-                        {r.vegosszeg.toLocaleString("hu-HU")} Ft
-                      </span>
-                    </div>
-                  </div>
-                  <svg
-                    className={`w-4 h-4 text-brown/30 transition-transform ${isExpanded ? "rotate-180" : ""}`}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
+                  ✕
                 </button>
-
-                {/* Reszletek */}
-                {isExpanded && (
-                  <div className="border-t border-cream-dark px-4 py-4 space-y-4">
-                    {/* Kontakt */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider">Email</p>
-                        <a href={`mailto:${r.email}`} className="font-sans text-sm text-brown-dark hover:text-gold">
-                          {r.email}
-                        </a>
-                      </div>
-                      <div>
-                        <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider">Telefon</p>
-                        <a href={`tel:${r.telefon}`} className="font-sans text-sm text-brown-dark hover:text-gold">
-                          {r.telefon}
-                        </a>
-                      </div>
-                    </div>
-
-                    {r.megjegyzes && (
-                      <div>
-                        <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider">Megjegyzes</p>
-                        <p className="font-sans text-sm text-brown/70">{r.megjegyzes}</p>
-                      </div>
-                    )}
-
-                    {/* Tetelek */}
-                    <div>
-                      <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider mb-2">Tetelek</p>
-                      <div className="space-y-1">
-                        {r.rendeles_tetelek.map((t) => (
-                          <div key={t.id} className="flex items-center justify-between font-sans text-sm">
-                            <span className="text-brown-dark">
-                              {t.mennyiseg}x {t.termek_nev}
-                              <span className="text-brown/40 ml-1">({t.nap})</span>
-                            </span>
-                            <span className="text-brown/60">
-                              {t.reszosszeg.toLocaleString("hu-HU")} Ft
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Allapot valtas */}
-                    {nextAllapot && r.allapot !== "torolve" && (
-                      <div className="flex items-center gap-2 pt-2">
-                        <button
-                          onClick={() => updateAllapot(r.id, nextAllapot)}
-                          className="px-4 py-2 rounded-lg font-sans text-sm font-semibold
-                            bg-gold text-brown-dark hover:bg-gold-light transition-colors cursor-pointer"
-                        >
-                          {nextAllapot === "folyamatban" ? "Elfogadas" : "Kesz"}
-                        </button>
-                        {r.allapot === "uj" && (
-                          <button
-                            onClick={() => updateAllapot(r.id, "torolve")}
-                            className="px-4 py-2 rounded-lg font-sans text-sm
-                              text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                          >
-                            Torles
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
-            );
-          })}
-        </div>
-      )}
+
+              {/* Állapot */}
+              <div>
+                <span className={`px-2 py-1 rounded-full font-sans text-xs font-semibold ${
+                  ALLAPOT_LABELS[selected.allapot]?.color ?? "bg-gray-100 text-gray-800"
+                }`}>
+                  {ALLAPOT_LABELS[selected.allapot]?.label ?? selected.allapot}
+                </span>
+              </div>
+
+              {/* Kontakt */}
+              <div className="space-y-2">
+                <div>
+                  <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider">Email</p>
+                  <a href={`mailto:${selected.email}`} className="font-sans text-sm text-brown-dark hover:text-gold break-all">
+                    {selected.email}
+                  </a>
+                </div>
+                <div>
+                  <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider">Telefon</p>
+                  <a href={`tel:${selected.telefon}`} className="font-sans text-sm text-brown-dark hover:text-gold">
+                    {selected.telefon}
+                  </a>
+                </div>
+              </div>
+
+              {selected.megjegyzes && (
+                <div>
+                  <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider">Megjegyzés</p>
+                  <p className="font-sans text-sm text-brown/70 mt-0.5">{selected.megjegyzes}</p>
+                </div>
+              )}
+
+              {/* Tételek */}
+              <div>
+                <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider mb-2">Tételek</p>
+                <div className="space-y-1.5">
+                  {selected.rendeles_tetelek.map((t) => (
+                    <div key={t.id} className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className="font-sans text-sm text-brown-dark font-medium">
+                          {t.mennyiseg}× {t.termek_nev}
+                        </span>
+                        <span className="font-sans text-xs text-brown/40 ml-1">
+                          ({t.nap}, {formatTetelDatum(t.datum)})
+                        </span>
+                      </div>
+                      <span className="font-sans text-xs text-brown/60 whitespace-nowrap">
+                        {t.reszosszeg.toLocaleString("hu-HU")} Ft
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 pt-2 border-t border-cream-dark flex justify-between">
+                  <span className="font-sans text-xs text-brown/40">Összesen</span>
+                  <span className="font-sans text-sm font-bold text-brown-dark">
+                    {selected.vegosszeg.toLocaleString("hu-HU")} Ft
+                  </span>
+                </div>
+              </div>
+
+              {/* Állapotváltás */}
+              {selected.allapot !== "torolve" && selected.allapot !== "atvetel" && (
+                <div className="space-y-2 pt-1">
+                  {ALLAPOT_NEXT_LABEL[selected.allapot] && (
+                    <button
+                      onClick={() => updateAllapot(selected.id, ALLAPOT_FLOW[ALLAPOT_FLOW.indexOf(selected.allapot) + 1])}
+                      className="w-full py-2 rounded-lg font-sans text-sm font-semibold
+                        bg-gold text-brown-dark hover:bg-gold-light transition-colors cursor-pointer"
+                    >
+                      → {ALLAPOT_NEXT_LABEL[selected.allapot]}
+                    </button>
+                  )}
+                  {selected.allapot === "uj" && (
+                    <button
+                      onClick={() => updateAllapot(selected.id, "torolve")}
+                      className="w-full py-2 rounded-lg font-sans text-sm
+                        text-red-600 hover:bg-red-50 transition-colors cursor-pointer border border-red-200"
+                    >
+                      Törlés
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <p className="font-sans text-[10px] text-brown/30 text-center">
+                {formatDate(selected.created_at)}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

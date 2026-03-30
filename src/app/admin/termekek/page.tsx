@@ -118,7 +118,7 @@ export default function TermekekPage() {
     fetchTermekek();
   };
 
-  // Kategoriak szerinti csoportositas
+  // Kategóriák szerinti csoportosítás
   const grouped: Record<string, Termek[]> = {};
   for (const t of termekek) {
     if (!grouped[t.kategoria]) grouped[t.kategoria] = [];
@@ -130,9 +130,9 @@ export default function TermekekPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-serif text-2xl text-brown-dark">Termekek</h1>
+          <h1 className="font-serif text-2xl text-brown-dark">Termékek</h1>
           <p className="font-sans text-sm text-brown/50 mt-1">
-            Termekek kezelese, ar- es fotomodositas
+            Termékek kezelése, ár- és fotómódosítás
           </p>
         </div>
         <button
@@ -140,7 +140,7 @@ export default function TermekekPage() {
           className="px-4 py-2 rounded-lg font-sans text-sm font-semibold
             bg-gold text-brown-dark hover:bg-gold-light transition-colors cursor-pointer"
         >
-          + Uj termek
+          + Új termék
         </button>
       </div>
 
@@ -163,7 +163,7 @@ export default function TermekekPage() {
                     !t.aktiv ? "opacity-50" : ""
                   }`}
                 >
-                  {/* Foto */}
+                  {/* Fotó */}
                   <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-cream-dark flex-shrink-0">
                     <Image
                       src={t.foto_url || "/images/termek-placeholder.jpg"}
@@ -184,14 +184,14 @@ export default function TermekekPage() {
                     </p>
                   </div>
 
-                  {/* Aktiv toggle */}
+                  {/* Aktív toggle */}
                   <button
                     onClick={() => toggleAktiv(t)}
                     className={`
                       w-10 h-6 rounded-full transition-colors cursor-pointer relative
                       ${t.aktiv ? "bg-green-500" : "bg-gray-300"}
                     `}
-                    title={t.aktiv ? "Aktiv" : "Inaktiv"}
+                    title={t.aktiv ? "Aktív" : "Inaktív"}
                   >
                     <div
                       className={`
@@ -201,11 +201,11 @@ export default function TermekekPage() {
                     />
                   </button>
 
-                  {/* Szerkesztes */}
+                  {/* Szerkesztés */}
                   <button
                     onClick={() => openEdit(t)}
                     className="p-2 text-brown/40 hover:text-brown-dark transition-colors cursor-pointer"
-                    title="Szerkesztes"
+                    title="Szerkesztés"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -223,12 +223,12 @@ export default function TermekekPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-cream rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="font-serif text-xl text-brown-dark">
-              {editingId ? "Termek szerkesztese" : "Uj termek"}
+              {editingId ? "Termék szerkesztése" : "Új termék"}
             </h2>
 
             <div className="space-y-3">
               <div>
-                <label className="block font-sans text-xs text-brown/60 mb-1">Nev</label>
+                <label className="block font-sans text-xs text-brown/60 mb-1">Név</label>
                 <input
                   type="text"
                   value={form.nev}
@@ -238,7 +238,7 @@ export default function TermekekPage() {
               </div>
 
               <div>
-                <label className="block font-sans text-xs text-brown/60 mb-1">Slug (URL nev)</label>
+                <label className="block font-sans text-xs text-brown/60 mb-1">Slug (URL név)</label>
                 <input
                   type="text"
                   value={form.slug}
@@ -249,7 +249,7 @@ export default function TermekekPage() {
               </div>
 
               <div>
-                <label className="block font-sans text-xs text-brown/60 mb-1">Kategoria</label>
+                <label className="block font-sans text-xs text-brown/60 mb-1">Kategória</label>
                 <select
                   value={form.kategoria}
                   onChange={(e) => setForm({ ...form, kategoria: e.target.value })}
@@ -263,7 +263,7 @@ export default function TermekekPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-sans text-xs text-brown/60 mb-1">Ar (Ft)</label>
+                  <label className="block font-sans text-xs text-brown/60 mb-1">Ár (Ft)</label>
                   <input
                     type="number"
                     value={form.ar}
@@ -272,7 +272,7 @@ export default function TermekekPage() {
                   />
                 </div>
                 <div>
-                  <label className="block font-sans text-xs text-brown/60 mb-1">Egyseg</label>
+                  <label className="block font-sans text-xs text-brown/60 mb-1">Egység</label>
                   <input
                     type="text"
                     value={form.egyseg}
@@ -284,7 +284,7 @@ export default function TermekekPage() {
               </div>
 
               <div>
-                <label className="block font-sans text-xs text-brown/60 mb-1">Leiras</label>
+                <label className="block font-sans text-xs text-brown/60 mb-1">Leírás</label>
                 <textarea
                   value={form.leiras}
                   onChange={(e) => setForm({ ...form, leiras: e.target.value })}
@@ -294,7 +294,7 @@ export default function TermekekPage() {
               </div>
 
               <div>
-                <label className="block font-sans text-xs text-brown/60 mb-1">Foto URL</label>
+                <label className="block font-sans text-xs text-brown/60 mb-1">Fotó URL</label>
                 <input
                   type="text"
                   value={form.foto_url}
@@ -311,7 +311,7 @@ export default function TermekekPage() {
                 className="flex-1 py-2.5 rounded-lg font-sans text-sm border border-cream-dark
                   text-brown/60 hover:bg-cream-dark transition-colors cursor-pointer"
               >
-                Megse
+                Mégsem
               </button>
               <button
                 onClick={handleSave}
@@ -320,7 +320,7 @@ export default function TermekekPage() {
                   bg-gold text-brown-dark hover:bg-gold-light transition-colors
                   disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                {saving ? "Mentes..." : "Mentes"}
+                {saving ? "Mentés..." : "Mentés"}
               </button>
             </div>
           </div>
