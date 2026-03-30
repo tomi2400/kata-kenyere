@@ -1,5 +1,30 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { deriveNapiAllapotok, deriveRendelesDisplayAllapot, matchesAllapotFilter } from "@/lib/rendeles-allapot";
+
+type TetelRow = {
+  id: string;
+  datum: string;
+  nap: string;
+  termek_nev: string;
+  mennyiseg: number;
+  egysegar: number;
+  reszosszeg: number;
+  allapot?: string | null;
+};
+
+type RendelesRow = {
+  id: string;
+  rendeles_szam: string;
+  nev: string;
+  email: string;
+  telefon: string;
+  megjegyzes: string | null;
+  vegosszeg: number;
+  allapot: string | null;
+  created_at: string;
+  rendeles_tetelek: TetelRow[];
+};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -10,13 +35,9 @@ export async function GET(request: Request) {
     .from("rendelesek")
     .select(`
       id, rendeles_szam, nev, email, telefon, megjegyzes, vegosszeg, allapot, created_at,
-      rendeles_tetelek (id, datum, nap, termek_nev, mennyiseg, egysegar, reszosszeg)
+      rendeles_tetelek (id, datum, nap, termek_nev, mennyiseg, egysegar, reszosszeg, allapot)
     `)
     .order("created_at", { ascending: false });
-
-  if (allapot && allapot !== "mind") {
-    query = query.eq("allapot", allapot);
-  }
 
   // Ha datum szuro van, azokat a rendeleseket keressuk amiknek van tetele azon a napon
   if (datum) {
@@ -38,5 +59,23 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ rendelesek: data });
+  const rendelesek = ((data ?? []) as RendelesRow[]).map((rendeles) => {
+    const napi_allapotok = deriveNapiAllapotok(rendeles.rendeles_tetelek ?? []);
+    const display_allapot = deriveRendelesDisplayAllapot(rendeles.rendeles_tetelek ?? [], rendeles.allapot);
+
+    return {
+      ...rendeles,
+      allapot: display_allapot,
+      display_allapot,
+      napi_allapotok,
+    };
+  });
+
+  const filtered = allapot && allapot !== "mind"
+    ? rendelesek.filter((rendeles) =>
+        matchesAllapotFilter(rendeles.rendeles_tetelek ?? [], rendeles.display_allapot, allapot)
+      )
+    : rendelesek;
+
+  return NextResponse.json({ rendelesek: filtered });
 }

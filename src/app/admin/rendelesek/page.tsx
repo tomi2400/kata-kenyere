@@ -10,6 +10,13 @@ type Tetel = {
   mennyiseg: number;
   egysegar: number;
   reszosszeg: number;
+  allapot: string;
+};
+
+type NapiAllapot = {
+  datum: string;
+  nap: string;
+  allapot: string;
 };
 
 type Rendeles = {
@@ -21,8 +28,10 @@ type Rendeles = {
   megjegyzes: string | null;
   vegosszeg: number;
   allapot: string;
+  display_allapot: string;
   created_at: string;
   rendeles_tetelek: Tetel[];
+  napi_allapotok: NapiAllapot[];
 };
 
 const ALLAPOT_LABELS: Record<string, { label: string; color: string }> = {
@@ -31,15 +40,10 @@ const ALLAPOT_LABELS: Record<string, { label: string; color: string }> = {
   kesz: { label: "Kész", color: "bg-green-100 text-green-800" },
   atvetel: { label: "Átvéve", color: "bg-purple-100 text-purple-800" },
   torolve: { label: "Törölve", color: "bg-red-100 text-red-800" },
+  reszben: { label: "Részben kész", color: "bg-amber-100 text-amber-800" },
 };
 
-const ALLAPOT_FLOW = ["uj", "feldolgozva", "kesz", "atvetel"];
-
-const ALLAPOT_NEXT_LABEL: Record<string, string> = {
-  uj: "Feldolgozás",
-  feldolgozva: "Kész",
-  kesz: "Átvéve",
-};
+const NAPI_ALLAPOT_SORREND = ["uj", "feldolgozva", "kesz", "atvetel", "torolve"];
 
 export default function RendelesekPage() {
   const [rendelesek, setRendelesek] = useState<Rendeles[]>([]);
@@ -47,6 +51,7 @@ export default function RendelesekPage() {
   const [datumFilter, setDatumFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [updatingKey, setUpdatingKey] = useState<string | null>(null);
 
   const fetchRendelesek = (allapot: string, datum: string) => {
     setLoading(true);
@@ -67,12 +72,15 @@ export default function RendelesekPage() {
     fetchRendelesek(filter, datumFilter);
   }, [filter, datumFilter]);
 
-  const updateAllapot = async (id: string, allapot: string) => {
+  const updateNapiAllapot = async (id: string, datum: string, allapot: string) => {
+    const key = `${id}_${datum}_${allapot}`;
+    setUpdatingKey(key);
     await fetch(`/api/admin/rendelesek/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ allapot }),
+      body: JSON.stringify({ datum, allapot }),
     });
+    setUpdatingKey(null);
     fetchRendelesek(filter, datumFilter);
   };
 
@@ -90,6 +98,27 @@ export default function RendelesekPage() {
     return d.toLocaleDateString("hu-HU", { month: "short", day: "numeric" });
   };
 
+  const groupedTetelekByDatum = (tetelek: Tetel[]) => {
+    const groups = new Map<string, { nap: string; tetelek: Tetel[] }>();
+
+    for (const tetel of tetelek) {
+      const current = groups.get(tetel.datum);
+      if (current) {
+        current.tetelek.push(tetel);
+      } else {
+        groups.set(tetel.datum, { nap: tetel.nap, tetelek: [tetel] });
+      }
+    }
+
+    return Array.from(groups.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([datum, value]) => ({
+        datum,
+        nap: value.nap,
+        tetelek: value.tetelek,
+      }));
+  };
+
   const selected = rendelesek.find((r) => r.id === selectedId) ?? null;
 
   return (
@@ -105,7 +134,7 @@ export default function RendelesekPage() {
       {/* Szűrők */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
         <div className="flex gap-2 overflow-x-auto pb-1">
-          {["mind", "uj", "feldolgozva", "kesz", "atvetel", "torolve"].map((a) => (
+          {["mind", "uj", "feldolgozva", "kesz", "reszben", "atvetel", "torolve"].map((a) => (
             <button
               key={a}
               onClick={() => setFilter(a)}
@@ -163,7 +192,7 @@ export default function RendelesekPage() {
                 </thead>
                 <tbody>
                   {rendelesek.map((r, i) => {
-                    const allapotInfo = ALLAPOT_LABELS[r.allapot] ?? { label: r.allapot, color: "bg-gray-100 text-gray-800" };
+                    const allapotInfo = ALLAPOT_LABELS[r.display_allapot] ?? { label: r.display_allapot, color: "bg-gray-100 text-gray-800" };
                     const isSelected = selectedId === r.id;
                     // Termékek összefoglalója
                     const tetelSummary = r.rendeles_tetelek
@@ -205,6 +234,11 @@ export default function RendelesekPage() {
                           <span className={`px-2 py-0.5 rounded-full font-sans text-[10px] font-semibold whitespace-nowrap ${allapotInfo.color}`}>
                             {allapotInfo.label}
                           </span>
+                          {r.napi_allapotok.length > 1 && (
+                            <p className="font-sans text-[10px] text-brown/40 mt-1">
+                              {r.napi_allapotok.filter((item) => item.allapot === "atvetel").length}/{r.napi_allapotok.length} nap lezárva
+                            </p>
+                          )}
                         </td>
                       </tr>
                     );
@@ -236,9 +270,9 @@ export default function RendelesekPage() {
               {/* Állapot */}
               <div>
                 <span className={`px-2 py-1 rounded-full font-sans text-xs font-semibold ${
-                  ALLAPOT_LABELS[selected.allapot]?.color ?? "bg-gray-100 text-gray-800"
+                  ALLAPOT_LABELS[selected.display_allapot]?.color ?? "bg-gray-100 text-gray-800"
                 }`}>
-                  {ALLAPOT_LABELS[selected.allapot]?.label ?? selected.allapot}
+                  {ALLAPOT_LABELS[selected.display_allapot]?.label ?? selected.display_allapot}
                 </span>
               </div>
 
@@ -267,23 +301,68 @@ export default function RendelesekPage() {
 
               {/* Tételek */}
               <div>
-                <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider mb-2">Tételek</p>
-                <div className="space-y-1.5">
-                  {selected.rendeles_tetelek.map((t) => (
-                    <div key={t.id} className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className="font-sans text-sm text-brown-dark font-medium">
-                          {t.mennyiseg}× {t.termek_nev}
-                        </span>
-                        <span className="font-sans text-xs text-brown/40 ml-1">
-                          ({t.nap}, {formatTetelDatum(t.datum)})
-                        </span>
+                <p className="font-sans text-[10px] text-brown/40 uppercase tracking-wider mb-2">Napi bontás</p>
+                <div className="space-y-3">
+                  {groupedTetelekByDatum(selected.rendeles_tetelek).map((group) => {
+                    const napiAllapot = selected.napi_allapotok.find((item) => item.datum === group.datum)?.allapot ?? "uj";
+                    const napiAllapotInfo = ALLAPOT_LABELS[napiAllapot] ?? { label: napiAllapot, color: "bg-gray-100 text-gray-800" };
+
+                    return (
+                      <div key={group.datum} className="rounded-xl border border-cream-dark p-3 bg-cream/50">
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div>
+                            <p className="font-sans text-sm font-semibold text-brown-dark">
+                              {group.nap}, {formatTetelDatum(group.datum)}
+                            </p>
+                            <p className="font-sans text-xs text-brown/40">
+                              {group.tetelek.length} tétel
+                            </p>
+                          </div>
+                          <span className={`px-2 py-1 rounded-full font-sans text-[10px] font-semibold whitespace-nowrap ${napiAllapotInfo.color}`}>
+                            {napiAllapotInfo.label}
+                          </span>
+                        </div>
+
+                        <div className="space-y-1.5 mb-3">
+                          {group.tetelek.map((t) => (
+                            <div key={t.id} className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="font-sans text-sm text-brown-dark font-medium">
+                                  {t.mennyiseg}× {t.termek_nev}
+                                </span>
+                              </div>
+                              <span className="font-sans text-xs text-brown/60 whitespace-nowrap">
+                                {t.reszosszeg.toLocaleString("hu-HU")} Ft
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          {NAPI_ALLAPOT_SORREND.map((allapot) => {
+                            const active = napiAllapot === allapot;
+                            const buttonInfo = ALLAPOT_LABELS[allapot];
+                            const actionKey = `${selected.id}_${group.datum}_${allapot}`;
+
+                            return (
+                              <button
+                                key={allapot}
+                                onClick={() => updateNapiAllapot(selected.id, group.datum, allapot)}
+                                disabled={updatingKey !== null}
+                                className={`px-2.5 py-1.5 rounded-lg font-sans text-xs transition-colors cursor-pointer border ${
+                                  active
+                                    ? `${buttonInfo.color} border-current`
+                                    : "bg-white text-brown/60 border-cream-dark hover:border-gold hover:text-brown-dark"
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                              >
+                                {updatingKey === actionKey ? "Mentés..." : buttonInfo.label}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                      <span className="font-sans text-xs text-brown/60 whitespace-nowrap">
-                        {t.reszosszeg.toLocaleString("hu-HU")} Ft
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="mt-2 pt-2 border-t border-cream-dark flex justify-between">
                   <span className="font-sans text-xs text-brown/40">Összesen</span>
@@ -293,29 +372,9 @@ export default function RendelesekPage() {
                 </div>
               </div>
 
-              {/* Állapotváltás */}
-              {selected.allapot !== "torolve" && selected.allapot !== "atvetel" && (
-                <div className="space-y-2 pt-1">
-                  {ALLAPOT_NEXT_LABEL[selected.allapot] && (
-                    <button
-                      onClick={() => updateAllapot(selected.id, ALLAPOT_FLOW[ALLAPOT_FLOW.indexOf(selected.allapot) + 1])}
-                      className="w-full py-2 rounded-lg font-sans text-sm font-semibold
-                        bg-gold text-brown-dark hover:bg-gold-light transition-colors cursor-pointer"
-                    >
-                      → {ALLAPOT_NEXT_LABEL[selected.allapot]}
-                    </button>
-                  )}
-                  {selected.allapot === "uj" && (
-                    <button
-                      onClick={() => updateAllapot(selected.id, "torolve")}
-                      className="w-full py-2 rounded-lg font-sans text-sm
-                        text-red-600 hover:bg-red-50 transition-colors cursor-pointer border border-red-200"
-                    >
-                      Törlés
-                    </button>
-                  )}
-                </div>
-              )}
+              <p className="font-sans text-xs text-brown/50">
+                A státusz most naponként kezelhető. Így a több napra leadott rendeléseknél csak a megfelelő napi rész halad tovább.
+              </p>
 
               <p className="font-sans text-[10px] text-brown/30 text-center">
                 {formatDate(selected.created_at)}

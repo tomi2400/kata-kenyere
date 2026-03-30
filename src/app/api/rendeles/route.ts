@@ -86,6 +86,7 @@ export async function POST(request: Request) {
       mennyiseg: r.mennyiseg,
       egysegar: r.egysegar,
       reszosszeg: r.reszosszeg,
+      allapot: "uj",
     }));
 
     const { error: tetelError } = await supabaseAdmin
