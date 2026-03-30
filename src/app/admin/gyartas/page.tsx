@@ -6,6 +6,7 @@ type GyartasItem = {
   termek_nev: string;
   egyseg: string;
   ossz_mennyiseg: number;
+  osszmennyiseg?: number;
 };
 
 const getItemId = (item: Pick<GyartasItem, "termek_nev" | "egyseg">) => `${item.termek_nev}__${item.egyseg}`;
@@ -26,7 +27,11 @@ export default function GyartasPage() {
     fetch(`/api/admin/gyartas/${datum}`)
       .then((res) => res.json())
       .then((data) => {
-        setItems(data.items ?? []);
+        const normalized = (data.items ?? []).map((item: GyartasItem) => ({
+          ...item,
+          ossz_mennyiseg: item.ossz_mennyiseg ?? item.osszmennyiseg ?? 0,
+        }));
+        setItems(normalized);
         setLoading(false);
       })
       .catch(() => setLoading(false));
