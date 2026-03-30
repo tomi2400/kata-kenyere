@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import DaySelector from "@/components/DaySelector";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import type { OrderDay } from "@/lib/deadline";
 import { MapPin, Clock, ShoppingBag } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Kovászos kenyér előrendelés online – Pécs",
@@ -22,12 +23,11 @@ export const metadata = {
 function formatHatarido(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
-  return d.toLocaleString("hu-HU", {
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }) + "-ig";
+  const month = d.toLocaleDateString("hu-HU", { month: "long" });
+  const day = d.getDate();
+  const hour = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${month} ${day}., ${hour}:${min}-ig`;
 }
 
 export default async function ElorendelesPage() {
@@ -40,15 +40,14 @@ export default async function ElorendelesPage() {
     .eq("nyitott", true)
     .gte("datum", todayStr)
     .order("datum")
-    .limit(7);
+    .limit(90);
 
-  const days: OrderDay[] = (napok ?? [])
+  const days = (napok ?? [])
     .filter((nap) => nap.hatarido && new Date(nap.hatarido) > now)
     .map((nap) => ({
-      nap: nap.nap as OrderDay["nap"],
+      nap: nap.nap as string,
       datum: nap.datum,
       hatarido: formatHatarido(nap.hatarido),
-      nyitott: true,
     }));
 
   return (
