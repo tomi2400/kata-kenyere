@@ -52,6 +52,8 @@ function TermekekTab() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<Record<string, string>>({});
 
   const fetchTermekek = () => {
     setLoading(true);
@@ -74,6 +76,7 @@ function TermekekTab() {
   };
 
   const openEdit = (t: Termek) => {
+    setDeleteError((prev) => ({ ...prev, [t.id]: "" }));
     setEditingId(t.id);
     setForm({
       nev: t.nev, slug: t.slug, leiras: t.leiras,
@@ -116,6 +119,25 @@ function TermekekTab() {
     fetchTermekek();
   };
 
+  const handleDelete = async (t: Termek) => {
+    setDeleteError((prev) => ({ ...prev, [t.id]: "" }));
+
+    const biztos = window.confirm(`Biztosan törlöd ezt a terméket?\n\n${t.nev} (${t.egyseg})`);
+    if (!biztos) return;
+
+    setDeletingId(t.id);
+    const res = await fetch(`/api/admin/termekek/${t.id}`, { method: "DELETE" });
+    setDeletingId(null);
+
+    if (res.ok) {
+      fetchTermekek();
+      return;
+    }
+
+    const d = await res.json().catch(() => ({}));
+    setDeleteError((prev) => ({ ...prev, [t.id]: d.error ?? "Hiba történt a törlés közben." }));
+  };
+
   const grouped: Record<string, Termek[]> = {};
   for (const t of termekek) {
     if (!grouped[t.kategoria]) grouped[t.kategoria] = [];
@@ -148,34 +170,50 @@ function TermekekTab() {
               {items.map((t) => (
                 <div
                   key={t.id}
-                  className={`flex items-center gap-3 bg-white rounded-xl border border-cream-dark p-3 ${!t.aktiv ? "opacity-50" : ""}`}
+                  className={`bg-white rounded-xl border border-cream-dark p-3 ${!t.aktiv ? "opacity-50" : ""}`}
                 >
-                  <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-cream-dark flex-shrink-0">
-                    <Image
-                      src={t.foto_url || "/images/termek-placeholder.jpg"}
-                      alt={t.nev} fill className="object-cover" sizes="56px"
-                    />
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-cream-dark flex-shrink-0">
+                      <Image
+                        src={t.foto_url || "/images/termek-placeholder.jpg"}
+                        alt={t.nev} fill className="object-cover" sizes="56px"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-sans text-sm font-semibold text-brown-dark truncate">{t.nev}</p>
+                      <p className="font-sans text-xs text-brown/50">{t.egyseg} · {t.ar.toLocaleString("hu-HU")} Ft</p>
+                    </div>
+                    <button
+                      onClick={() => toggleAktiv(t)}
+                      className={`w-10 h-6 rounded-full transition-colors cursor-pointer relative ${t.aktiv ? "bg-green-500" : "bg-gray-300"}`}
+                      title={t.aktiv ? "Aktív" : "Inaktív"}
+                    >
+                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${t.aktiv ? "left-5" : "left-1"}`} />
+                    </button>
+                    <button
+                      onClick={() => openEdit(t)}
+                      className="p-2 text-brown/40 hover:text-brown-dark transition-colors cursor-pointer"
+                      title="Szerkesztés"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(t)}
+                      disabled={deletingId === t.id}
+                      className="p-2 text-brown/25 hover:text-red-500 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Törlés"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-sans text-sm font-semibold text-brown-dark truncate">{t.nev}</p>
-                    <p className="font-sans text-xs text-brown/50">{t.egyseg} · {t.ar.toLocaleString("hu-HU")} Ft</p>
-                  </div>
-                  <button
-                    onClick={() => toggleAktiv(t)}
-                    className={`w-10 h-6 rounded-full transition-colors cursor-pointer relative ${t.aktiv ? "bg-green-500" : "bg-gray-300"}`}
-                    title={t.aktiv ? "Aktív" : "Inaktív"}
-                  >
-                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${t.aktiv ? "left-5" : "left-1"}`} />
-                  </button>
-                  <button
-                    onClick={() => openEdit(t)}
-                    className="p-2 text-brown/40 hover:text-brown-dark transition-colors cursor-pointer"
-                    title="Szerkesztés"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                    </svg>
-                  </button>
+
+                  {deleteError[t.id] && (
+                    <p className="font-sans text-xs text-red-500 mt-2 ml-[68px]">{deleteError[t.id]}</p>
+                  )}
                 </div>
               ))}
             </div>

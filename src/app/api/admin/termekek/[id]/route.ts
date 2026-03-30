@@ -25,13 +25,19 @@ export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } }
 ) {
-  // Soft delete: aktiv = false
   const { error } = await supabaseAdmin
     .from("termekek")
-    .update({ aktiv: false })
+    .delete()
     .eq("id", params.id);
 
   if (error) {
+    if (error.code === "23503") {
+      return NextResponse.json(
+        { error: "Ez a termék nem törölhető, mert már kapcsolódik meglévő rendeléshez vagy más adathoz." },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

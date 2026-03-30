@@ -20,7 +20,7 @@ export default function TermekekPage() {
 
   useEffect(() => {
     setMounted(true);
-    fetch("/api/termekek")
+    fetch("/api/termekek", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         setTermekek(data.termekek);

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { type Termek, getTermekFoto, csoportositByKategoria } from "@/lib/products";
 import { supabase } from "@/lib/supabase/client";
 import Navbar from "@/components/Navbar";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Kovászos kenyerek és péksütemények – Kínálatunk",
@@ -21,6 +24,8 @@ export const metadata: Metadata = {
 };
 
 export default async function TermekekPage() {
+  noStore();
+
   const { data: kategoriak } = await supabase
     .from("kategoriak")
     .select("nev")

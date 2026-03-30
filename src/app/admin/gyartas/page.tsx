@@ -8,7 +8,8 @@ type GyartasItem = {
   ossz_mennyiseg: number;
 };
 
-const DONE_KEY = (datum: string, nev: string) => `gyartas_kesz_${datum}_${nev}`;
+const getItemId = (item: Pick<GyartasItem, "termek_nev" | "egyseg">) => `${item.termek_nev}__${item.egyseg}`;
+const DONE_KEY = (datum: string, itemId: string) => `gyartas_kesz_${datum}_${itemId}`;
 
 export default function GyartasPage() {
   const [items, setItems] = useState<GyartasItem[]>([]);
@@ -40,23 +41,25 @@ export default function GyartasPage() {
     if (items.length === 0) return;
     const saved = new Set<string>();
     for (const item of items) {
-      const key = DONE_KEY(selectedDate, item.termek_nev);
+      const itemId = getItemId(item);
+      const key = DONE_KEY(selectedDate, itemId);
       if (localStorage.getItem(key) === "1") {
-        saved.add(item.termek_nev);
+        saved.add(itemId);
       }
     }
     setDoneSet(saved);
   }, [items, selectedDate]);
 
-  const toggleDone = (termek_nev: string) => {
-    const key = DONE_KEY(selectedDate, termek_nev);
+  const toggleDone = (item: GyartasItem) => {
+    const itemId = getItemId(item);
+    const key = DONE_KEY(selectedDate, itemId);
     setDoneSet((prev) => {
       const next = new Set(prev);
-      if (next.has(termek_nev)) {
-        next.delete(termek_nev);
+      if (next.has(itemId)) {
+        next.delete(itemId);
         localStorage.removeItem(key);
       } else {
-        next.add(termek_nev);
+        next.add(itemId);
         localStorage.setItem(key, "1");
       }
       return next;
@@ -69,10 +72,10 @@ export default function GyartasPage() {
   };
 
   const visibleItems = csakNemKesz
-    ? items.filter((i) => !doneSet.has(i.termek_nev))
+    ? items.filter((i) => !doneSet.has(getItemId(i)))
     : items;
 
-  const mindenKesz = items.length > 0 && items.every((i) => doneSet.has(i.termek_nev));
+  const mindenKesz = items.length > 0 && items.every((i) => doneSet.has(getItemId(i)));
 
   return (
     <div className="p-4 md:p-8 max-w-3xl mx-auto">
@@ -165,15 +168,16 @@ export default function GyartasPage() {
             </thead>
             <tbody>
               {visibleItems.map((item, i) => {
-                const kesz = doneSet.has(item.termek_nev);
+                const itemId = getItemId(item);
+                const kesz = doneSet.has(itemId);
                 return (
                   <tr
-                    key={item.termek_nev}
+                    key={itemId}
                     className={`${i < visibleItems.length - 1 ? "border-b border-cream-dark" : ""} ${kesz ? "bg-green-50" : ""}`}
                   >
                     <td className="px-4 py-3 print:hidden">
                       <button
-                        onClick={() => toggleDone(item.termek_nev)}
+                        onClick={() => toggleDone(item)}
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors cursor-pointer
                           ${kesz ? "bg-green-500 border-green-500" : "border-cream-dark hover:border-gold"}`}
                       >

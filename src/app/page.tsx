@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import Navbar from "@/components/Navbar";
 import { MapPin, Clock, Star, Wheat, Flame, Leaf, Heart } from "lucide-react";
 import { type Termek, getTermekFoto } from "@/lib/products";
 import { supabase } from "@/lib/supabase/client";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Kata Kenyere – Kézműves pékség Pécsett",
@@ -62,6 +65,8 @@ function StarRating({ n }: { n: number }) {
 }
 
 export default async function Home() {
+  noStore();
+
   const { data: termekekRaw } = await supabase
     .from("termekek")
     .select("id, slug, nev, leiras, kategoria, ar, egyseg, foto_url, sorrend")
