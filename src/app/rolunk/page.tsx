@@ -19,7 +19,7 @@ export const metadata = {
 
 export default function RolunkPage() {
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream grain-overlay">
       <Navbar />
 
       {/* HERO */}
@@ -34,14 +34,14 @@ export default function RolunkPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-brown-dark/90 via-brown-dark/40 to-transparent" />
         <div className="relative z-10 max-w-5xl mx-auto px-6 pb-10 w-full">
           <div className="w-10 h-px bg-gold mb-4" />
-          <h1 className="font-serif text-4xl sm:text-5xl text-cream">Rólunk</h1>
+          <h1 className="font-serif text-4xl sm:text-5xl text-cream reveal-soft">Rólunk</h1>
         </div>
       </section>
 
       {/* TÖRTÉNET */}
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-          <div>
+          <div className="reveal-up">
             <div className="w-10 h-px bg-gold mb-5" />
             <h2 className="font-serif text-3xl text-brown-dark mb-5 leading-tight">
               Kata és a<br />
@@ -57,7 +57,7 @@ export default function RolunkPage() {
               Ma már naponta 60-80 kenyeret sütünk, de minden darab ugyanolyan figyelmet kap, mint az első.
             </p>
           </div>
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden reveal-scale delay-2">
             <Image
               src="/images/termek-placeholder.jpg"
               alt="Kata a pékségben"
@@ -71,7 +71,7 @@ export default function RolunkPage() {
       {/* ÉRTÉKEK */}
       <section className="py-20 px-6 bg-cream-dark">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-12 reveal-up">
             <div className="w-10 h-px bg-gold mx-auto mb-5" />
             <h2 className="font-serif text-3xl text-brown-dark">Amit hiszünk</h2>
           </div>
@@ -108,7 +108,7 @@ export default function RolunkPage() {
                 szoveg: "Nem melóból sütjük. Ez a munkánk és a szenvedélyünk egyszerre.",
               },
             ].map(({ Icon, cim, szoveg }) => (
-              <div key={cim} className="bg-cream rounded-xl p-6">
+              <div key={cim} className="bg-cream rounded-xl p-6 hover-lift reveal-up">
                 <Icon className="w-5 h-5 text-gold mb-4" />
                 <p className="font-serif text-base font-semibold text-brown-dark mb-2">{cim}</p>
                 <p className="font-sans text-sm text-brown/60 leading-relaxed">{szoveg}</p>
@@ -121,7 +121,7 @@ export default function RolunkPage() {
       {/* HELYSZÍN */}
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-          <div className="order-2 md:order-1 bg-cream-dark rounded-2xl p-8">
+          <div className="order-2 md:order-1 bg-cream-dark rounded-2xl p-8 reveal-scale">
             <p className="font-sans text-xs text-brown/40 uppercase tracking-wider mb-4">Látogass meg minket</p>
             <div className="space-y-4">
               {[
@@ -140,7 +140,7 @@ export default function RolunkPage() {
               ))}
             </div>
           </div>
-          <div className="order-1 md:order-2">
+          <div className="order-1 md:order-2 reveal-up delay-2">
             <div className="w-10 h-px bg-gold mb-5" />
             <h2 className="font-serif text-3xl text-brown-dark mb-5 leading-tight">
               Gyere be hozzánk,<br />
@@ -151,7 +151,7 @@ export default function RolunkPage() {
             </p>
             <Link
               href="/elorendeles"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-sans font-bold text-sm bg-brown-dark text-cream hover:bg-brown transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-sans font-bold text-sm bg-brown-dark text-cream hover:bg-brown transition-colors hover-lift"
             >
               Előrendelés
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

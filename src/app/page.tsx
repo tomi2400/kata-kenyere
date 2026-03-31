@@ -75,7 +75,7 @@ export default async function Home() {
     .limit(8);
   const KINALAT_PREVIEW: Termek[] = termekekRaw ?? [];
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream grain-overlay">
       <Navbar transparent />
 
       {/* ═══ HERO ═══ */}
@@ -91,24 +91,24 @@ export default async function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-brown-dark/40 via-transparent to-transparent" />
 
         <div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-16 md:pb-20">
-          <p className="font-sans text-xs tracking-[0.2em] text-gold uppercase mb-4">
+          <p className="font-sans text-xs tracking-[0.2em] text-gold uppercase mb-4 reveal-up">
             Kézműves pékség · Pécs
           </p>
-          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl text-cream leading-[1.05] mb-4 max-w-2xl">
+          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl text-cream leading-[1.05] mb-4 max-w-2xl reveal-soft delay-1">
             Frissen,
             <br />
             <em className="text-gold not-italic">kézzel,</em>
             <br />
             szeretettel.
           </h1>
-          <p className="font-sans text-cream/75 text-lg max-w-md mb-8 leading-relaxed">
+          <p className="font-sans text-cream/75 text-lg max-w-md mb-8 leading-relaxed reveal-up delay-2">
             Kovásszal kelesztett kenyerek és kézzel formázott pékáruk –
             minden nap frissen sütve.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 reveal-up delay-3">
             <Link
               href="/elorendeles"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-sans font-bold text-base bg-gold text-brown-dark hover:bg-gold-light transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-sans font-bold text-base bg-gold text-brown-dark hover:bg-gold-light transition-colors hover-lift"
             >
               Előrendelés
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -117,7 +117,7 @@ export default async function Home() {
             </Link>
             <Link
               href="/termekek"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-sans font-semibold text-base border-2 border-cream/30 text-cream hover:border-cream/60 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-sans font-semibold text-base border-2 border-cream/30 text-cream hover:border-cream/60 transition-colors hover-lift"
             >
               Kínálatunk
             </Link>
@@ -133,7 +133,7 @@ export default async function Home() {
             { Icon: Clock, label: "Nyitvatartás", value: "K–P: 8:00–17:00" },
             { Icon: Star, label: "Google értékelés", value: "5,0 · 4 vélemény" },
           ].map(({ Icon, label, value }) => (
-            <div key={label} className="flex items-center gap-3">
+            <div key={label} className="flex items-center gap-3 reveal-up hover-lift">
               <Icon className="w-4 h-4 text-gold shrink-0" />
               <div>
                 <p className="text-xs text-cream/40 uppercase tracking-wider font-sans">{label}</p>
@@ -148,7 +148,7 @@ export default async function Home() {
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
+            <div className="reveal-up">
               <div className="w-10 h-px bg-gold mb-5" />
               <h2 className="font-serif text-4xl text-brown-dark mb-5 leading-tight">
                 Minden termékben
@@ -168,14 +168,14 @@ export default async function Home() {
                 Ismerd meg történetünket →
               </Link>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 reveal-scale delay-2">
               {[
                 { Icon: Wheat, cim: "Természetes kovász", szoveg: "Időt adunk a tésztának, nem adalékanyagot" },
                 { Icon: Leaf, cim: "Kézzel, szívvel", szoveg: "Úgy készítjük, mintha a családunknak adnánk" },
                 { Icon: Flame, cim: "Mindig frissen sütve", szoveg: "Csak annyit készítünk, amennyit rendeltek" },
                 { Icon: Heart, cim: "Tiszta alapanyagok", szoveg: "Nálunk nincs mit rejtegetni" },
               ].map(({ Icon, cim, szoveg }) => (
-                <div key={cim} className="bg-cream-dark rounded-xl p-4">
+                <div key={cim} className="bg-cream-dark rounded-xl p-4 hover-lift">
                   <Icon className="w-5 h-5 text-gold mb-3" />
                   <p className="font-serif text-sm font-semibold text-brown-dark mb-1">{cim}</p>
                   <p className="font-sans text-xs text-brown/60 leading-relaxed">{szoveg}</p>
@@ -190,7 +190,7 @@ export default async function Home() {
       <section className="py-16 px-6 bg-cream-dark">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-end justify-between mb-8">
-            <div>
+            <div className="reveal-up">
               <div className="w-10 h-px bg-gold mb-4" />
               <h2 className="font-serif text-3xl text-brown-dark">Kínálatunkból</h2>
             </div>
@@ -202,9 +202,9 @@ export default async function Home() {
             </Link>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-3 -mx-6 px-6 snap-x snap-mandatory scrollbar-none mb-6">
+          <div className="flex gap-3 overflow-x-auto pb-3 -mx-6 px-6 snap-x snap-mandatory scrollbar-none mb-6 reveal-soft delay-1">
             {KINALAT_PREVIEW.map((termek) => (
-              <div key={termek.slug} className="rounded-xl overflow-hidden bg-cream shrink-0 w-[46vw] sm:w-56 snap-start">
+              <div key={termek.slug} className="rounded-xl overflow-hidden bg-cream shrink-0 w-[46vw] sm:w-56 snap-start hover-lift">
                 <div className="relative aspect-[4/3]">
                   <Image
                     src={getTermekFoto(termek)}
@@ -225,7 +225,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 reveal-up delay-2">
             <Link
               href="/termekek"
               className="flex-1 sm:flex-none py-3 px-6 rounded-xl font-sans font-semibold text-sm border-2 border-brown-dark/20 text-brown-dark hover:border-brown-dark transition-colors text-center"
@@ -245,7 +245,7 @@ export default async function Home() {
       {/* ═══ GOOGLE REVIEWS ═══ */}
       <section className="py-20 px-6 bg-brown-dark">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
+          <div className="text-center mb-10 reveal-up">
             <div className="w-10 h-px bg-gold mx-auto mb-5" />
             <h2 className="font-serif text-3xl text-cream mb-2">
               Amit vendégeink írtak
@@ -256,9 +256,9 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4 mb-8">
+          <div className="grid sm:grid-cols-2 gap-4 mb-8 reveal-soft delay-1">
             {REVIEWS.filter(r => r.szoveg !== "Hamarosan...").map((review) => (
-              <div key={review.nev} className="bg-cream/5 border border-cream/10 rounded-2xl p-5">
+              <div key={review.nev} className="bg-cream/5 border border-cream/10 rounded-2xl p-5 hover-lift">
                 <StarRating n={review.csillag} />
                 <p className="font-sans text-cream/80 text-sm leading-relaxed mt-3 mb-4 italic">
                   &bdquo;{review.szoveg}&rdquo;
@@ -273,7 +273,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <div className="text-center">
+          <div className="text-center reveal-up delay-2">
             <a
               href="https://g.page/r/kata-kenyere/review"
               target="_blank"
@@ -288,7 +288,7 @@ export default async function Home() {
 
       {/* ═══ CTA SZEKCIÓ ═══ */}
       <section className="py-20 px-6 bg-cream text-center">
-        <div className="max-w-xl mx-auto">
+        <div className="max-w-xl mx-auto reveal-scale">
           <Image
             src="/images/logo.png"
             alt="Kata Kenyere"
@@ -306,8 +306,8 @@ export default async function Home() {
           </p>
           <Link
             href="/elorendeles"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-sans font-bold text-base bg-brown-dark text-cream hover:bg-brown transition-colors"
-          >
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-sans font-bold text-base bg-brown-dark text-cream hover:bg-brown transition-colors hover-lift"
+            >
             Előrendelés indítása
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />

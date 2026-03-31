@@ -28,7 +28,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
   return (
     <>
       <header className={`
-        fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow] duration-500
+        fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow,transform] duration-500
         ${transparent && !open && !scrolled
           ? "bg-transparent"
           : "bg-cream border-b border-gold/30 shadow-md"
@@ -36,7 +36,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
       `}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+          <Link href="/" className="flex items-center gap-2.5 shrink-0 reveal-up">
             <Image
               src="/images/logo.png"
               alt="Kata Kenyere"
@@ -50,7 +50,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-6 reveal-up delay-1">
             {LINKS.map((l) => (
               <Link
                 key={l.href}
@@ -75,7 +75,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
           <div className="flex items-center gap-3">
             <Link
               href="/elorendeles"
-              className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-lg font-sans font-semibold text-sm bg-gold text-brown-dark hover:bg-gold-light transition-colors"
+              className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-lg font-sans font-semibold text-sm bg-gold text-brown-dark hover:bg-gold-light transition-colors reveal-up delay-2 hover-lift"
             >
               Előrendelés
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -105,7 +105,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
 
         {/* Mobile menu */}
         {open && (
-          <div className="md:hidden bg-cream border-t border-gold/20 px-4 py-4 space-y-1">
+          <div className="md:hidden bg-cream border-t border-gold/20 px-4 py-4 space-y-1 reveal-soft">
             {LINKS.map((l) => (
               <Link
                 key={l.href}
