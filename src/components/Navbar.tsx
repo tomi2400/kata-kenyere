@@ -40,7 +40,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
               flex h-16 items-center justify-between rounded-full px-4 sm:px-5
               transition-[background-color,border-color,box-shadow] duration-500
               ${transparent && !open && !scrolled
-                ? "border border-cream/10 bg-white/0"
+                ? "border border-transparent bg-transparent shadow-none"
                 : "border border-white/45 bg-white/35 shadow-[0_10px_35px_rgba(61,35,20,0.08)] backdrop-blur-xl"
               }
             `}
@@ -71,7 +71,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                   ${pathname === l.href
                     ? "text-gold font-medium"
                     : transparent && !scrolled
-                      ? "text-cream/72 hover:text-cream"
+                      ? "text-cream/68 hover:text-cream"
                       : "text-brown/60 hover:text-brown-dark"
                   }
                 `}

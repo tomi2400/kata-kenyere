@@ -88,122 +88,79 @@ export default async function Home() {
           sizes="100vw"
           priority
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(19,14,10,0.28)_0%,rgba(19,14,10,0.16)_26%,rgba(19,14,10,0.48)_58%,rgba(19,14,10,0.94)_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_22%,rgba(19,14,10,0.26)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,14,10,0.24)_0%,rgba(20,14,10,0.1)_28%,rgba(20,14,10,0.28)_58%,rgba(20,14,10,0.78)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(20,14,10,0.18)_100%)]" />
 
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 pb-8 md:pb-12 pt-28 md:pt-36">
-          <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-3 rounded-full border border-cream/15 bg-cream/8 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-[#e4c39d] reveal-up">
-                <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-                Kézműves pékség Pécsen
-              </div>
-              <h1 className="mt-6 max-w-3xl font-serif text-[clamp(3.2rem,8vw,6.6rem)] leading-[0.94] text-cream reveal-soft delay-1">
-                Letisztult ízek,
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-8 md:pb-10 pt-28 md:pt-36">
+          <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_220px]">
+            <div className="max-w-2xl">
+              <p className="text-[11px] uppercase tracking-[0.22em] text-[#d7b287] reveal-up">
+                Kézműves pékség · Pécs
+              </p>
+              <h1 className="mt-5 max-w-2xl font-serif text-[clamp(3.3rem,7vw,5.6rem)] leading-[0.92] text-cream reveal-soft delay-1">
+                Frissen, <em className="text-[#e2c19b] not-italic">kézzel,</em>
                 <br />
-                lassú kelesztés,
-                <br />
-                <span className="text-[#e8c9a4]">friss átvétel.</span>
+                szeretettel.
               </h1>
-              <p className="mt-6 max-w-xl text-base leading-8 text-cream/74 sm:text-lg reveal-up delay-2">
-                Kovászos kenyerek és gondosan sütött péksütemények előrendelésre.
-                Amit itt látsz, azt valóban elkészítjük neked, frissen, a kiválasztott napra.
+              <p className="mt-6 max-w-lg text-base leading-8 text-cream/72 reveal-up delay-2">
+                Kovásszal kelesztett kenyerek és kézzel formázott pékáruk
+                <br className="hidden sm:block" />
+                {" "}– minden nap frissen sütve, természetes alapanyagokból.
               </p>
               <div className="mt-8 flex flex-wrap gap-3 reveal-up delay-3">
                 <Link
                   href="/elorendeles"
-                  className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3.5 font-sans text-sm font-bold text-brown-dark shadow-[0_18px_40px_rgba(31,20,12,0.24)] transition-all hover:bg-gold-light hover-lift"
+                  className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3.5 font-sans text-sm font-bold text-brown-dark shadow-[0_18px_40px_rgba(31,20,12,0.2)] transition-all hover:bg-gold-light hover-lift"
                 >
-                  Előrendelés indítása
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
+                  Előrendelés
                 </Link>
                 <Link
                   href="/termekek"
-                  className="inline-flex items-center gap-2 rounded-full border border-cream/25 bg-cream/8 px-6 py-3.5 font-sans text-sm font-medium text-cream transition-all hover:border-cream/50 hover:bg-cream/12 hover-lift"
+                  className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-white/5 px-6 py-3.5 font-sans text-sm font-medium text-cream transition-all hover:border-cream/40 hover:bg-white/10 hover-lift"
                 >
-                  Kínálat megtekintése
+                  Kínálatunk
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.25}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
                 </Link>
-              </div>
-              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-cream/62 reveal-up delay-4">
-                <div className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-gold" />
-                  5,0 Google értékelés
-                </div>
-                <div className="flex items-center gap-2">
-                  <Wheat className="h-4 w-4 text-gold" />
-                  Természetes kovász, tiszta alapanyagok
-                </div>
               </div>
             </div>
 
-            <aside className="glass-panel rounded-[28px] p-6 text-cream reveal-scale delay-3">
-              <p className="text-[11px] uppercase tracking-[0.22em] text-cream/45">
-                Átvétel és rendelés
-              </p>
-              <div className="mt-5 space-y-5">
-                <div className="border-b border-cream/12 pb-5">
-                  <p className="text-xs uppercase tracking-[0.2em] text-cream/40">Nyitvatartás</p>
-                  <div className="mt-3 flex items-start gap-3">
-                    <Clock className="mt-0.5 h-4 w-4 text-gold shrink-0" />
-                    <div className="text-sm leading-7 text-cream/82">
-                      <p>Kedd–Péntek</p>
-                      <p>8:00–17:00</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="border-b border-cream/12 pb-5">
-                  <p className="text-xs uppercase tracking-[0.2em] text-cream/40">Átvételi pont</p>
-                  <div className="mt-3 flex items-start gap-3">
-                    <MapPin className="mt-0.5 h-4 w-4 text-gold shrink-0" />
-                    <div className="text-sm leading-7 text-cream/82">
-                      <p>Pécs</p>
-                      <p>Salakhegyi út 14.</p>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-cream/40">Rendszer</p>
-                  <p className="mt-3 text-sm leading-7 text-cream/82">
-                    Előrendelés alapján sütünk, így a kínálat mindig követhető és az átvétel kiszámítható.
-                  </p>
-                </div>
+            <aside className="self-end justify-self-start lg:justify-self-end text-left lg:text-right text-cream reveal-up delay-3">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.22em] text-cream/48">Nyitvatartás</p>
+                <p className="mt-3 text-sm leading-7 text-cream/76">Kedd – Péntek</p>
+                <p className="mt-1 font-serif text-4xl leading-none text-cream">8:00–17:00</p>
               </div>
+              <p className="mt-8 text-sm leading-7 text-cream/56">
+                Pécs, Salakhegyi út 14.
+              </p>
             </aside>
           </div>
 
-          <div className="mt-10 grid gap-3 md:grid-cols-3 reveal-up delay-4">
-            {[
-              {
-                Icon: MapPin,
-                label: "Személyes átvétel",
-                value: "Pécs, Salakhegyi út 14.",
-              },
-              {
-                Icon: Clock,
-                label: "Rendelési ritmus",
-                value: "A kiválasztott napra frissen sütve",
-              },
-              {
-                Icon: Star,
-                label: "Vásárlói bizalom",
-                value: "5,0 Google értékelés",
-              },
-            ].map(({ Icon, label, value }) => (
-              <div
-                key={label}
-                className="glass-panel rounded-2xl px-5 py-4 text-cream hover-lift"
-              >
-                <div className="flex items-start gap-3">
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.2em] text-cream/40">{label}</p>
-                    <p className="mt-1 text-sm leading-6 text-cream/82">{value}</p>
+          <div className="mt-10 reveal-up delay-4">
+            <div className="overflow-hidden rounded-[22px] border border-white/10 bg-[rgba(52,38,28,0.58)] shadow-[0_24px_60px_rgba(15,10,7,0.22)] backdrop-blur-md">
+              <div className="grid md:grid-cols-3">
+                {[
+                  { label: "Helyszín", value: "Pécs, Salakhegyi út 14." },
+                  { label: "Nyitvatartás", value: "K–P: 8:00–17:00" },
+                  { label: "Google értékelés", value: "5,0 · 4 vélemény" },
+                ].map(({ label, value }, index) => (
+                  <div
+                    key={label}
+                    className={`px-6 py-5 text-cream ${index !== 2 ? "md:border-r md:border-white/10" : ""}`}
+                  >
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-cream/42">{label}</p>
+                    <p className="mt-2 text-sm leading-6 text-cream/82">{value}</p>
+                    {label === "Google értékelés" ? (
+                      <div className="mt-2">
+                        <StarRating n={5} />
+                      </div>
+                    ) : null}
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
