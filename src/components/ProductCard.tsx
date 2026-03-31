@@ -29,51 +29,65 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
 
   return (
     <div className={`
-      rounded-xl overflow-hidden border-2
-      transition-[transform,box-shadow,border-color] duration-200
-      hover:-translate-y-0.5
-      ${isSelected ? "border-gold shadow-lg" : "border-cream-dark hover:border-gold/40 hover:shadow-md"}
+      rounded-[1.4rem] overflow-hidden border
+      transition-[transform,box-shadow,border-color] duration-300
+      hover:-translate-y-1
+      ${isSelected ? "border-gold shadow-[0_20px_40px_rgba(61,35,20,0.16)]" : "border-gold/15 hover:border-gold/40 shadow-[0_14px_28px_rgba(61,35,20,0.08)]"}
     `}>
-      {/* Fotó */}
       <div className="relative aspect-[4/3] bg-cream-dark">
         <Image
           src={getTermekFoto(termek)}
           alt={termek.nev}
           fill
-          className="object-cover"
+          className="object-cover scale-[1.02]"
           sizes="(max-width: 640px) 50vw, 33vw"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-brown-dark/55 via-transparent to-white/10" />
+        <div className="absolute left-3 top-3 rounded-full bg-cream/90 px-2.5 py-1 text-[10px] font-sans font-semibold uppercase tracking-[0.18em] text-brown-dark">
+          Frissen sütve
+        </div>
         {isSelected && (
-          <div className="absolute top-2 right-2 bg-gold text-brown-dark text-xs font-bold font-sans px-2 py-0.5 rounded-full">
+          <div className="absolute top-3 right-3 bg-gold text-brown-dark text-xs font-bold font-sans px-2.5 py-1 rounded-full shadow-sm">
             {qty} db
           </div>
         )}
       </div>
 
-      {/* Info */}
-      <div className="p-3 bg-cream">
-        <p className="font-serif text-sm font-semibold text-brown-dark leading-tight">
-          {termek.nev}
-        </p>
-        <p className="font-sans text-xs text-brown/50 mt-0.5">{termek.egyseg}</p>
-        <p className="font-sans text-sm font-bold text-brown-dark mt-1">
-          {formatAr(termek.ar)}
+      <div className={`p-4 ${isSelected ? "bg-gradient-to-b from-white to-cream" : "bg-white"}`}>
+        <div className="mb-3">
+          <p className="font-serif text-base font-semibold text-brown-dark leading-tight">
+            {termek.nev}
+          </p>
+          <div className="mt-1 flex items-center justify-between gap-2">
+            <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-brown/45">{termek.egyseg}</p>
+            <p className="font-sans text-sm font-bold text-brown-dark">
+              {formatAr(termek.ar)}
+            </p>
+          </div>
+        </div>
+        <p className="font-sans text-xs text-brown/55 min-h-[2.5rem] leading-relaxed">
+          {termek.leiras?.trim() || "Kézműves péksütemény, frissen készítve az átvételi napodra."}
         </p>
 
-        {/* Mennyiség */}
+        <div className="mt-4 flex items-center justify-between">
+          <span className="font-sans text-[11px] text-brown/40">
+            {qty > 0 ? `Kosárban: ${qty} db` : "Egy kattintással hozzáadható"}
+          </span>
+        </div>
+
         <div className="flex items-center justify-between mt-3">
           {qty === 0 ? (
             <button
               onClick={() => change(1)}
-              className="w-full py-2 text-xs font-sans font-semibold rounded-lg bg-brown-dark text-cream hover:bg-brown transition-colors cursor-pointer"
+              className="w-full py-2.5 text-xs font-sans font-semibold rounded-xl bg-brown-dark text-cream hover:bg-brown transition-colors cursor-pointer shadow-sm"
             >
               + Hozzáadom
             </button>
           ) : (
-            <div className="flex items-center gap-2 w-full justify-between">
+            <div className="flex items-center gap-2 w-full justify-between rounded-xl border border-gold/20 bg-cream px-2 py-2">
               <button
                 onClick={() => change(-1)}
-                className="w-8 h-8 rounded-lg bg-cream-dark hover:bg-gold/20 text-brown-dark font-bold text-base flex items-center justify-center transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-white hover:bg-gold/15 text-brown-dark font-bold text-base flex items-center justify-center transition-colors cursor-pointer border border-gold/10"
                 aria-label="Kevesebb"
               >
                 −
@@ -81,7 +95,7 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
               <span className="font-sans font-bold text-brown-dark text-sm">{qty} db</span>
               <button
                 onClick={() => change(1)}
-                className="w-8 h-8 rounded-lg bg-brown-dark hover:bg-brown text-cream font-bold text-base flex items-center justify-center transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-brown-dark hover:bg-brown text-cream font-bold text-base flex items-center justify-center transition-colors cursor-pointer"
                 aria-label="Több"
               >
                 +

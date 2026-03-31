@@ -91,9 +91,8 @@ export default function OsszesitesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cream pb-12">
-      {/* HEADER */}
-      <header className="bg-cream border-b border-gold/20 px-4 py-4">
+    <div className="min-h-screen bg-cream pb-12 grain-overlay">
+      <header className="bg-cream/80 backdrop-blur-sm border-b border-gold/20 px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link href="/">
             <Image src="/images/logo.png" alt="Kata Kenyere" width={36} height={36} />
@@ -108,21 +107,24 @@ export default function OsszesitesPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 pt-8 space-y-8">
+        <section className="paper-panel warm-ring rounded-[1.8rem] px-5 py-6 md:px-7 md:py-7 relative overflow-hidden">
+          <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-gold/10 blur-2xl" />
+          <div className="relative">
+            <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-brown/40 mb-2">Utolsó lépés</p>
+            <h1 className="font-serif text-3xl text-brown-dark">Rendelés összesítése</h1>
+            <p className="font-sans text-sm text-brown/55 mt-2 leading-relaxed max-w-lg">
+              Nézd át nyugodtan a napokra bontott kosarat, aztán add meg az adataidat. A rendelés csak az elküldés után végleges.
+            </p>
+          </div>
+        </section>
 
-        {/* Cím */}
-        <div>
-          <div className="w-8 h-px bg-gold mb-3" />
-          <h1 className="font-serif text-3xl text-brown-dark">Rendelés összesítése</h1>
-        </div>
-
-        {/* Rendelések napok szerint */}
         <section className="space-y-4">
           {selectedDays.map((day) => {
             const items = carts[day.datum] ?? [];
             if (items.length === 0) return null;
             const dayTotal = items.reduce((s, i) => s + i.ar * i.mennyiseg, 0);
             return (
-              <div key={day.datum} className="bg-cream-dark rounded-xl p-4">
+              <div key={day.datum} className="paper-panel rounded-[1.4rem] p-4 border border-gold/15">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-serif text-base font-semibold text-brown-dark">
                     {day.nap}
@@ -150,14 +152,17 @@ export default function OsszesitesPage() {
           })}
         </section>
 
-        {/* Végösszeg */}
-        <div className="flex items-center justify-between py-4 border-t-2 border-gold/30">
-          <span className="font-serif text-lg text-brown-dark">Végösszeg</span>
-          <span className="font-serif text-2xl font-bold text-brown-dark">{formatAr(total)}</span>
+        <div className="paper-panel warm-ring rounded-[1.4rem] px-5 py-5 flex items-center justify-between">
+          <div>
+            <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-brown/40">Végösszeg</p>
+            <span className="font-serif text-3xl font-bold text-brown-dark">{formatAr(total)}</span>
+          </div>
+          <p className="font-sans text-sm text-brown/50 max-w-[12rem] text-right">
+            Minden kiválasztott nap és tétel együtt számolva
+          </p>
         </div>
 
-        {/* Átvétel info */}
-        <div className="bg-brown-dark rounded-xl p-4 flex gap-4 items-start">
+        <div className="bg-brown-dark rounded-[1.5rem] p-5 flex gap-4 items-start shadow-[0_20px_40px_rgba(61,35,20,0.16)]">
           <div className="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center shrink-0 mt-0.5">
             <MapPin className="w-4 h-4 text-gold" />
           </div>
@@ -167,8 +172,7 @@ export default function OsszesitesPage() {
           </div>
         </div>
 
-        {/* Form */}
-        <section>
+        <section className="paper-panel rounded-[1.6rem] p-5 md:p-6 border border-gold/15">
           <h2 className="font-serif text-xl text-brown-dark mb-4">Adataid</h2>
           <div className="space-y-4">
             {[
@@ -213,7 +217,7 @@ export default function OsszesitesPage() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full py-4 rounded-xl font-sans font-bold text-base bg-brown-dark text-cream hover:bg-brown transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-4 rounded-[1.4rem] font-sans font-bold text-base bg-brown-dark text-cream hover:bg-brown transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_20px_36px_rgba(61,35,20,0.18)]"
         >
           {loading ? (
             <>

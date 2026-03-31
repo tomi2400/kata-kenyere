@@ -41,32 +41,41 @@ export default async function TermekekPage() {
   const termekekByKategoria = csoportositByKategoria(termekek, kategoriaLista);
 
   return (
-    <div className="bg-cream min-h-screen">
+    <div className="bg-cream min-h-screen grain-overlay">
       <Navbar />
 
-      {/* Page header */}
-      <div className="max-w-5xl mx-auto px-6 pt-12 pb-8">
-        <div className="w-10 h-px bg-gold mb-4" />
-        <h1 className="font-serif text-4xl text-brown-dark">Kínálatunk</h1>
-        <p className="font-sans text-brown/60 mt-2">
-          Kézműves kovászos termékek, frissen sütve
-        </p>
+      <div className="max-w-6xl mx-auto px-6 pt-10 pb-8">
+        <section className="paper-panel warm-ring rounded-[2rem] px-6 py-8 md:px-10 md:py-10 overflow-hidden relative">
+          <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-gold/10 blur-3xl" />
+          <div className="relative max-w-2xl">
+            <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-brown/40 mb-3">Napi kézműves kínálat</p>
+            <h1 className="font-serif text-4xl md:text-5xl text-brown-dark leading-[1.05]">
+              Kenyerek,
+              <br />
+              <em className="text-gold not-italic">csigák és péksütik</em>
+            </h1>
+            <p className="font-sans text-brown/60 mt-4 leading-relaxed">
+              Minden terméket úgy mutatunk itt, ahogy a vásárló is találkozik vele: tisztán, külön kiszereléssel,
+              friss árral és egyértelmű kategóriákkal.
+            </p>
+          </div>
+        </section>
       </div>
 
-      {/* Product categories */}
       {Object.entries(termekekByKategoria).map(([kategoria, termekek]) => (
-        <section key={kategoria} className="max-w-5xl mx-auto px-6 mb-10">
-          <h2 className="font-serif text-xl text-brown-dark border-b border-gold/30 pb-2 mb-4">
-            {kategoria}
-          </h2>
+        <section key={kategoria} className="max-w-6xl mx-auto px-6 mb-12">
+          <div className="flex items-center gap-4 mb-5">
+            <div className="h-px flex-1 bg-gold/25" />
+            <h2 className="font-serif text-2xl text-brown-dark shrink-0">{kategoria}</h2>
+            <div className="h-px flex-1 bg-gold/25" />
+          </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
             {termekek.map((termek) => (
               <div
                 key={termek.id}
-                className="bg-cream-dark rounded-xl overflow-hidden"
+                className="bg-white rounded-[1.5rem] overflow-hidden border border-gold/15 shadow-[0_14px_30px_rgba(61,35,20,0.08)]"
               >
-                {/* Image */}
                 <div className="relative aspect-[4/3]">
                   <Image
                     src={getTermekFoto(termek)}
@@ -75,18 +84,26 @@ export default async function TermekekPage() {
                     className="object-cover"
                     sizes="(max-width: 640px) 50vw, 25vw"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brown-dark/45 via-transparent to-white/10" />
+                  <div className="absolute left-3 top-3 rounded-full bg-cream/90 px-2.5 py-1 text-[10px] font-sans font-semibold uppercase tracking-[0.18em] text-brown-dark">
+                    {termek.kategoria}
+                  </div>
                 </div>
 
-                {/* Content */}
-                <div className="p-3">
-                  <p className="font-serif text-sm font-semibold text-brown-dark">
-                    {termek.nev}
-                  </p>
-                  <p className="font-sans text-xs text-brown/50">
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-serif text-base font-semibold text-brown-dark">
+                      {termek.nev}
+                    </p>
+                    <p className="font-sans text-sm font-bold text-brown-dark shrink-0">
+                      {termek.ar.toLocaleString("hu-HU")} Ft
+                    </p>
+                  </div>
+                  <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-brown/45 mt-1">
                     {termek.egyseg}
                   </p>
-                  <p className="font-sans text-sm font-bold text-brown-dark mt-1">
-                    {termek.ar.toLocaleString("hu-HU")} Ft
+                  <p className="font-sans text-sm text-brown/60 mt-3 min-h-[3rem] leading-relaxed">
+                    {termek.leiras?.trim() || "Hagyományos, kézműves pékáru természetes alapanyagokkal."}
                   </p>
                 </div>
               </div>
@@ -95,7 +112,6 @@ export default async function TermekekPage() {
         </section>
       ))}
 
-      {/* Bottom CTA */}
       <div className="bg-brown-dark text-cream py-16 text-center">
         <div className="max-w-xl mx-auto">
           <div className="w-10 h-px bg-gold mx-auto mb-6" />

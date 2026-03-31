@@ -105,9 +105,7 @@ export default function DaySelector({
         Akár több napra is rendelhetsz egyszerre
       </p>
 
-      {/* Naptár */}
-      <div className="bg-white rounded-2xl border border-gold/20 overflow-hidden shadow-sm">
-        {/* Hónap navigáció */}
+      <div className="paper-panel rounded-[2rem] border border-gold/20 overflow-hidden warm-ring">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gold/10">
           <button
             onClick={() => setMonthIndex((i) => Math.max(0, i - 1))}
@@ -134,8 +132,7 @@ export default function DaySelector({
           </button>
         </div>
 
-        {/* Napok fejléce */}
-        <div className="grid grid-cols-7 px-3 pt-3">
+        <div className="grid grid-cols-7 px-3 pt-4">
           {HU_DAYS.map((d, i) => (
             <div key={i} className="text-center font-sans text-[11px] font-semibold text-brown/30 pb-2">
               {d}
@@ -143,8 +140,7 @@ export default function DaySelector({
           ))}
         </div>
 
-        {/* Naptár cellák */}
-        <div className="grid grid-cols-7 gap-y-1 px-3 pb-4">
+        <div className="grid grid-cols-7 gap-y-1.5 px-3 pb-4">
           {cells.map((datum, idx) => {
             if (!datum) return <div key={`e-${idx}`} />;
 
@@ -159,7 +155,7 @@ export default function DaySelector({
                 <button
                   key={datum}
                   onClick={() => toggle(datum)}
-                  className="aspect-square flex flex-col items-center justify-center rounded-xl bg-gold cursor-pointer transition-all hover:bg-gold/80"
+                  className="aspect-square flex flex-col items-center justify-center rounded-2xl bg-gold cursor-pointer transition-all hover:bg-gold/80 shadow-sm"
                 >
                   <span className="font-sans text-sm font-bold text-brown-dark">{dayNum}</span>
                 </button>
@@ -171,7 +167,7 @@ export default function DaySelector({
                 <button
                   key={datum}
                   onClick={() => toggle(datum)}
-                  className="aspect-square flex flex-col items-center justify-center rounded-xl cursor-pointer transition-all border-2 border-gold/40 hover:border-gold hover:bg-gold/10 group"
+                  className="aspect-square flex flex-col items-center justify-center rounded-2xl cursor-pointer transition-all border border-gold/30 hover:border-gold hover:bg-white group bg-white/55"
                 >
                   <span className={`font-sans text-sm font-semibold ${isToday ? "text-gold" : "text-brown-dark"}`}>
                     {dayNum}
@@ -195,7 +191,6 @@ export default function DaySelector({
         </div>
       </div>
 
-      {/* Jelmagyarázat */}
       <div className="flex items-center justify-center gap-6 mt-3">
         <span className="flex items-center gap-1.5 font-sans text-xs text-brown/40">
           <span className="w-3 h-3 rounded border-2 border-gold/40 inline-block" />
@@ -209,20 +204,20 @@ export default function DaySelector({
 
       {/* Kiválasztott napok összesítője */}
       {selectedDays.length > 0 && (
-        <div className="mt-5 bg-cream-dark rounded-xl p-4 space-y-2">
+        <div className="mt-5 paper-panel rounded-2xl p-4 space-y-3 border border-gold/15">
           <p className="font-sans text-xs font-semibold text-brown/40 uppercase tracking-wider">
             Kiválasztott napok
           </p>
           {selectedDays.map((d) => (
             <div key={d.datum} className="flex items-center justify-between">
-              <div>
+              <div className="min-w-0">
                 <span className="font-sans text-sm font-semibold text-brown-dark">{d.nap}</span>
-                <span className="font-sans text-xs text-brown/50 ml-2">
+                <span className="font-sans text-xs text-brown/50 ml-2 block sm:inline sm:ml-2">
                   {new Date(d.datum + "T00:00:00").toLocaleDateString("hu-HU", { month: "long", day: "numeric" })}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-sans text-xs text-brown/40">
+                <span className="hidden sm:inline font-sans text-xs text-brown/40">
                   {d.hatarido}
                 </span>
                 <button
@@ -242,10 +237,10 @@ export default function DaySelector({
         onClick={handleContinue}
         disabled={selected.length === 0}
         className={`
-          w-full mt-5 py-4 px-8 rounded-2xl font-sans font-semibold text-base transition-all duration-200
+          w-full mt-5 py-4 px-8 rounded-[1.4rem] font-sans font-semibold text-base transition-all duration-200
           flex items-center justify-center gap-2
           ${selected.length > 0
-            ? "bg-brown-dark text-cream hover:bg-brown cursor-pointer shadow-md"
+            ? "bg-brown-dark text-cream hover:bg-brown cursor-pointer shadow-[0_18px_32px_rgba(61,35,20,0.18)]"
             : "bg-brown-dark/20 text-brown/30 cursor-not-allowed"
           }
         `}

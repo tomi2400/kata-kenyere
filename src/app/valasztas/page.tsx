@@ -77,9 +77,8 @@ export default function TermekekPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cream pb-32">
-      {/* HEADER */}
-      <header className="sticky top-0 z-20 bg-cream/95 backdrop-blur-sm border-b border-gold/20 px-4 py-4">
+    <div className="min-h-screen bg-cream pb-32 grain-overlay">
+      <header className="sticky top-0 z-20 bg-cream/85 backdrop-blur-md border-b border-gold/15 px-4 py-4">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <button onClick={() => router.push("/")} className="flex items-center gap-2 cursor-pointer">
@@ -96,27 +95,35 @@ export default function TermekekPage() {
         </div>
       </header>
 
-      {/* TARTALOM */}
       <main className="max-w-2xl mx-auto px-4 pt-6">
+        <section className="paper-panel warm-ring rounded-[1.75rem] px-5 py-5 md:px-6 md:py-6 mb-6 relative overflow-hidden">
+          <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-gold/10 blur-2xl" />
+          <div className="relative">
+            <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-brown/40 mb-2">
+              {currentStep + 1}. lépés
+            </p>
+            <h1 className="font-serif text-2xl md:text-3xl text-brown-dark">
+              {currentDay.nap}i kínálat
+            </h1>
+            <p className="font-sans text-sm text-brown/55 mt-2 max-w-lg leading-relaxed">
+              Állítsd össze erre a napra a kosarat. A mennyiségek külön ennél az átvételi napnál számolódnak.
+            </p>
+          </div>
+        </section>
 
-        {/* Nap fejléc */}
-        <div className="mb-6">
-          <div className="w-8 h-px bg-gold mb-3" />
-          <h1 className="font-serif text-2xl text-brown-dark">
-            {currentDay.nap}i kínálat
-          </h1>
-          <p className="font-sans text-sm text-brown/50 mt-1">
-            Válaszd ki amit szeretnél rendelni
-          </p>
-        </div>
-
-        {/* Kategóriák */}
         {Object.entries(termekekByKategoria).map(([kategoria, termekek]) => (
           <section key={kategoria} className="mb-8">
-            <h2 className="font-serif text-base text-brown/60 mb-3 pb-2 border-b border-gold/20">
-              {kategoria}
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px flex-1 bg-gold/25" />
+              <h2 className="font-serif text-base text-brown/70 shrink-0">
+                {kategoria}
+              </h2>
+              <div className="h-px flex-1 bg-gold/25" />
+            </div>
+            <p className="font-sans text-xs text-brown/45 mb-4">
+              Az itt kiválasztott termékek csak a {currentDay.nap.toLowerCase()}i átvételhez kerülnek.
+            </p>
+            <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-2 gap-4">
               {termekek.map((termek) => (
                 <ProductCard
                   key={termek.id}
@@ -129,19 +136,18 @@ export default function TermekekPage() {
         ))}
       </main>
 
-      {/* FLOATING BOTTOM BAR */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-brown-dark border-t border-cream/10 px-4 py-4 safe-area-pb">
-        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
+      <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-4 safe-area-pb">
+        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4 rounded-[1.7rem] bg-brown-dark/96 backdrop-blur-md border border-cream/10 px-5 py-4 shadow-[0_26px_50px_rgba(61,35,20,0.28)]">
           <div>
             {totalItems > 0 ? (
               <>
-                <p className="font-sans text-xs text-cream/50">{totalItems} tétel</p>
+                <p className="font-sans text-xs uppercase tracking-[0.16em] text-cream/45">{totalItems} tétel</p>
                 <p className="font-sans font-bold text-cream text-lg">
                   {formatAr(dayTotal)}
                 </p>
               </>
             ) : (
-              <p className="font-sans text-sm text-cream/40">Még nem választottál</p>
+              <p className="font-sans text-sm text-cream/40">Még nem választottál erre a napra</p>
             )}
           </div>
 

@@ -13,18 +13,16 @@ export default function DayProgress({
   currentIndex: number;
 }) {
   return (
-    <div className="w-full">
-      {/* Step indicators */}
+    <div className="w-full paper-panel rounded-2xl px-4 py-4 warm-ring">
       <div className="flex items-center justify-center gap-0 mb-3">
         {steps.map((step, i) => {
           const isDone = i < currentIndex;
           const isActive = i === currentIndex;
           return (
             <div key={step.datum} className="flex items-center">
-              {/* Dot */}
               <div className={`
-                flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold font-sans transition-all
-                ${isDone ? "bg-gold text-brown-dark" : isActive ? "bg-brown-dark text-cream ring-2 ring-gold" : "bg-cream-dark text-brown/40"}
+                flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold font-sans transition-all
+                ${isDone ? "bg-gold text-brown-dark shadow-sm" : isActive ? "bg-brown-dark text-cream ring-2 ring-gold shadow-md" : "bg-white text-brown/40 border border-gold/15"}
               `}>
                 {isDone ? (
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -34,28 +32,28 @@ export default function DayProgress({
                   i + 1
                 )}
               </div>
-              {/* Connector */}
               {i < steps.length - 1 && (
-                <div className={`w-8 h-px mx-1 transition-colors ${i < currentIndex ? "bg-gold" : "bg-cream-dark"}`} />
+                <div className={`w-8 h-px mx-1 transition-colors ${i < currentIndex ? "bg-gold" : "bg-gold/20"}`} />
               )}
             </div>
           );
         })}
-        {/* Összesítés lépés */}
         <div className="flex items-center">
-          <div className={`w-8 h-px mx-1 ${currentIndex >= steps.length ? "bg-gold" : "bg-cream-dark"}`} />
+          <div className={`w-8 h-px mx-1 ${currentIndex >= steps.length ? "bg-gold" : "bg-gold/20"}`} />
           <div className={`
-            flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold font-sans
-            ${currentIndex >= steps.length ? "bg-gold text-brown-dark" : "bg-cream-dark text-brown/40"}
+            flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold font-sans
+            ${currentIndex >= steps.length ? "bg-gold text-brown-dark" : "bg-white text-brown/40 border border-gold/15"}
           `}>
             ✓
           </div>
         </div>
       </div>
 
-      {/* Active day label */}
       {currentIndex < steps.length && (
         <div className="text-center">
+          <p className="font-sans text-[10px] uppercase tracking-[0.22em] text-brown/35 mb-1">
+            Aktuális rendelési nap
+          </p>
           <span className="font-serif text-lg text-brown-dark font-semibold">
             {steps[currentIndex].nap}
           </span>
