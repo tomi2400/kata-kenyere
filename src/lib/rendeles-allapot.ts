@@ -1,4 +1,4 @@
-export const TETEL_ALLAPOTOK = ["uj", "feldolgozva", "kesz", "atvetel", "torolve"] as const;
+export const TETEL_ALLAPOTOK = ["uj", "kesz", "atvetel", "torolve"] as const;
 export const DISPLAY_ALLAPOTOK = [...TETEL_ALLAPOTOK, "reszben"] as const;
 
 export type TetelAllapot = (typeof TETEL_ALLAPOTOK)[number];
@@ -21,6 +21,7 @@ export function isTetelAllapot(value: string): value is TetelAllapot {
 }
 
 export function normalizeTetelAllapot(value?: string | null): TetelAllapot {
+  if (value === "feldolgozva") return "uj";
   return value && isTetelAllapot(value) ? value : "uj";
 }
 

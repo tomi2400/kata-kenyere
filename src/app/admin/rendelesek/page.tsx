@@ -36,14 +36,13 @@ type Rendeles = {
 
 const ALLAPOT_LABELS: Record<string, { label: string; color: string }> = {
   uj: { label: "Új", color: "bg-blue-100 text-blue-800" },
-  feldolgozva: { label: "Feldolgozva", color: "bg-yellow-100 text-yellow-800" },
   kesz: { label: "Kész", color: "bg-green-100 text-green-800" },
   atvetel: { label: "Átvéve", color: "bg-purple-100 text-purple-800" },
   torolve: { label: "Törölve", color: "bg-red-100 text-red-800" },
   reszben: { label: "Részben kész", color: "bg-amber-100 text-amber-800" },
 };
 
-const NAPI_ALLAPOT_SORREND = ["uj", "feldolgozva", "kesz", "atvetel", "torolve"];
+const NAPI_ALLAPOT_SORREND = ["uj", "kesz", "atvetel", "torolve"];
 
 export default function RendelesekPage() {
   const [rendelesek, setRendelesek] = useState<Rendeles[]>([]);
@@ -52,6 +51,7 @@ export default function RendelesekPage() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [updatingKey, setUpdatingKey] = useState<string | null>(null);
+  const [editedDatumok, setEditedDatumok] = useState<Record<string, string>>({});
 
   const fetchRendelesek = (allapot: string, datum: string) => {
     setLoading(true);
@@ -81,6 +81,22 @@ export default function RendelesekPage() {
       body: JSON.stringify({ datum, allapot }),
     });
     setUpdatingKey(null);
+    fetchRendelesek(filter, datumFilter);
+  };
+
+  const updateAtveteliDatum = async (id: string, datum: string, ujDatum: string) => {
+    const trimmedUjDatum = ujDatum.trim();
+    if (!trimmedUjDatum || trimmedUjDatum === datum) return;
+
+    const key = `${id}_${datum}_date`;
+    setUpdatingKey(key);
+    await fetch(`/api/admin/rendelesek/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ datum, ujDatum: trimmedUjDatum }),
+    });
+    setUpdatingKey(null);
+    setEditedDatumok((prev) => ({ ...prev, [datum]: trimmedUjDatum }));
     fetchRendelesek(filter, datumFilter);
   };
 
@@ -121,6 +137,17 @@ export default function RendelesekPage() {
 
   const selected = rendelesek.find((r) => r.id === selectedId) ?? null;
 
+  useEffect(() => {
+    if (!selected) return;
+
+    const nextValues = groupedTetelekByDatum(selected.rendeles_tetelek).reduce<Record<string, string>>((acc, group) => {
+      acc[group.datum] = group.datum;
+      return acc;
+    }, {});
+
+    setEditedDatumok(nextValues);
+  }, [selected]);
+
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto">
       {/* Header */}
@@ -134,7 +161,7 @@ export default function RendelesekPage() {
       {/* Szűrők */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
         <div className="flex gap-2 overflow-x-auto pb-1">
-          {["mind", "uj", "feldolgozva", "kesz", "reszben", "atvetel", "torolve"].map((a) => (
+          {["mind", "uj", "kesz", "reszben", "atvetel", "torolve"].map((a) => (
             <button
               key={a}
               onClick={() => setFilter(a)}
@@ -323,6 +350,28 @@ export default function RendelesekPage() {
                           </span>
                         </div>
 
+                        <div className="mb-3 rounded-lg border border-cream-dark bg-white p-2.5">
+                          <p className="font-sans text-[10px] uppercase tracking-wider text-brown/40 mb-2">
+                            Átvételi nap módosítása
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="date"
+                              value={editedDatumok[group.datum] ?? group.datum}
+                              onChange={(e) => setEditedDatumok((prev) => ({ ...prev, [group.datum]: e.target.value }))}
+                              disabled={updatingKey !== null}
+                              className="flex-1 px-3 py-2 rounded-lg border border-cream-dark font-sans text-sm bg-white focus:border-gold focus:outline-none cursor-pointer"
+                            />
+                            <button
+                              onClick={() => updateAtveteliDatum(selected.id, group.datum, editedDatumok[group.datum] ?? group.datum)}
+                              disabled={updatingKey !== null || (editedDatumok[group.datum] ?? group.datum) === group.datum}
+                              className="px-3 py-2 rounded-lg font-sans text-xs font-semibold border border-cream-dark text-brown-dark hover:border-gold hover:text-gold disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {updatingKey === `${selected.id}_${group.datum}_date` ? "Mentés..." : "Nap mentése"}
+                            </button>
+                          </div>
+                        </div>
+
                         <div className="space-y-1.5 mb-3">
                           {group.tetelek.map((t) => (
                             <div key={t.id} className="flex items-start justify-between gap-2">
@@ -373,7 +422,7 @@ export default function RendelesekPage() {
               </div>
 
               <p className="font-sans text-xs text-brown/50">
-                A státusz most naponként kezelhető. Így a több napra leadott rendeléseknél csak a megfelelő napi rész halad tovább.
+                A státusz naponként kezelhető, és ugyanitt az átvételi dátum is átírható, ha a vásárló másik napra kérné.
               </p>
 
               <p className="font-sans text-[10px] text-brown/30 text-center">
