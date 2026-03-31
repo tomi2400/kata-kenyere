@@ -2,7 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Clock } from "lucide-react";
 
-export default function KoszonjukPage() {
+export default function KoszonjukPage({
+  searchParams,
+}: {
+  searchParams?: { rendelesSzam?: string };
+}) {
+  const rendelesSzam = searchParams?.rendelesSzam;
+
   return (
     <div className="min-h-screen bg-cream flex flex-col">
       {/* HEADER */}
@@ -26,9 +32,16 @@ export default function KoszonjukPage() {
         </h1>
 
         <p className="font-sans text-brown/60 text-base max-w-sm mb-8 leading-relaxed">
-          Emailben küldtünk visszaigazolást a rendelésed részleteivel.
-          Kérjük, ellenőrizd a postaládádat.
+          A rendelésed sikeresen beérkezett hozzánk.
+          Ezt az oldalt használhatjuk stabil sikeres rendelési eseményként a mérésekhez is.
         </p>
+
+        {rendelesSzam && (
+          <div className="mb-8 rounded-2xl border border-gold/20 bg-white px-5 py-4 w-full max-w-sm">
+            <p className="font-sans text-xs text-brown/40 uppercase tracking-wider">Rendelési azonosító</p>
+            <p className="font-sans text-lg font-semibold text-brown-dark mt-2">{rendelesSzam}</p>
+          </div>
+        )}
 
         {/* Átvétel info */}
         <div className="bg-brown-dark rounded-2xl p-6 w-full max-w-sm mb-8 text-left">
@@ -44,6 +57,10 @@ export default function KoszonjukPage() {
             </div>
           </div>
         </div>
+
+        <p className="font-sans text-xs text-brown/45 max-w-sm mb-8 leading-relaxed">
+          Az automatikus emailes visszaigazolást a következő fejlesztési körben kötjük rá erre a sikeres leadási pontra.
+        </p>
 
         {/* CTA-k */}
         <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">

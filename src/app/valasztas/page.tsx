@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { useCartStore } from "@/lib/store";
 import { type Termek, csoportositByKategoria, formatAr } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
@@ -11,8 +10,7 @@ import DayProgress from "@/components/DayProgress";
 
 export default function TermekekPage() {
   const router = useRouter();
-  const { selectedDays, carts, getDayTotal } = useCartStore();
-  const [currentStep, setCurrentStep] = useState(0);
+  const { selectedDays, carts, getDayTotal, currentStep, setCurrentStep } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [termekek, setTermekek] = useState<Termek[]>([]);
   const [kategoriak, setKategoriak] = useState<string[]>([]);
@@ -37,6 +35,13 @@ export default function TermekekPage() {
     }
   }, [mounted, selectedDays, router]);
 
+  useEffect(() => {
+    if (!mounted || selectedDays.length === 0) return;
+    if (currentStep < 0 || currentStep >= selectedDays.length) {
+      setCurrentStep(Math.max(0, selectedDays.length - 1));
+    }
+  }, [mounted, selectedDays, currentStep, setCurrentStep]);
+
   if (!mounted || selectedDays.length === 0 || loading) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
@@ -53,11 +58,22 @@ export default function TermekekPage() {
 
   const handleNext = () => {
     if (isLastDay) {
+      setCurrentStep(currentStep);
       router.push("/osszesites");
     } else {
-      setCurrentStep((s) => s + 1);
+      setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    router.push("/elorendeles");
   };
 
   return (
@@ -66,12 +82,15 @@ export default function TermekekPage() {
       <header className="sticky top-0 z-20 bg-cream/95 backdrop-blur-sm border-b border-gold/20 px-4 py-4">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <Link href="/" className="flex items-center gap-2">
+            <button onClick={() => router.push("/")} className="flex items-center gap-2 cursor-pointer">
               <Image src="/images/logo.png" alt="Kata Kenyere" width={32} height={32} />
-            </Link>
-            <Link href="/elorendeles" className="font-sans text-xs text-brown/50 hover:text-brown transition-colors">
+            </button>
+            <button
+              onClick={handleBack}
+              className="font-sans text-xs text-brown/50 hover:text-brown transition-colors cursor-pointer"
+            >
               ← Vissza
-            </Link>
+            </button>
           </div>
           <DayProgress steps={selectedDays} currentIndex={currentStep} />
         </div>

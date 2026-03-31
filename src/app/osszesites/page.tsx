@@ -15,7 +15,7 @@ function formatDatum(datum: string): string {
 
 export default function OsszesitesPage() {
   const router = useRouter();
-  const { selectedDays, carts, getTotal, clearCart } = useCartStore();
+  const { selectedDays, carts, getTotal, clearCart, setCurrentStep } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ nev: "", email: "", telefon: "", megjegyzes: "" });
@@ -69,9 +69,12 @@ export default function OsszesitesPage() {
         body: JSON.stringify({ ...form, rendelesek, vegosszeg: total }),
       });
 
+      const data = await res.json().catch(() => null);
+
       if (res.ok) {
         clearCart();
-        router.push("/koszonjuk");
+        const rendelesSzam = data?.rendelesSzam ? `?rendelesSzam=${encodeURIComponent(data.rendelesSzam)}` : "";
+        router.push(`/koszonjuk${rendelesSzam}`);
       } else {
         alert("Hiba történt, kérlek próbáld újra!");
       }
@@ -82,6 +85,11 @@ export default function OsszesitesPage() {
     }
   };
 
+  const handleBack = () => {
+    setCurrentStep(Math.max(0, selectedDays.length - 1));
+    router.push("/valasztas");
+  };
+
   return (
     <div className="min-h-screen bg-cream pb-12">
       {/* HEADER */}
@@ -90,9 +98,12 @@ export default function OsszesitesPage() {
           <Link href="/">
             <Image src="/images/logo.png" alt="Kata Kenyere" width={36} height={36} />
           </Link>
-          <Link href="/termekek" className="font-sans text-xs text-brown/50 hover:text-brown transition-colors">
-            ← Vissza a termékekhez
-          </Link>
+          <button
+            onClick={handleBack}
+            className="font-sans text-xs text-brown/50 hover:text-brown transition-colors cursor-pointer"
+          >
+            ← Vissza
+          </button>
         </div>
       </header>
 

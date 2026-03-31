@@ -19,7 +19,9 @@ export type DayCart = {
 type CartStore = {
   selectedDays: { nap: string; datum: string }[];
   carts: Record<string, CartItem[]>; // datum -> items
+  currentStep: number;
   setSelectedDays: (days: { nap: string; datum: string }[]) => void;
+  setCurrentStep: (step: number) => void;
   setQuantity: (datum: string, item: Omit<CartItem, "mennyiseg">, qty: number) => void;
   getTotal: () => number;
   getDayTotal: (datum: string) => number;
@@ -31,8 +33,11 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       selectedDays: [],
       carts: {},
+      currentStep: 0,
 
-      setSelectedDays: (days) => set({ selectedDays: days }),
+      setSelectedDays: (days) => set({ selectedDays: days, currentStep: 0 }),
+
+      setCurrentStep: (step) => set({ currentStep: step }),
 
       setQuantity: (datum, item, qty) =>
         set((state) => {
@@ -65,7 +70,7 @@ export const useCartStore = create<CartStore>()(
           .reduce((sum, i) => sum + i.ar * i.mennyiseg, 0);
       },
 
-      clearCart: () => set({ selectedDays: [], carts: {} }),
+      clearCart: () => set({ selectedDays: [], carts: {}, currentStep: 0 }),
     }),
     { name: "kata-kenyere-cart" }
   )
