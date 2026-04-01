@@ -53,6 +53,25 @@
       inset 0 1px 0 rgba(255,255,255,0.12);
     backdrop-filter: blur(20px);
   }
+  .story-surface {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.24)),
+      rgba(246, 237, 220, 0.9);
+    border: 1px solid rgba(61, 35, 20, 0.08);
+    box-shadow:
+      0 24px 60px rgba(61, 35, 20, 0.08),
+      inset 0 1px 0 rgba(255,255,255,0.34);
+    backdrop-filter: blur(16px);
+  }
+  .story-surface-dark {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04)),
+      rgba(52, 38, 28, 0.32);
+    box-shadow:
+      0 24px 60px rgba(15, 10, 7, 0.14),
+      inset 0 1px 0 rgba(255,255,255,0.12);
+    backdrop-filter: blur(20px);
+  }
   .hero-zoom {
     animation: hero-zoom 18s ease-in-out infinite alternate;
     will-change: transform;
@@ -194,6 +213,7 @@
     color: var(--foreground);
     background-image:
       radial-gradient(circle at top, rgba(255,255,255,0.45), transparent 30%),
+      radial-gradient(circle at 20% 10%, rgba(201,169,110,0.08), transparent 24%),
       linear-gradient(180deg, rgba(201,169,110,0.06), transparent 18%);
   }
 }

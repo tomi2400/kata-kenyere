@@ -74,8 +74,10 @@ export default async function Home() {
     .order("sorrend")
     .limit(8);
   const KINALAT_PREVIEW: Termek[] = termekekRaw ?? [];
+  const actualReviews = REVIEWS.filter((review) => review.szoveg !== "Hamarosan...").slice(0, 2);
+
   return (
-    <div className="min-h-screen bg-cream grain-overlay">
+    <div className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f5edd9_16%,#f1e6d2_54%,#f5edd9_100%)] grain-overlay">
       <Navbar transparent />
 
       {/* ═══ HERO ═══ */}
@@ -88,35 +90,36 @@ export default async function Home() {
           sizes="100vw"
           priority
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,14,10,0.24)_0%,rgba(20,14,10,0.1)_28%,rgba(20,14,10,0.28)_58%,rgba(20,14,10,0.78)_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(20,14,10,0.18)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,14,10,0.34)_0%,rgba(20,14,10,0.18)_26%,rgba(20,14,10,0.34)_58%,rgba(20,14,10,0.84)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(226,193,155,0.2)_0%,transparent_30%),radial-gradient(circle_at_82%_14%,rgba(255,255,255,0.12)_0%,transparent_24%),radial-gradient(circle_at_center,transparent_34%,rgba(20,14,10,0.18)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-[linear-gradient(180deg,transparent_0%,rgba(20,14,10,0.24)_32%,rgba(245,237,217,0.9)_88%,#f5edd9_100%)]" />
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-8 md:pb-10 pt-28 md:pt-36">
-          <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_220px]">
-            <div className="max-w-2xl">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-10 md:pb-14 pt-28 md:pt-36">
+          <div className="grid items-end gap-12 lg:grid-cols-[minmax(0,1fr)_240px]">
+            <div className="max-w-3xl">
               <p className="text-[11px] uppercase tracking-[0.22em] text-[#d7b287] reveal-up">
                 Kézműves pékség · Pécs
               </p>
-              <h1 className="mt-5 max-w-2xl font-serif text-[clamp(3.3rem,7vw,5.6rem)] leading-[0.92] text-cream reveal-soft delay-1">
+              <h1 className="mt-6 max-w-3xl font-serif text-[clamp(3.8rem,8vw,6.4rem)] leading-[0.88] tracking-[-0.04em] text-cream reveal-soft delay-1">
                 Frissen, <em className="text-[#e2c19b] not-italic">kézzel,</em>
                 <br />
                 szeretettel.
               </h1>
-              <p className="mt-6 max-w-lg text-base leading-8 text-cream/72 reveal-up delay-2">
+              <p className="mt-7 max-w-xl text-[clamp(1.02rem,1.55vw,1.14rem)] leading-8 text-cream/84 reveal-up delay-2">
                 Kovásszal kelesztett kenyerek és kézzel formázott pékáruk
                 <br className="hidden sm:block" />
                 {" "}– minden nap frissen sütve, természetes alapanyagokból.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3 reveal-up delay-3">
+              <div className="mt-10 flex flex-wrap gap-4 reveal-up delay-3">
                 <Link
                   href="/elorendeles"
-                  className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3.5 font-sans text-sm font-bold text-brown-dark shadow-[0_18px_40px_rgba(31,20,12,0.2)] transition-all hover:bg-gold-light hover-lift"
+                  className="inline-flex min-w-[11.5rem] items-center justify-center gap-2 rounded-full bg-gold px-7 py-4 font-sans text-sm font-bold text-brown-dark shadow-[0_20px_42px_rgba(31,20,12,0.22)] transition-all hover:bg-gold-light hover-lift"
                 >
                   Előrendelés
                 </Link>
                 <Link
                   href="/termekek"
-                  className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-white/5 px-6 py-3.5 font-sans text-sm font-medium text-cream transition-all hover:border-cream/40 hover:bg-white/10 hover-lift"
+                  className="inline-flex min-w-[11.5rem] items-center justify-center gap-2 rounded-full border border-cream/22 bg-white/8 px-7 py-4 font-sans text-sm font-medium text-cream transition-all hover:border-cream/40 hover:bg-white/12 hover-lift"
                 >
                   Kínálatunk
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.25}>
@@ -126,101 +129,33 @@ export default async function Home() {
               </div>
             </div>
 
-            <aside className="self-end justify-self-start lg:justify-self-end text-left lg:text-right text-cream reveal-up delay-3">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.22em] text-cream/48">Nyitvatartás</p>
-                <p className="mt-3 text-sm leading-7 text-cream/76">Kedd – Péntek</p>
-                <p className="mt-1 font-serif text-4xl leading-none text-cream">8:00–17:00</p>
+            <aside className="max-w-[240px] self-end justify-self-start lg:justify-self-end text-left text-cream reveal-up delay-3">
+              <div className="border-l border-cream/16 pl-5">
+                <p className="text-[11px] uppercase tracking-[0.22em] text-cream/48">Átvétel és nyitvatartás</p>
+                <p className="mt-3 text-sm leading-7 text-cream/78">Kedd – Péntek</p>
+                <p className="mt-1 font-serif text-[2.3rem] leading-none text-cream">8:00–17:00</p>
+                <p className="mt-5 text-sm leading-7 text-cream/62">
+                  Pécs, Salakhegyi út 14.
+                </p>
               </div>
-              <p className="mt-8 text-sm leading-7 text-cream/56">
-                Pécs, Salakhegyi út 14.
-              </p>
             </aside>
           </div>
 
-          <div className="mt-10 reveal-up delay-4">
-            <div className="overflow-hidden rounded-[22px] border border-white/10 bg-[rgba(52,38,28,0.58)] shadow-[0_24px_60px_rgba(15,10,7,0.22)] backdrop-blur-md">
-              <div className="grid md:grid-cols-3">
-                {[
-                  { label: "Helyszín", value: "Pécs, Salakhegyi út 14." },
-                  { label: "Nyitvatartás", value: "K–P: 8:00–17:00" },
-                  { label: "Google értékelés", value: "5,0 · 4 vélemény" },
-                ].map(({ label, value }, index) => (
-                  <div
-                    key={label}
-                    className={`px-6 py-5 text-cream ${index !== 2 ? "md:border-r md:border-white/10" : ""}`}
-                  >
-                    <p className="text-[11px] uppercase tracking-[0.2em] text-cream/42">{label}</p>
-                    <p className="mt-2 text-sm leading-6 text-cream/82">{value}</p>
-                    {label === "Google értékelés" ? (
-                      <div className="mt-2">
-                        <StarRating n={5} />
-                      </div>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ INFO SÁV ═══ */}
-      <section className="relative -mt-px bg-[linear-gradient(180deg,#130e0b_0%,#221813_100%)] text-cream">
-        <div className="max-w-6xl mx-auto px-6 py-6 flex flex-wrap gap-x-8 gap-y-4 items-center justify-between">
-          {[
-            { Icon: MapPin, label: "Átvétel", value: "Személyesen Pécsen" },
-            { Icon: Clock, label: "Nyitvatartás", value: "K–P: 8:00–17:00" },
-            { Icon: Star, label: "Vélemény", value: "5,0 · Google értékelések" },
-          ].map(({ Icon, label, value }) => (
-            <div key={label} className="flex items-center gap-3 reveal-up hover-lift">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-cream/12 bg-cream/6">
-                <Icon className="h-4 w-4 text-gold shrink-0" />
-              </span>
-              <div>
-                <p className="text-[11px] text-cream/38 uppercase tracking-[0.2em] font-sans">{label}</p>
-                <p className="font-sans text-sm font-medium text-cream/84">{value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══ MIÉRT MI ═══ */}
-      <section className="py-28 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div className="reveal-up">
-              <div className="w-10 h-px bg-gold mb-5" />
-              <h2 className="font-serif text-4xl md:text-5xl text-brown-dark mb-5 leading-tight">
-                Minden termékben
-                <br />
-                <em className="text-gold not-italic">benne van a munkánk.</em>
-              </h2>
-              <p className="max-w-xl font-sans text-brown/70 leading-8 mb-6">
-                Amit mi csinálunk, az kicsit több idő. De megéri.<br />
-                Kenyereinket természetes kovásszal kelesztjük, kézzel formázzuk<br />
-                – péksüteményeinket pedig ugyanezzel a gondossággal készítjük.<br />
-                Nincs benne semmi trükk, csak türelem és jó alapanyag.
-              </p>
-              <Link
-                href="/rolunk"
-                className="inline-flex items-center gap-2 font-sans text-sm font-semibold text-brown-dark border-b-2 border-gold pb-0.5 hover:border-brown-dark transition-colors"
-              >
-                Ismerd meg történetünket →
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 reveal-scale delay-2">
+          <div className="mt-14 reveal-up delay-4">
+            <div className="story-surface-dark inline-flex max-w-4xl flex-col gap-3 rounded-[30px] border border-white/12 px-5 py-4 md:flex-row md:items-center md:gap-0 md:rounded-full md:px-6">
               {[
-                { Icon: Wheat, cim: "Természetes kovász", szoveg: "Időt adunk a tésztának, nem adalékanyagot" },
-                { Icon: Leaf, cim: "Kézzel, szívvel", szoveg: "Úgy készítjük, mintha a családunknak adnánk" },
-                { Icon: Flame, cim: "Mindig frissen sütve", szoveg: "Csak annyit készítünk, amennyit rendeltek" },
-                { Icon: Heart, cim: "Tiszta alapanyagok", szoveg: "Nálunk nincs mit rejtegetni" },
-              ].map(({ Icon, cim, szoveg }) => (
-                <div key={cim} className="paper-panel rounded-[24px] p-5 hover-lift">
-                  <Icon className="w-5 h-5 text-gold mb-3" />
-                  <p className="font-serif text-base font-semibold text-brown-dark mb-1">{cim}</p>
-                  <p className="font-sans text-sm text-brown/60 leading-7">{szoveg}</p>
+                { Icon: Star, value: "5.0 Google értékelés" },
+                { Icon: MapPin, value: "Átvétel Pécsen" },
+                { Icon: Flame, value: "Minden nap frissen sütve" },
+              ].map(({ Icon, value }, index) => (
+                <div
+                  key={value}
+                  className={`flex items-center gap-3 text-cream/88 md:px-5 ${index !== 2 ? "md:border-r md:border-white/10" : ""}`}
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-gold">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <p className="font-sans text-sm font-medium">{value}</p>
                 </div>
               ))}
             </div>
@@ -228,50 +163,174 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ═══ TERMÉK ELŐNÉZET ═══ */}
-      <section className="py-24 px-6 bg-[linear-gradient(180deg,#efe4cf_0%,#e8d7bc_100%)]">
+      {/* ═══ MIÉRT MI ═══ */}
+      <section className="relative z-10 -mt-8 px-6 pb-24 pt-8 md:-mt-14 md:pb-28 md:pt-14">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-10">
+          <div className="grid items-start gap-14 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:gap-16">
+            <div className="reveal-up">
+              <div className="w-10 h-px bg-gold mb-5" />
+              <p className="text-[11px] uppercase tracking-[0.22em] text-brown/48 mb-4">
+                Bizalom és érték
+              </p>
+              <h2 className="font-serif text-4xl md:text-5xl text-brown-dark mb-5 leading-tight">
+                Minden termékben
+                <br />
+                <em className="text-gold not-italic">benne van a munkánk.</em>
+              </h2>
+              <p className="max-w-xl font-sans text-brown/70 leading-8 mb-8">
+                Amit mi csinálunk, az kicsit több idő. De megéri. Kenyereinket természetes
+                kovásszal kelesztjük, kézzel formázzuk – péksüteményeinket pedig ugyanezzel a
+                gondossággal készítjük. Nincs benne semmi trükk, csak türelem és jó alapanyag.
+              </p>
+              <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
+                {[
+                  { Icon: Wheat, cim: "Természetes kovász", szoveg: "Időt adunk a tésztának, nem adalékanyagot." },
+                  { Icon: Leaf, cim: "Kézzel, szívvel", szoveg: "Úgy készítjük, mintha a családunknak adnánk." },
+                  { Icon: Flame, cim: "Mindig frissen sütve", szoveg: "Csak annyit készítünk, amennyit valóban kértek." },
+                  { Icon: Heart, cim: "Tiszta alapanyagok", szoveg: "Egyszerű, természetes összetevőkkel dolgozunk." },
+                ].map(({ Icon, cim, szoveg }, index) => (
+                  <div
+                    key={cim}
+                    className={`border-brown-dark/10 pt-4 ${index < 2 ? "border-t" : "border-t sm:border-t-0"}`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/55 text-gold shadow-[0_12px_30px_rgba(61,35,20,0.08)]">
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <div>
+                        <p className="font-serif text-lg text-brown-dark">{cim}</p>
+                        <p className="mt-1 font-sans text-sm leading-7 text-brown/60">{szoveg}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href="/rolunk"
+                className="mt-8 inline-flex items-center gap-2 font-sans text-sm font-semibold text-brown-dark border-b-2 border-gold pb-0.5 hover:border-brown-dark transition-colors"
+              >
+                Ismerd meg történetünket →
+              </Link>
+            </div>
+            <div className="story-surface reveal-scale delay-2 rounded-[34px] px-6 py-7 sm:px-8 sm:py-8">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-brown-dark/10 pb-5">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-brown/45">Vendégvisszajelzés</p>
+                  <p className="mt-2 font-serif text-2xl text-brown-dark">5,0 Google értékelés</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <StarRating n={5} />
+                  <span className="font-sans text-sm text-brown/55">Pécsi átvétellel</span>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-5">
+                {actualReviews.map((review) => (
+                  <div key={review.nev} className="border-b border-brown-dark/8 pb-5 last:border-b-0 last:pb-0">
+                    <p className="font-sans text-base leading-8 text-brown/74 italic">
+                      &bdquo;{review.szoveg}&rdquo;
+                    </p>
+                    <div className="mt-3 flex items-center justify-between gap-4">
+                      <p className="font-sans text-sm font-semibold text-brown-dark">{review.nev}</p>
+                      {review.datum ? (
+                        <p className="font-sans text-xs uppercase tracking-[0.16em] text-brown/38">{review.datum}</p>
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <a
+                href="https://g.page/r/kata-kenyere/review"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex items-center gap-2 font-sans text-sm font-medium text-brown-dark hover:text-gold-dark transition-colors"
+              >
+                Google vélemények megnyitása →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ TERMÉK ELŐNÉZET ═══ */}
+      <section className="relative px-6 py-24 md:py-28">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
             <div className="reveal-up">
               <div className="w-10 h-px bg-gold mb-4" />
+              <p className="text-[11px] uppercase tracking-[0.22em] text-brown/48 mb-4">Termékek</p>
               <h2 className="font-serif text-3xl md:text-5xl text-brown-dark">Kínálatunkból</h2>
-              <p className="mt-3 max-w-lg font-sans text-sm leading-7 text-brown/65">
+              <p className="mt-3 max-w-2xl font-sans text-sm leading-7 text-brown/65">
                 A rendelhető termékeket mindig az aktuális kínálatból mutatjuk, hogy a választás gyors és biztos maradjon.
               </p>
             </div>
-            <Link
-              href="/termekek"
-              className="font-sans text-sm text-brown/60 hover:text-brown-dark transition-colors hidden sm:block"
-            >
-              Teljes kínálat →
-            </Link>
+
+            <div className="flex flex-col gap-3 sm:flex-row reveal-up delay-1">
+              <Link
+                href="/termekek"
+                className="inline-flex items-center justify-center rounded-full border border-brown-dark/15 px-6 py-3.5 font-sans text-sm font-semibold text-brown-dark transition-colors hover:border-brown-dark"
+              >
+                Teljes kínálat
+              </Link>
+              <Link
+                href="/elorendeles"
+                className="inline-flex items-center justify-center rounded-full bg-brown-dark px-6 py-3.5 font-sans text-sm font-bold text-cream transition-colors hover:bg-brown"
+              >
+                Előrendelés
+              </Link>
+            </div>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-3 -mx-6 px-6 snap-x snap-mandatory scrollbar-none mb-6 reveal-soft delay-1">
+          <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-4 reveal-soft delay-2">
             {KINALAT_PREVIEW.map((termek) => (
-              <div key={termek.slug} className="paper-panel rounded-[28px] overflow-hidden shrink-0 w-[72vw] sm:w-[280px] snap-start hover-lift">
-                <div className="relative aspect-[4/3] overflow-hidden">
+              <article key={termek.slug} className="group flex flex-col">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] border border-brown-dark/10 bg-white/45 shadow-[0_18px_44px_rgba(61,35,20,0.08)] transition-transform duration-500 group-hover:-translate-y-1">
                   <Image
                     src={getTermekFoto(termek)}
                     alt={termek.nev}
                     fill
-                    className="object-cover transition-transform duration-700 hover:scale-[1.04]"
-                    sizes="(max-width: 640px) 72vw, 280px"
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
                   />
-                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brown-dark/30 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brown-dark/38 to-transparent" />
                 </div>
-                <div className="p-5">
-                  <p className="font-serif text-xl font-semibold text-brown-dark">{termek.nev}</p>
-                  <p className="mt-1 font-sans text-sm text-brown/50">{termek.egyseg}</p>
-                  <p className="font-sans text-base font-bold text-brown-dark mt-3">
-                    {termek.ar.toLocaleString("hu-HU")} Ft
+
+                <div className="mt-4 px-1">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-serif text-xl font-semibold text-brown-dark">{termek.nev}</p>
+                      <p className="mt-1 font-sans text-[11px] uppercase tracking-[0.18em] text-brown/45">{termek.egyseg}</p>
+                    </div>
+                    <p className="pt-1 font-sans text-base font-bold text-brown-dark whitespace-nowrap">
+                      {termek.ar.toLocaleString("hu-HU")} Ft
+                    </p>
+                  </div>
+
+                  <p className="mt-3 min-h-[4.5rem] font-sans text-sm leading-7 text-brown/58">
+                    {termek.leiras?.trim() || "Kézműves péksütemény, frissen készítve az átvételi napodra."}
                   </p>
+
+                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-brown-dark/8 pt-4">
+                    <span className="font-sans text-[11px] uppercase tracking-[0.18em] text-brown/40">
+                      Előrendelhető
+                    </span>
+                    <Link
+                      href="/elorendeles"
+                      className="inline-flex items-center gap-2 font-sans text-sm font-semibold text-brown-dark transition-colors hover:text-gold-dark"
+                    >
+                      Rendelés
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 reveal-up delay-2">
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 reveal-up delay-3">
             <Link
               href="/termekek"
               className="flex-1 sm:flex-none py-3.5 px-6 rounded-full font-sans font-semibold text-sm border border-brown-dark/20 text-brown-dark hover:border-brown-dark transition-colors text-center"
@@ -288,63 +347,20 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ═══ GOOGLE REVIEWS ═══ */}
-      <section className="py-24 px-6 bg-[linear-gradient(180deg,#1a130f_0%,#2a1d16_100%)]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10 reveal-up">
-            <div className="w-10 h-px bg-gold mx-auto mb-5" />
-            <h2 className="font-serif text-3xl md:text-5xl text-cream mb-2">
-              Amit vendégeink írtak
-            </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-cream/56">
-              A legjobb visszajelzés számunkra az, hogy újra visszajönnek érte. Ezek a sorok is ezt mutatják.
-            </p>
-            <div className="flex items-center justify-center gap-2 mt-5">
-              <StarRating n={5} />
-              <span className="font-sans text-cream/60 text-sm">5,0 · 4 Google értékelés</span>
-            </div>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-5 mb-8 reveal-soft delay-1">
-            {REVIEWS.filter(r => r.szoveg !== "Hamarosan...").map((review) => (
-              <div key={review.nev} className="glass-panel rounded-[28px] p-6 hover-lift">
-                <StarRating n={review.csillag} />
-                <p className="font-sans text-cream/80 text-base leading-8 mt-4 mb-5 italic">
-                  &bdquo;{review.szoveg}&rdquo;
-                </p>
-                <div className="flex items-center justify-between">
-                  <p className="font-sans text-sm font-semibold text-cream">{review.nev}</p>
-                  {review.datum && (
-                    <p className="font-sans text-xs text-cream/40">{review.datum}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center reveal-up delay-2">
-            <a
-              href="https://g.page/r/kata-kenyere/review"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 font-sans text-sm text-gold hover:text-gold-light transition-colors"
-            >
-              Írj te is véleményt a Google-n →
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* ═══ CTA SZEKCIÓ ═══ */}
-      <section className="py-24 px-6 bg-cream text-center">
-        <div className="paper-panel max-w-3xl mx-auto rounded-[36px] px-6 py-12 sm:px-10 reveal-scale">
+      <section className="px-6 pb-24 pt-10 md:pb-28 md:pt-16 text-center">
+        <div className="max-w-3xl mx-auto reveal-scale">
+          <div className="mx-auto h-20 w-px bg-[linear-gradient(180deg,transparent_0%,rgba(201,169,110,0.85)_50%,transparent_100%)]" />
           <Image
             src="/images/logo.png"
             alt="Kata Kenyere"
             width={56}
             height={56}
-            className="mx-auto mb-6 opacity-80"
+            className="mx-auto mb-6 mt-2 opacity-80"
           />
+          <p className="text-[11px] uppercase tracking-[0.22em] text-brown/44">
+            Frissességre időzített előrendelés
+          </p>
           <h2 className="font-serif text-4xl md:text-5xl text-brown-dark mb-4">
             Rendeld meg előre,
             <br />
@@ -356,24 +372,28 @@ export default async function Home() {
           <Link
             href="/elorendeles"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-sans font-bold text-base bg-brown-dark text-cream hover:bg-brown transition-colors hover-lift"
-            >
+          >
             Előrendelés indítása
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </Link>
-          <p className="font-sans text-sm text-brown/60 mt-4 flex items-center justify-center gap-1.5">
-            <svg className="w-4 h-4 text-gold shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-            </svg>
-            Átvétel személyesen · Pécs, Salakhegyi út 14.
-          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-sans text-sm text-brown/58">
+            <span className="flex items-center gap-1.5">
+              <MapPin className="h-4 w-4 text-gold shrink-0" />
+              Átvétel személyesen · Pécs
+            </span>
+            <span className="hidden h-1.5 w-1.5 rounded-full bg-gold/70 sm:block" />
+            <span className="flex items-center gap-1.5">
+              <Clock className="h-4 w-4 text-gold shrink-0" />
+              Minden nap frissen sütve
+            </span>
+          </div>
         </div>
       </section>
 
       {/* ═══ FOOTER ═══ */}
-      <footer className="bg-brown-dark border-t border-cream/10 py-10 px-6">
+      <footer className="bg-[linear-gradient(180deg,#211712_0%,#1b130f_100%)] border-t border-cream/8 py-10 px-6">
         <div className="max-w-5xl mx-auto grid sm:grid-cols-3 gap-8">
           <div>
             <Image src="/images/logo.png" alt="Kata Kenyere" width={40} height={40} className="mb-3 opacity-80" />
