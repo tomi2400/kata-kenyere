@@ -72,6 +72,26 @@
       inset 0 1px 0 rgba(255,255,255,0.12);
     backdrop-filter: blur(20px);
   }
+  .flow-surface {
+    position: relative;
+    overflow: hidden;
+    background: #fafaf8;
+  }
+  .flow-surface::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(circle at 8% 20%, rgba(201,169,110,0.08), transparent 32%),
+      radial-gradient(circle at 92% 80%, rgba(245,237,220,0.22), transparent 36%);
+  }
+  .flow-divider {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, rgba(208,175,119,0), rgba(208,175,119,0.28) 18%, rgba(208,175,119,0.48) 50%, rgba(208,175,119,0.28) 82%, rgba(208,175,119,0));
+  }
   .hero-zoom {
     animation: hero-zoom 18s ease-in-out infinite alternate;
     will-change: transform;
@@ -100,6 +120,25 @@
   .hover-lift:hover {
     transform: translateY(-4px);
   }
+  /* ── Scroll-reveal – progressive enhancement ──
+     Elements are VISIBLE by default (SSR / no-JS safe).
+     JS adds 'sr-animate' which enables the hidden state + transition.
+  ── */
+  .sr-animate {
+    will-change: transform, opacity;
+    transition:
+      opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sr-animate.sr-up    { opacity: 0; transform: translate3d(0, 32px, 0); }
+  .sr-animate.sr-left  { opacity: 0; transform: translate3d(-24px, 0, 0); }
+  .sr-animate.sr-right { opacity: 0; transform: translate3d(24px, 0, 0); }
+  .sr-animate.sr-scale { opacity: 0; transform: scale(0.95) translate3d(0, 20px, 0); }
+  .sr-animate.sr-soft  { opacity: 0; transform: translate3d(0, 18px, 0); filter: blur(4px); }
+  .sr-animate.sr-visible { opacity: 1; transform: none; filter: none; }
+  .delay-6 { animation-delay: 0.48s; }
+  .delay-7 { animation-delay: 0.56s; }
 }
 
 @keyframes reveal-up {
@@ -137,6 +176,11 @@
   }
 }
 
+@keyframes gallery-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 @keyframes hero-zoom {
   from {
     transform: scale(1);
@@ -149,14 +193,14 @@
 @layer base {
   :root {
     /* Kata Kenyere brand */
-    --background: #F5EDD9;
+    --background: #fafaf8;
     --foreground: #3D2314;
     --card: #EDE0C4;
     --card-foreground: #3D2314;
-    --popover: #F5EDD9;
+    --popover: #fafaf8;
     --popover-foreground: #3D2314;
     --primary: #3D2314;
-    --primary-foreground: #F5EDD9;
+    --primary-foreground: #fafaf8;
     --secondary: #EDE0C4;
     --secondary-foreground: #3D2314;
     --muted: #EDE0C4;
@@ -229,5 +273,17 @@
   .hover-lift:hover {
     transition: none !important;
     transform: none !important;
+  }
+  .sr-animate {
+    transition: none !important;
+  }
+  .sr-animate.sr-up,
+  .sr-animate.sr-left,
+  .sr-animate.sr-right,
+  .sr-animate.sr-scale,
+  .sr-animate.sr-soft {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 }
