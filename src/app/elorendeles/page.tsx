@@ -10,7 +10,6 @@ export const dynamic = "force-dynamic";
 function formatHatarido(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
-  // Mindig Budapest időzónában formázzuk
   return d.toLocaleString("hu-HU", {
     timeZone: "Europe/Budapest",
     month: "long",
@@ -21,7 +20,6 @@ function formatHatarido(iso: string | null): string {
 }
 
 export default async function ElorendelesPage() {
-  // Next.js 14: fetch cache teljes tiltása ennél a kérésnél
   noStore();
 
   const now = new Date();
@@ -44,65 +42,68 @@ export default async function ElorendelesPage() {
     }));
 
   return (
-    <div className="min-h-screen bg-cream grain-overlay">
-      {/* HEADER */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-gold/20 bg-cream/80 backdrop-blur-sm">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/images/logo.png" alt="Kata Kenyere" width={36} height={36} />
-          <span className="font-serif text-sm text-brown-dark hidden sm:block">Kata Kenyere</span>
-        </Link>
-        <Link href="/termekek" className="font-sans text-xs text-brown/50 hover:text-brown transition-colors">
-          ← Kínálatunk
-        </Link>
+    <div className="min-h-screen bg-[#fafaf8] grain-overlay text-[#4b2e1f]">
+      {/* Header */}
+      <header className="border-b border-[#ede8df] bg-white/90 px-6 py-4 backdrop-blur-md">
+        <div className="mx-auto flex max-w-3xl items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <Image src="/images/logo.png" alt="Kata Kenyere" width={32} height={32} />
+            <span className="hidden font-serif text-sm text-[#3d2314] sm:block">Kata Kenyere</span>
+          </Link>
+          <Link href="/termekek" className="font-sans text-xs text-[#9a7a5d] transition-colors hover:text-[#4b2e1f]">
+            ← Kínálatunk
+          </Link>
+        </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-10 md:py-14">
-        <section className="paper-panel warm-ring rounded-[2rem] px-6 py-8 md:px-10 md:py-10 mb-8 overflow-hidden relative">
-          <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-gold/10 blur-3xl" />
-          <div className="relative">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold/20 bg-white/70 px-3 py-1 mb-5">
-              <span className="h-2 w-2 rounded-full bg-gold" />
-              <span className="font-sans text-[11px] uppercase tracking-[0.2em] text-brown/55">Online előrendelés</span>
-            </div>
-            <h1 className="font-serif text-4xl md:text-5xl text-brown-dark mb-4 leading-[1.05]">
-              Válaszd ki,
-              <br />
-              <em className="text-gold not-italic">mikor süssünk neked.</em>
-            </h1>
-            <p className="font-sans text-brown/65 text-sm md:text-base leading-relaxed max-w-xl">
-              Több napot is kiválaszthatsz egyszerre. A következő lépésben napokra bontva tudsz termékeket rendelni,
-              így minden átvétel külön átlátható marad.
-            </p>
+      <main className="mx-auto max-w-3xl px-4 py-10 md:py-14">
+
+        {/* Hero kártya */}
+        <section className="mb-8 overflow-hidden rounded-[24px] border border-[#ede8df] bg-white px-6 py-8 md:px-10 md:py-10">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#d0af77]/30 bg-[#fafaf8] px-3 py-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#c79a66]" />
+            <span className="font-sans text-[11px] uppercase tracking-[0.2em] text-[#9a7a5d]">Online előrendelés</span>
           </div>
+          <h1 className="font-serif text-[2.2rem] leading-tight text-[#3d2314] md:text-[2.8rem]">
+            Válaszd ki,<br />
+            <span className="text-[#d0af77]">mikor süssünk neked.</span>
+          </h1>
+          <p className="mt-4 max-w-xl font-sans text-[0.9rem] leading-relaxed text-[#7c5a46]">
+            Több napot is kiválaszthatsz egyszerre. A következő lépésben napokra bontva tudsz termékeket rendelni,
+            így minden átvétel külön átlátható marad.
+          </p>
         </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+        {/* Lépések */}
+        <div className="mb-8 grid grid-cols-1 gap-3 md:grid-cols-3">
           {[
             { cim: "1. Nap kiválasztása", szoveg: "Jelöld be, melyik napokra szeretnél rendelni." },
             { cim: "2. Termékek napokra", szoveg: "Minden naphoz külön állíthatod össze a kosarat." },
             { cim: "3. Egy leadás", szoveg: "A végén egyben tudod elküldeni az egész rendelést." },
           ].map((item) => (
-            <div key={item.cim} className="paper-panel rounded-2xl px-4 py-4 border border-gold/15">
-              <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-brown/40 mb-2">{item.cim}</p>
-              <p className="font-sans text-sm text-brown/70 leading-relaxed">{item.szoveg}</p>
+            <div key={item.cim} className="rounded-[16px] border border-[#ede8df] bg-white px-4 py-4">
+              <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-[#9a7a5d]">{item.cim}</p>
+              <p className="mt-1.5 font-sans text-sm leading-relaxed text-[#7c5a46]">{item.szoveg}</p>
             </div>
           ))}
         </div>
 
         <DaySelector days={days} redirectTo="/valasztas" />
 
+        {/* Info sáv */}
         <div className="mt-10 grid grid-cols-3 gap-3 text-center">
           {[
             { Icon: MapPin, text: "Salakhegyi út 14." },
             { Icon: Clock, text: "K–P 8:00–17:00" },
             { Icon: ShoppingBag, text: "Személyes átvétel" },
           ].map(({ Icon, text }) => (
-            <div key={text} className="paper-panel rounded-2xl py-4 px-2 flex flex-col items-center gap-2 border border-gold/15">
-              <Icon className="w-4 h-4 text-gold" />
-              <p className="font-sans text-xs text-brown/60">{text}</p>
+            <div key={text} className="flex flex-col items-center gap-2 rounded-[16px] border border-[#ede8df] bg-white px-2 py-4">
+              <Icon className="h-4 w-4 text-[#c79a66]" />
+              <p className="font-sans text-xs text-[#7c5a46]">{text}</p>
             </div>
           ))}
         </div>
+
       </main>
     </div>
   );

@@ -10,59 +10,56 @@ export default function KoszonjukPage({
   const rendelesSzam = searchParams?.rendelesSzam;
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col grain-overlay">
-      <header className="px-6 py-5 flex items-center justify-between">
-        <Image src="/images/logo.png" alt="Kata Kenyere" width={40} height={40} />
+    <div className="flex min-h-screen flex-col bg-[#fafaf8] grain-overlay text-[#4b2e1f]">
+      <header className="border-b border-[#ede8df] bg-white/90 px-6 py-4 backdrop-blur-sm">
+        <Image src="/images/logo.png" alt="Kata Kenyere" width={36} height={36} />
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center">
-        <div className="paper-panel warm-ring rounded-[2rem] w-full max-w-xl px-6 py-10 md:px-8 md:py-12">
-          <div className="w-20 h-20 rounded-full bg-gold/20 flex items-center justify-center mb-6 mx-auto">
-            <svg className="w-10 h-10 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <main className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
+        <div className="w-full max-w-lg rounded-[24px] border border-[#ede8df] bg-white px-6 py-10 md:px-8 md:py-12">
+
+          {/* Pipa ikon */}
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#c79a66]/15">
+            <svg className="h-10 w-10 text-[#c79a66]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
 
-          <div className="w-10 h-px bg-gold mx-auto mb-5" />
+          <div className="mx-auto mb-5 h-px w-10 bg-[#d0af77]" />
 
-          <h1 className="font-serif text-4xl text-brown-dark mb-3">
+          <h1 className="font-serif text-[2rem] text-[#3d2314] md:text-[2.4rem]">
             Köszönjük<br />a rendelésedet!
           </h1>
-
-          <p className="font-sans text-brown/60 text-base max-w-sm mb-8 leading-relaxed mx-auto">
+          <p className="mx-auto mt-4 max-w-sm font-sans text-[0.9rem] leading-relaxed text-[#7c5a46]">
             A rendelésed sikeresen beérkezett hozzánk.
-            Ezt az oldalt használhatjuk stabil sikeres rendelési eseményként a mérésekhez is.
           </p>
 
           {rendelesSzam && (
-            <div className="mb-8 rounded-2xl border border-gold/20 bg-white px-5 py-4 w-full max-w-sm mx-auto">
-              <p className="font-sans text-xs text-brown/40 uppercase tracking-wider">Rendelési azonosító</p>
-              <p className="font-sans text-lg font-semibold text-brown-dark mt-2">{rendelesSzam}</p>
+            <div className="mx-auto mt-6 w-full max-w-xs rounded-[16px] border border-[#ede8df] bg-[#fafaf8] px-5 py-4">
+              <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-[#9a7a5d]">Rendelési azonosító</p>
+              <p className="mt-1.5 font-sans text-lg font-semibold text-[#3d2314]">{rendelesSzam}</p>
             </div>
           )}
 
-          <div className="bg-brown-dark rounded-2xl p-6 w-full max-w-sm mb-8 text-left mx-auto shadow-[0_18px_32px_rgba(61,35,20,0.16)]">
-            <p className="font-sans text-xs text-cream/40 uppercase tracking-wider mb-3">Átvétel</p>
+          {/* Átvétel info */}
+          <div className="mx-auto mt-6 w-full max-w-xs rounded-[16px] bg-[#3e2315] p-5 text-left">
+            <p className="mb-3 font-sans text-[11px] uppercase tracking-[0.18em] text-[#e8d6c0]/50">Átvétel</p>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <MapPin className="w-4 h-4 text-gold shrink-0" />
-                <span className="font-sans text-sm text-cream">Pécs, Salakhegyi út 14.</span>
+                <MapPin className="h-4 w-4 shrink-0 text-[#c79a66]" />
+                <span className="font-sans text-sm text-[#e8d6c0]">Pécs, Salakhegyi út 14.</span>
               </div>
               <div className="flex items-center gap-3">
-                <Clock className="w-4 h-4 text-gold shrink-0" />
-                <span className="font-sans text-sm text-cream">Kedd – Péntek: 8:00–17:00</span>
+                <Clock className="h-4 w-4 shrink-0 text-[#c79a66]" />
+                <span className="font-sans text-sm text-[#e8d6c0]">Kedd – Péntek: 8:00–17:00</span>
               </div>
             </div>
           </div>
 
-          <p className="font-sans text-xs text-brown/45 max-w-sm mb-8 leading-relaxed mx-auto">
-            Az automatikus emailes visszaigazolást a következő fejlesztési körben kötjük rá erre a sikeres leadási pontra.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm mx-auto">
+          <div className="mx-auto mt-8 flex w-full max-w-xs flex-col gap-3 sm:flex-row">
             <Link
               href="/"
-              className="flex-1 py-3 px-6 rounded-xl font-sans font-semibold text-sm bg-brown-dark text-cream hover:bg-brown transition-colors text-center"
+              className="flex-1 rounded-full bg-[#c79a66] py-3 px-6 text-center font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_6px_18px_rgba(199,154,102,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b98b58]"
             >
               Új rendelés
             </Link>
@@ -70,7 +67,7 @@ export default function KoszonjukPage({
               href="https://www.instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 py-3 px-6 rounded-xl font-sans font-semibold text-sm border-2 border-gold/30 text-brown-dark hover:border-gold transition-colors text-center bg-white/70"
+              className="flex-1 rounded-full border border-[#c79a66]/40 py-3 px-6 text-center font-sans text-sm font-semibold text-[#5b3826] transition-all duration-300 hover:border-[#c79a66] hover:bg-[#c79a66]/6"
             >
               Kövess minket
             </a>
@@ -78,11 +75,10 @@ export default function KoszonjukPage({
         </div>
       </main>
 
-      {/* FOOTER */}
       <footer className="px-6 py-4 text-center">
-        <p className="font-sans text-xs text-brown/30">
+        <p className="font-sans text-xs text-[#9a7a5d]">
           © 2026 Kata Kenyere ·{" "}
-          <Link href="/impresszum" className="hover:text-brown/50 transition-colors">Impresszum</Link>
+          <Link href="/impresszum" className="transition-colors hover:text-[#4b2e1f]">Impresszum</Link>
         </p>
       </footer>
     </div>

@@ -22,15 +22,12 @@ export default function OsszesitesPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => { setMounted(true); }, []);
-
-  useEffect(() => {
-    if (mounted && selectedDays.length === 0) router.replace("/");
-  }, [mounted, selectedDays, router]);
+  useEffect(() => { if (mounted && selectedDays.length === 0) router.replace("/"); }, [mounted, selectedDays, router]);
 
   if (!mounted || selectedDays.length === 0) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-[#fafaf8]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#c79a66] border-t-transparent" />
       </div>
     );
   }
@@ -49,101 +46,72 @@ export default function OsszesitesPage() {
   const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true);
-
     const rendelesek = selectedDays.flatMap((day) =>
       (carts[day.datum] ?? []).map((item) => ({
-        nap: day.nap,
-        datum: day.datum,
-        termekId: item.termekId,
-        nev: item.nev,
-        mennyiseg: item.mennyiseg,
-        egysegar: item.ar,
-        reszosszeg: item.ar * item.mennyiseg,
+        nap: day.nap, datum: day.datum, termekId: item.termekId,
+        nev: item.nev, mennyiseg: item.mennyiseg, egysegar: item.ar, reszosszeg: item.ar * item.mennyiseg,
       }))
     );
-
     try {
       const res = await fetch("/api/rendeles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, rendelesek, vegosszeg: total }),
       });
-
       const data = await res.json().catch(() => null);
-
       if (res.ok) {
         clearCart();
         const rendelesSzam = data?.rendelesSzam ? `?rendelesSzam=${encodeURIComponent(data.rendelesSzam)}` : "";
         router.push(`/koszonjuk${rendelesSzam}`);
-      } else {
-        alert("Hiba történt, kérlek próbáld újra!");
-      }
-    } catch {
-      alert("Hiba történt, kérlek próbáld újra!");
-    } finally {
-      setLoading(false);
-    }
+      } else { alert("Hiba történt, kérlek próbáld újra!"); }
+    } catch { alert("Hiba történt, kérlek próbáld újra!"); }
+    finally { setLoading(false); }
   };
 
-  const handleBack = () => {
-    setCurrentStep(Math.max(0, selectedDays.length - 1));
-    router.push("/valasztas");
-  };
+  const handleBack = () => { setCurrentStep(Math.max(0, selectedDays.length - 1)); router.push("/valasztas"); };
 
   return (
-    <div className="min-h-screen bg-cream pb-12 grain-overlay">
-      <header className="bg-cream/80 backdrop-blur-sm border-b border-gold/20 px-4 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <Link href="/">
-            <Image src="/images/logo.png" alt="Kata Kenyere" width={36} height={36} />
-          </Link>
-          <button
-            onClick={handleBack}
-            className="font-sans text-xs text-brown/50 hover:text-brown transition-colors cursor-pointer"
-          >
-            ← Vissza
-          </button>
+    <div className="min-h-screen bg-[#fafaf8] pb-12 grain-overlay text-[#4b2e1f]">
+      <header className="border-b border-[#ede8df] bg-white/90 px-4 py-4 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-2xl items-center justify-between">
+          <Link href="/"><Image src="/images/logo.png" alt="Kata Kenyere" width={32} height={32} /></Link>
+          <button onClick={handleBack} className="font-sans text-xs text-[#9a7a5d] transition-colors hover:text-[#4b2e1f] cursor-pointer">← Vissza</button>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 pt-8 space-y-8">
-        <section className="paper-panel warm-ring rounded-[1.8rem] px-5 py-6 md:px-7 md:py-7 relative overflow-hidden">
-          <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-gold/10 blur-2xl" />
-          <div className="relative">
-            <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-brown/40 mb-2">Utolsó lépés</p>
-            <h1 className="font-serif text-3xl text-brown-dark">Rendelés összesítése</h1>
-            <p className="font-sans text-sm text-brown/55 mt-2 leading-relaxed max-w-lg">
-              Nézd át nyugodtan a napokra bontott kosarat, aztán add meg az adataidat. A rendelés csak az elküldés után végleges.
-            </p>
-          </div>
+      <main className="mx-auto max-w-2xl space-y-6 px-4 pt-8">
+
+        {/* Fejléc kártya */}
+        <section className="overflow-hidden rounded-[20px] border border-[#ede8df] bg-white px-5 py-6 md:px-7 md:py-7">
+          <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-[#9a7a5d]">Utolsó lépés</p>
+          <h1 className="mt-1 font-serif text-[1.8rem] text-[#3d2314]">Rendelés összesítése</h1>
+          <p className="mt-2 font-sans text-sm leading-relaxed text-[#7c5a46]">
+            Nézd át nyugodtan a napokra bontott kosarat, aztán add meg az adataidat.
+          </p>
         </section>
 
-        <section className="space-y-4">
+        {/* Napok */}
+        <section className="space-y-3">
           {selectedDays.map((day) => {
             const items = carts[day.datum] ?? [];
             if (items.length === 0) return null;
             const dayTotal = items.reduce((s, i) => s + i.ar * i.mennyiseg, 0);
             return (
-              <div key={day.datum} className="paper-panel rounded-[1.4rem] p-4 border border-gold/15">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-serif text-base font-semibold text-brown-dark">
+              <div key={day.datum} className="rounded-[20px] border border-[#ede8df] bg-white p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="font-serif text-base text-[#3d2314]">
                     {day.nap}
-                    <span className="font-sans text-xs font-normal text-brown/50 ml-2">
-                      {formatDatum(day.datum)}
-                    </span>
+                    <span className="ml-2 font-sans text-xs font-normal text-[#9a7a5d]">{formatDatum(day.datum)}</span>
                   </h3>
-                  <span className="font-sans text-sm font-bold text-brown-dark">{formatAr(dayTotal)}</span>
+                  <span className="font-sans text-sm font-semibold text-[#5b3826]">{formatAr(dayTotal)}</span>
                 </div>
                 <div className="space-y-1.5">
                   {items.map((item) => (
                     <div key={item.termekId} className="flex items-center justify-between text-sm">
-                      <span className="font-sans text-brown/80">
-                        {item.nev}
-                        <span className="text-brown/40 ml-1">({item.egyseg})</span>
+                      <span className="font-sans text-[#7c5a46]">
+                        {item.nev}<span className="ml-1 text-[#9a7a5d]">({item.egyseg})</span>
                       </span>
-                      <span className="font-sans text-brown/60 ml-4 shrink-0">
-                        {item.mennyiseg} × {formatAr(item.ar)}
-                      </span>
+                      <span className="ml-4 shrink-0 font-sans text-[#9a7a5d]">{item.mennyiseg} × {formatAr(item.ar)}</span>
                     </div>
                   ))}
                 </div>
@@ -152,62 +120,61 @@ export default function OsszesitesPage() {
           })}
         </section>
 
-        <div className="paper-panel warm-ring rounded-[1.4rem] px-5 py-5 flex items-center justify-between">
+        {/* Végösszeg */}
+        <div className="flex items-center justify-between rounded-[20px] border border-[#c79a66]/30 bg-white px-5 py-5">
           <div>
-            <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-brown/40">Végösszeg</p>
-            <span className="font-serif text-3xl font-bold text-brown-dark">{formatAr(total)}</span>
+            <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-[#9a7a5d]">Végösszeg</p>
+            <span className="font-serif text-3xl font-bold text-[#3d2314]">{formatAr(total)}</span>
           </div>
-          <p className="font-sans text-sm text-brown/50 max-w-[12rem] text-right">
-            Minden kiválasztott nap és tétel együtt számolva
-          </p>
+          <p className="max-w-[12rem] text-right font-sans text-sm text-[#9a7a5d]">Minden kiválasztott nap és tétel együtt</p>
         </div>
 
-        <div className="bg-brown-dark rounded-[1.5rem] p-5 flex gap-4 items-start shadow-[0_20px_40px_rgba(61,35,20,0.16)]">
-          <div className="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center shrink-0 mt-0.5">
-            <MapPin className="w-4 h-4 text-gold" />
+        {/* Átvétel info */}
+        <div className="flex items-center gap-4 rounded-[20px] bg-[#3e2315] p-5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#c79a66]/20">
+            <MapPin className="h-4 w-4 text-[#c79a66]" />
           </div>
           <div>
-            <p className="font-sans text-sm font-semibold text-cream">Személyes átvétel</p>
-            <p className="font-sans text-xs text-cream/60 mt-0.5">Pécs, Salakhegyi út 14. · K–P: 8:00–17:00</p>
+            <p className="font-sans text-sm font-semibold text-[#fff5ea]">Személyes átvétel</p>
+            <p className="font-sans text-xs text-[#e8d6c0]/60">Pécs, Salakhegyi út 14. · K–P: 8:00–17:00</p>
           </div>
         </div>
 
-        <section className="paper-panel rounded-[1.6rem] p-5 md:p-6 border border-gold/15">
-          <h2 className="font-serif text-xl text-brown-dark mb-4">Adataid</h2>
+        {/* Adatok */}
+        <section className="rounded-[20px] border border-[#ede8df] bg-white p-5 md:p-6">
+          <h2 className="mb-5 font-serif text-xl text-[#3d2314]">Adataid</h2>
           <div className="space-y-4">
             {[
-              { key: "nev", label: "Teljes neved", type: "text", placeholder: "Kovács Katalin", req: true },
-              { key: "email", label: "Email cím", type: "email", placeholder: "pelda@email.com", req: true },
-              { key: "telefon", label: "Telefonszám", type: "tel", placeholder: "+36 30 123 4567", req: true },
-            ].map(({ key, label, type, placeholder, req }) => (
+              { key: "nev", label: "Teljes neved", type: "text", placeholder: "Kovács Katalin" },
+              { key: "email", label: "Email cím", type: "email", placeholder: "pelda@email.com" },
+              { key: "telefon", label: "Telefonszám", type: "tel", placeholder: "+36 30 123 4567" },
+            ].map(({ key, label, type, placeholder }) => (
               <div key={key}>
-                <label className="block font-sans text-sm font-medium text-brown-dark mb-1">
-                  {label} {req && <span className="text-red-500">*</span>}
+                <label className="mb-1 block font-sans text-sm font-medium text-[#4b2e1f]">
+                  {label} <span className="text-red-400">*</span>
                 </label>
                 <input
                   type={type}
                   placeholder={placeholder}
                   value={form[key as keyof typeof form]}
                   onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                  className={`
-                    w-full px-4 py-3 rounded-lg font-sans text-sm bg-white border transition-colors outline-none
-                    ${errors[key] ? "border-red-400 focus:border-red-500" : "border-gold/30 focus:border-gold"}
-                  `}
+                  className={`w-full rounded-[12px] border px-4 py-3 font-sans text-sm outline-none transition-colors bg-[#fafaf8] ${
+                    errors[key] ? "border-red-300 focus:border-red-400" : "border-[#ede8df] focus:border-[#c79a66]"
+                  }`}
                 />
-                {errors[key] && <p className="font-sans text-xs text-red-500 mt-1">{errors[key]}</p>}
+                {errors[key] && <p className="mt-1 font-sans text-xs text-red-400">{errors[key]}</p>}
               </div>
             ))}
-
             <div>
-              <label className="block font-sans text-sm font-medium text-brown-dark mb-1">
-                Megjegyzés <span className="text-brown/40 font-normal">(opcionális)</span>
+              <label className="mb-1 block font-sans text-sm font-medium text-[#4b2e1f]">
+                Megjegyzés <span className="font-normal text-[#9a7a5d]">(opcionális)</span>
               </label>
               <textarea
                 placeholder="Pl. speciális kérés, allergia..."
                 value={form.megjegyzes}
                 onChange={(e) => setForm((f) => ({ ...f, megjegyzes: e.target.value }))}
                 rows={3}
-                className="w-full px-4 py-3 rounded-lg font-sans text-sm bg-white border border-gold/30 focus:border-gold outline-none transition-colors resize-none"
+                className="w-full resize-none rounded-[12px] border border-[#ede8df] bg-[#fafaf8] px-4 py-3 font-sans text-sm outline-none transition-colors focus:border-[#c79a66]"
               />
             </div>
           </div>
@@ -217,26 +184,22 @@ export default function OsszesitesPage() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full py-4 rounded-[1.4rem] font-sans font-bold text-base bg-brown-dark text-cream hover:bg-brown transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_20px_36px_rgba(61,35,20,0.18)]"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#c79a66] py-4 font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(199,154,102,0.32)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b98b58] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
-            <>
-              <div className="w-4 h-4 border-2 border-cream/30 border-t-cream rounded-full animate-spin" />
-              Küldés...
-            </>
+            <><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />Küldés...</>
           ) : (
-            <>
-              Rendelés elküldése
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <>Rendelés elküldése
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </>
           )}
         </button>
 
-        <p className="font-sans text-xs text-brown/40 text-center">
+        <p className="text-center font-sans text-xs text-[#9a7a5d]">
           Elküldéssel elfogadod az{" "}
-          <Link href="/adatvedelmi" className="underline hover:text-brown/70">adatkezelési tájékoztatót</Link>.
+          <Link href="/adatvedelmi" className="underline hover:text-[#4b2e1f]">adatkezelési tájékoztatót</Link>.
         </p>
       </main>
     </div>

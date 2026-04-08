@@ -20,19 +20,12 @@ export default function TermekekPage() {
     setMounted(true);
     fetch("/api/termekek", { cache: "no-store" })
       .then((res) => res.json())
-      .then((data) => {
-        setTermekek(data.termekek);
-        setKategoriak(data.kategoriak);
-        setLoading(false);
-      })
+      .then((data) => { setTermekek(data.termekek); setKategoriak(data.kategoriak); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
-  // Ha nincs kiválasztott nap, vissza a főoldalra
   useEffect(() => {
-    if (mounted && selectedDays.length === 0) {
-      router.replace("/");
-    }
+    if (mounted && selectedDays.length === 0) router.replace("/");
   }, [mounted, selectedDays, router]);
 
   useEffect(() => {
@@ -44,8 +37,8 @@ export default function TermekekPage() {
 
   if (!mounted || selectedDays.length === 0 || loading) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-[#fafaf8]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#c79a66] border-t-transparent" />
       </div>
     );
   }
@@ -57,37 +50,24 @@ export default function TermekekPage() {
   const totalItems = (carts[currentDay.datum] ?? []).reduce((s, i) => s + i.mennyiseg, 0);
 
   const handleNext = () => {
-    if (isLastDay) {
-      setCurrentStep(currentStep);
-      router.push("/osszesites");
-    } else {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    if (isLastDay) { setCurrentStep(currentStep); router.push("/osszesites"); }
+    else { setCurrentStep(currentStep + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
+    if (currentStep > 0) { setCurrentStep(currentStep - 1); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
     router.push("/elorendeles");
   };
 
   return (
-    <div className="min-h-screen bg-cream pb-32 grain-overlay">
-      <header className="sticky top-0 z-20 bg-cream/85 backdrop-blur-md border-b border-gold/15 px-4 py-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
+    <div className="min-h-screen bg-[#fafaf8] pb-32 grain-overlay text-[#4b2e1f]">
+      <header className="sticky top-0 z-20 border-b border-[#ede8df] bg-white/90 px-4 py-4 backdrop-blur-md">
+        <div className="mx-auto max-w-2xl">
+          <div className="mb-4 flex items-center justify-between">
             <button onClick={() => router.push("/")} className="flex items-center gap-2 cursor-pointer">
-              <Image src="/images/logo.png" alt="Kata Kenyere" width={32} height={32} />
+              <Image src="/images/logo.png" alt="Kata Kenyere" width={30} height={30} />
             </button>
-            <button
-              onClick={handleBack}
-              className="font-sans text-xs text-brown/50 hover:text-brown transition-colors cursor-pointer"
-            >
+            <button onClick={handleBack} className="font-sans text-xs text-[#9a7a5d] transition-colors hover:text-[#4b2e1f] cursor-pointer">
               ← Vissza
             </button>
           </div>
@@ -95,75 +75,58 @@ export default function TermekekPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 pt-6">
-        <section className="paper-panel warm-ring rounded-[1.75rem] px-5 py-5 md:px-6 md:py-6 mb-6 relative overflow-hidden">
-          <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-gold/10 blur-2xl" />
-          <div className="relative">
-            <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-brown/40 mb-2">
-              {currentStep + 1}. lépés
-            </p>
-            <h1 className="font-serif text-2xl md:text-3xl text-brown-dark">
-              {currentDay.nap}i kínálat
-            </h1>
-            <p className="font-sans text-sm text-brown/55 mt-2 max-w-lg leading-relaxed">
-              Állítsd össze erre a napra a kosarat. A mennyiségek külön ennél az átvételi napnál számolódnak.
-            </p>
-          </div>
+      <main className="mx-auto max-w-2xl px-4 pt-6">
+        <section className="mb-6 overflow-hidden rounded-[20px] border border-[#ede8df] bg-white px-5 py-5 md:px-6 md:py-6">
+          <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-[#9a7a5d]">{currentStep + 1}. lépés</p>
+          <h1 className="mt-1 font-serif text-[1.8rem] text-[#3d2314] md:text-[2.2rem]">{currentDay.nap}i kínálat</h1>
+          <p className="mt-2 font-sans text-sm leading-relaxed text-[#7c5a46]">
+            Állítsd össze erre a napra a kosarat. A mennyiségek külön ennél az átvételi napnál számolódnak.
+          </p>
         </section>
 
         {Object.entries(termekekByKategoria).map(([kategoria, termekek]) => (
           <section key={kategoria} className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px flex-1 bg-gold/25" />
-              <h2 className="font-serif text-base text-brown/70 shrink-0">
-                {kategoria}
-              </h2>
-              <div className="h-px flex-1 bg-gold/25" />
+            <div className="mb-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-[#d0af77]/30" />
+              <h2 className="font-serif text-base text-[#4b2e1f] shrink-0">{kategoria}</h2>
+              <div className="h-px flex-1 bg-[#d0af77]/30" />
             </div>
-            <p className="font-sans text-xs text-brown/45 mb-4">
+            <p className="mb-4 font-sans text-xs text-[#9a7a5d]">
               Az itt kiválasztott termékek csak a {currentDay.nap.toLowerCase()}i átvételhez kerülnek.
             </p>
-            <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2">
               {termekek.map((termek) => (
-                <ProductCard
-                  key={termek.id}
-                  termek={termek}
-                  datum={currentDay.datum}
-                />
+                <ProductCard key={termek.id} termek={termek} datum={currentDay.datum} />
               ))}
             </div>
           </section>
         ))}
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-4 safe-area-pb">
-        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4 rounded-[1.7rem] bg-brown-dark/96 backdrop-blur-md border border-cream/10 px-5 py-4 shadow-[0_26px_50px_rgba(61,35,20,0.28)]">
+      {/* Sticky bottom bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-4">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 rounded-[20px] border border-[#fff5ea]/10 bg-[#3e2315]/96 px-5 py-4 shadow-[0_20px_40px_rgba(40,20,10,0.28)] backdrop-blur-md">
           <div>
             {totalItems > 0 ? (
               <>
-                <p className="font-sans text-xs uppercase tracking-[0.16em] text-cream/45">{totalItems} tétel</p>
-                <p className="font-sans font-bold text-cream text-lg">
-                  {formatAr(dayTotal)}
-                </p>
+                <p className="font-sans text-xs uppercase tracking-[0.16em] text-[#e8d6c0]/50">{totalItems} tétel</p>
+                <p className="font-sans text-lg font-bold text-[#fff5ea]">{formatAr(dayTotal)}</p>
               </>
             ) : (
-              <p className="font-sans text-sm text-cream/40">Még nem választottál erre a napra</p>
+              <p className="font-sans text-sm text-[#e8d6c0]/40">Még nem választottál erre a napra</p>
             )}
           </div>
-
           <button
             onClick={handleNext}
-            className={`
-              flex items-center gap-2 px-6 py-3 rounded-lg font-sans font-semibold text-sm transition-all
-              ${totalItems > 0
-                ? "bg-gold text-brown-dark hover:bg-gold-light cursor-pointer"
-                : "bg-cream/10 text-cream/30 cursor-not-allowed"
-              }
-            `}
             disabled={totalItems === 0}
+            className={`flex items-center gap-2 rounded-full px-6 py-3 font-sans text-sm font-semibold transition-all duration-300 ${
+              totalItems > 0
+                ? "bg-[#c79a66] text-[#fff9f0] hover:-translate-y-0.5 hover:bg-[#b98b58] cursor-pointer"
+                : "cursor-not-allowed bg-white/10 text-white/30"
+            }`}
           >
             {isLastDay ? "Összesítés" : `${selectedDays[currentStep + 1]?.nap}i termékek`}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </button>
