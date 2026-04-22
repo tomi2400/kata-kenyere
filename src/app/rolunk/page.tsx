@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
-import { ArrowRight, MapPin, Clock, Phone, Mail } from "lucide-react";
+import { ArrowRight, MapPin, Clock } from "lucide-react";
 
 export const metadata = {
   title: "Kézműves kovászos pékség Pécsről – A mi történetünk",
@@ -93,8 +93,7 @@ export default function RolunkPage() {
               </p>
               <blockquote className="my-7 border-l-2 border-[#9c6f3a] pl-6">
                 <p className="font-serif text-[1.2rem] italic leading-[1.6] text-[#2C1F14]">
-                  „Annyira meg kellett volna jegyeznem azt a pillanatot! Összekevertem a lisztet
-                  és a vizet — és ebből élet lett."
+                  {`„Annyira meg kellett volna jegyeznem azt a pillanatot! Összekevertem a lisztet és a vizet — és ebből élet lett."`}
                 </p>
               </blockquote>
               <p className="text-[0.95rem] leading-[1.85] text-[#6b5a47]">

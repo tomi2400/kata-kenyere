@@ -75,7 +75,7 @@ function KoszonjukContent() {
         {/* Idézet */}
         <div className="mb-8 rounded-xl bg-[#3B2010] px-5 py-5">
           <p className="font-serif text-[1.05rem] italic leading-[1.7] text-[rgba(244,242,236,0.85)]">
-            „Frissen sütjük neked. Várunk szeretettel."
+            {`„Frissen sütjük neked. Várunk szeretettel."`}
           </p>
           <p className="mt-2 font-sans text-[0.75rem] text-[rgba(244,242,236,0.4)]">— Kata és csapata</p>
         </div>

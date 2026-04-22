@@ -115,7 +115,7 @@ export default function AlapanyagokPage() {
                 ))}
                 <blockquote className="mt-5 border-l-2 border-[#9c6f3a] pl-5">
                   <p className="font-serif text-[1.1rem] italic leading-[1.6] text-[#2C1F14]">
-                    „Összekevertem a lisztet és a vizet — és ebből élet lett."
+                    {`„Összekevertem a lisztet és a vizet — és ebből élet lett."`}
                   </p>
                 </blockquote>
               </div>
@@ -292,7 +292,7 @@ export default function AlapanyagokPage() {
           <ScrollReveal variant="up" delay={160}>
             <blockquote className="mt-10 border-l-2 border-[#c9975a] pl-6">
               <p className="font-serif text-[1.1rem] italic leading-[1.6] text-[rgba(244,242,236,0.85)]">
-                „Nem azért csináljuk, mert ez most divat. Hanem mert soha nem is tettünk bele. Nem szokásunk."
+                {`„Nem azért csináljuk, mert ez most divat. Hanem mert soha nem is tettünk bele. Nem szokásunk."`}
               </p>
             </blockquote>
           </ScrollReveal>
