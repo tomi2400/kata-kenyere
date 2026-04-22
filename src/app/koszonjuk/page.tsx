@@ -1,86 +1,106 @@
-import Image from "next/image";
-import Link from "next/link";
-import { MapPin, Clock } from "lucide-react";
+"use client";
 
-export default function KoszonjukPage({
-  searchParams,
-}: {
-  searchParams?: { rendelesSzam?: string };
-}) {
-  const rendelesSzam = searchParams?.rendelesSzam;
+import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense } from "react";
+import Image from "next/image";
+import { MapPin, Clock, Mail } from "lucide-react";
+
+function KoszonjukContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const rendelesSzam = searchParams.get("rendelesSzam");
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fafaf8] grain-overlay text-[#4b2e1f]">
-      <header className="border-b border-[#ede8df] bg-white/90 px-6 py-4 backdrop-blur-sm">
-        <Image src="/images/logo.png" alt="Kata Kenyere" width={36} height={36} />
-      </header>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#F4F2EC] px-5 py-16">
 
-      <main className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-        <div className="w-full max-w-lg rounded-[24px] border border-[#ede8df] bg-white px-6 py-10 md:px-8 md:py-12">
+      {/* Logo */}
+      <div className="mb-10">
+        <Image src="/images/Logo_web_dark.png" alt="Kata Kenyere" width={40} height={40} />
+      </div>
 
-          {/* Pipa ikon */}
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#c79a66]/15">
-            <svg className="h-10 w-10 text-[#c79a66]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
+      <div className="w-full max-w-md">
 
-          <div className="mx-auto mb-5 h-px w-10 bg-[#d0af77]" />
-
-          <h1 className="font-serif text-[2rem] text-[#3d2314] md:text-[2.4rem]">
-            Köszönjük<br />a rendelésedet!
-          </h1>
-          <p className="mx-auto mt-4 max-w-sm font-sans text-[0.9rem] leading-relaxed text-[#7c5a46]">
-            A rendelésed sikeresen beérkezett hozzánk.
+        {/* Fejléc */}
+        <div className="mb-6 text-center">
+          <p className="mb-3 font-sans text-[0.65rem] font-medium uppercase tracking-[0.2em] text-[#9c6f3a]">
+            Rendelés leadva
           </p>
-
+          <h1 className="font-serif text-[clamp(2.2rem,5vw,3rem)] leading-[1.1] text-[#2C1F14]">
+            Köszönjük<br />
+            <em className="italic text-[#9c6f3a]">a rendelést.</em>
+          </h1>
           {rendelesSzam && (
-            <div className="mx-auto mt-6 w-full max-w-xs rounded-[16px] border border-[#ede8df] bg-[#fafaf8] px-5 py-4">
-              <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-[#9a7a5d]">Rendelési azonosító</p>
-              <p className="mt-1.5 font-sans text-lg font-semibold text-[#3d2314]">{rendelesSzam}</p>
-            </div>
+            <p className="mt-3 font-sans text-[0.78rem] text-[#6b5a47]">
+              Rendelésszám:{" "}
+              <span className="font-medium text-[#2C1F14]">{rendelesSzam}</span>
+            </p>
           )}
+        </div>
 
-          {/* Átvétel info */}
-          <div className="mx-auto mt-6 w-full max-w-xs rounded-[16px] bg-[#3e2315] p-5 text-left">
-            <p className="mb-3 font-sans text-[11px] uppercase tracking-[0.18em] text-[#e8d6c0]/50">Átvétel</p>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <MapPin className="h-4 w-4 shrink-0 text-[#c79a66]" />
-                <span className="font-sans text-sm text-[#e8d6c0]">Pécs, Salakhegyi út 14.</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Clock className="h-4 w-4 shrink-0 text-[#c79a66]" />
-                <span className="font-sans text-sm text-[#e8d6c0]">Kedd – Péntek: 8:00–17:00</span>
-              </div>
-            </div>
+        {/* Email értesítő */}
+        <div className="mb-4 flex items-start gap-4 rounded-xl border border-[rgba(156,111,58,0.2)] bg-white px-5 py-4 shadow-[0_2px_12px_rgba(44,31,20,0.06)]">
+          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(156,111,58,0.1)]">
+            <Mail className="h-3.5 w-3.5 text-[#9c6f3a]" />
           </div>
-
-          <div className="mx-auto mt-8 flex w-full max-w-xs flex-col gap-3 sm:flex-row">
-            <Link
-              href="/"
-              className="flex-1 rounded-full bg-[#c79a66] py-3 px-6 text-center font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_6px_18px_rgba(199,154,102,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b98b58]"
-            >
-              Új rendelés
-            </Link>
-            <a
-              href="https://www.instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 rounded-full border border-[#c79a66]/40 py-3 px-6 text-center font-sans text-sm font-semibold text-[#5b3826] transition-all duration-300 hover:border-[#c79a66] hover:bg-[#c79a66]/6"
-            >
-              Kövess minket
-            </a>
+          <div>
+            <p className="font-sans text-[0.85rem] font-medium text-[#2C1F14]">
+              Emailben is elküldtük az összefoglalót
+            </p>
+            <p className="mt-0.5 font-sans text-[0.8rem] leading-[1.65] text-[#6b5a47]">
+              Nézd meg a beérkező leveleidet — ott megtalálod a rendelésed részleteit.
+              Ha nem érkezik meg pár percen belül, ellenőrizd a spam mappát is.
+            </p>
           </div>
         </div>
-      </main>
 
-      <footer className="px-6 py-4 text-center">
-        <p className="font-sans text-xs text-[#9a7a5d]">
-          © 2026 Kata Kenyere ·{" "}
-          <Link href="/impresszum" className="transition-colors hover:text-[#4b2e1f]">Impresszum</Link>
-        </p>
-      </footer>
+        {/* Átvétel */}
+        <div className="mb-4 overflow-hidden rounded-xl border border-[rgba(156,111,58,0.2)] bg-white shadow-[0_2px_12px_rgba(44,31,20,0.06)]">
+          <div className="border-b border-[rgba(156,111,58,0.12)] px-5 py-3">
+            <p className="font-sans text-[0.65rem] font-medium uppercase tracking-[0.18em] text-[#9c6f3a]">
+              Személyes átvétel
+            </p>
+          </div>
+          <div className="divide-y divide-[rgba(156,111,58,0.1)]">
+            <div className="flex items-center gap-3 px-5 py-3.5">
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-[#9c6f3a]" />
+              <p className="font-sans text-[0.85rem] text-[#2C1F14]">Pécs, Salakhegyi út 14.</p>
+            </div>
+            <div className="flex items-center gap-3 px-5 py-3.5">
+              <Clock className="h-3.5 w-3.5 shrink-0 text-[#9c6f3a]" />
+              <p className="font-sans text-[0.85rem] text-[#2C1F14]">Kedd – Péntek, 8:00–17:00</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Idézet */}
+        <div className="mb-8 rounded-xl bg-[#3B2010] px-5 py-5">
+          <p className="font-serif text-[1.05rem] italic leading-[1.7] text-[rgba(244,242,236,0.85)]">
+            „Frissen sütjük neked. Várunk szeretettel."
+          </p>
+          <p className="mt-2 font-sans text-[0.75rem] text-[rgba(244,242,236,0.4)]">— Kata és csapata</p>
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={() => router.push("/")}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9c6f3a] py-[0.95rem] font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(156,111,58,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#8a6030]"
+        >
+          Vissza a főoldalra
+        </button>
+
+      </div>
     </div>
+  );
+}
+
+export default function KoszonjukPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-[#F4F2EC]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#9c6f3a] border-t-transparent" />
+      </div>
+    }>
+      <KoszonjukContent />
+    </Suspense>
   );
 }

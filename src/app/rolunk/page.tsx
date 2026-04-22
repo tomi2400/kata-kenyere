@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
-import { ArrowRight, MapPin, Clock, Phone, Mail, Clock3, Wheat, Flame, Leaf, Heart } from "lucide-react";
+import { ArrowRight, MapPin, Clock, Phone, Mail } from "lucide-react";
 
 export const metadata = {
   title: "Kézműves kovászos pékség Pécsről – A mi történetünk",
@@ -16,79 +16,169 @@ export const metadata = {
 };
 
 const ERTEKEK = [
-  { Icon: Clock3, cim: "Az idő az alapanyag", szoveg: "A kovász 12–18 óra alatt érik. Nem lehet gyorsítani. Ez a titok." },
-  { Icon: Wheat, cim: "Kézbe vesszük", szoveg: "Minden cipót kézzel formázunk. A gép nem érzi, mikor van kész a tészta." },
-  { Icon: Flame, cim: "Csak annyit sütünk", szoveg: "Amennyi előrendelés érkezik, annyit sütünk. Nincs maradék, nincs hulladék." },
-  { Icon: Leaf, cim: "Tudjuk mi van benne", szoveg: "Liszt, víz, só, kovász. Ha kérdezed mi van a kenyeredben, tudunk válaszolni." },
-  { Icon: MapPin, cim: "Helyi büszkeség", szoveg: "Pécsi pékség, pécsi embereknek. A helyi alapanyag is prioritás nálunk." },
-  { Icon: Heart, cim: "Szeretettel csináljuk", szoveg: "Nem melóból sütjük. Ez a munkánk és a szenvedélyünk egyszerre." },
+  { num: "18–24h", cim: "Érlelési idő",       szoveg: "A kovász nem siet. Mi sem sietünk. Ennyi idő alatt a glutén előemésztődik — nem a szervezetnek kell lebontania." },
+  { num: "4",      cim: "Alapanyag",           szoveg: "Liszt, víz, só, kovász. Ha kérdezed, mi van a kenyeredben — tudunk válaszolni. Semmi egyéb nincs benne." },
+  { num: "1",      cim: "Az az első kovász",   szoveg: "Amit 2018-ban csináltam, azóta is él. Minden kenyerünkben az a kovász van." },
+  { num: "0",      cim: "Adalékanyag",         szoveg: "Nulla. Nem azért, mert ez most divat. Hanem mert soha nem is tettünk bele. Nem szokásunk." },
+  { num: "∞",      cim: "Kísérletezés",        szoveg: "Tökmagos, kolbászos, aszaltparadicsommal, spirulinával — ami nem vált be, elengedjük. Ami igen, az marad." },
+  { num: "♥",      cim: "Olyat sütünk",        szoveg: "Amit a saját asztalunkra is felteszünk. Ez az egyetlen mérce, amit soha nem engedek el." },
+];
+
+const CSAPAT = [
+  { initial: "K",  nev: "Kata",   szerep: "Pék, alapító — és még mindig a legszigorúbb a saját kenyereivel" },
+  { initial: "M",  nev: "Máté",   szerep: "A nagyobbik fiam — a kávézón dolgozik, de a dagasztásban is benne van" },
+  { initial: "Mi", nev: "Misi",   szerep: "A spirulinás kenyér az ő ötlete volt. Nem lett termék, de legalább megpróbáltuk" },
+  { initial: "H",  nev: "Hancsi", szerep: "Ő csinálja a leveles töltelékeket — nélküle nem mennének a csigák" },
 ];
 
 export default function RolunkPage() {
   return (
-    <div className="min-h-screen bg-[#fafaf8] grain-overlay text-[#4b2e1f]">
+    <div className="min-h-screen bg-[#F4F2EC] text-[#2C1F14]">
       <Navbar />
 
-      {/* Hero fotó */}
+      {/* ── Hero fotó — marad ── */}
       <section className="relative flex h-72 items-end overflow-hidden sm:h-96">
         <Image src="/images/DSC00042.JPG" alt="Kata Kenyere műhely" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(21,14,10,0.18)_0%,rgba(21,14,10,0.72)_100%)]" />
         <div className="relative z-10 w-full px-6 pb-10 md:px-8 xl:px-10">
-          <div className="mx-auto max-w-5xl">
-            <div className="mb-4 h-px w-10 bg-[#d0af77]" />
-            <h1 className="font-serif text-[2.8rem] text-[#fff5ea] md:text-[3.6rem]">Rólunk</h1>
+          <div className="mx-auto max-w-4xl">
+            <div className="mb-4 h-px w-10 bg-[#9c6f3a]" />
+            <h1 className="font-serif text-[2.8rem] leading-none text-[#fff5ea] md:text-[3.6rem]">Rólunk</h1>
           </div>
         </div>
       </section>
 
-      {/* Történet */}
-      <section className="px-6 py-20 md:px-8 xl:px-10">
-        <div className="mx-auto grid max-w-5xl items-center gap-12 md:grid-cols-2 md:gap-20">
+      {/* ── Hero szöveg ── */}
+      <section className="border-b border-[rgba(156,111,58,0.2)] px-6 py-20 text-center md:px-8">
+        <ScrollReveal variant="up">
+          <p className="mb-6 font-sans text-[0.7rem] font-medium uppercase tracking-[0.18em] text-[#6b5a47]">
+            Kata Kenyere — Pécs
+          </p>
+          <h2 className="font-serif text-[clamp(2.4rem,5vw,3.6rem)] leading-[1.15] text-[#2C1F14]">
+            Nem terveztük.<br />
+            <em className="italic text-[#9c6f3a]">Csak elkezdtük.</em>
+          </h2>
+          <p className="mx-auto mt-6 max-w-[560px] font-sans text-[1.05rem] font-light leading-[1.8] text-[#6b5a47]">
+            Ez egy anyuka, egy kovász és egy véletlenül összekevert tál liszt és víz története.
+            Abból lett, ami most van.
+          </p>
+        </ScrollReveal>
+      </section>
+
+      {/* ── Így kezdődött ── */}
+      <section className="border-b border-[rgba(156,111,58,0.2)] px-6 py-20 md:px-8 xl:px-10">
+        <div className="mx-auto max-w-4xl">
           <ScrollReveal variant="up">
-            <div className="mb-5 h-px w-10 bg-[#d0af77]" />
-            <h2 className="font-serif text-[2rem] leading-tight text-[#3d2314] md:text-[2.6rem]">
-              Kata és a<br />
-              <span className="text-[#d0af77]">kovász szerelme.</span>
-            </h2>
-            <p className="mt-5 text-[0.95rem] leading-relaxed text-[#7c5a46]">
-              Minden reggel 4-kor kezdődik a munka, mire te reggel megérkezel, a kenyér már sül.
-              Kata a kovásszal való munkát hivatásnak tekinti – nem termelésnek, hanem alkotásnak.
-            </p>
-            <p className="mt-4 text-[0.95rem] leading-relaxed text-[#7c5a46]">
-              A Kata Kenyere 2023-ban indult egy egyszerű felismeréssel: Pécsnek szüksége van egy helyre,
-              ahol valódi kovászos kenyeret kapnak az emberek. Nem gyorsítóval, nem adalékanyaggal –
-              csak liszttel, vízzel, sóval és idővel.
-            </p>
-            <p className="mt-4 text-[0.95rem] leading-relaxed text-[#7c5a46]">
-              Ma már naponta 60–80 kenyeret sütünk, de minden darab ugyanolyan figyelmet kap, mint az első.
+            <p className="mb-8 font-sans text-[0.68rem] font-medium uppercase tracking-[0.18em] text-[#9c6f3a]">
+              Így kezdődött
             </p>
           </ScrollReveal>
-          <ScrollReveal variant="scale" delay={120}>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[20px]">
-              <Image src="/images/DSC00043.JPG" alt="Kata a pékségben" fill className="object-cover" />
-            </div>
-          </ScrollReveal>
+
+          <div className="grid items-start gap-10 md:grid-cols-[3fr_2fr]">
+            {/* bal oszlop */}
+            <ScrollReveal variant="up" delay={60}>
+              <h2 className="font-serif text-[clamp(1.9rem,3.5vw,2.6rem)] leading-[1.15] text-[#2C1F14]">
+                2018-ban összekevertem<br />
+                <em className="italic text-[#9c6f3a]">lisztet meg vizet.</em>
+              </h2>
+              <p className="mt-5 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                Nem volt nagy terv mögötte. Otthon voltam a gyermekeimmel, minden nap sütöttem valamit
+                a családnak — csigát, buktát, lepényt. Aztán egy gasztroblogon megláttam a kovász szót.
+                Nem tudtam pontosan, mi az. Összekevertem a lisztet és a vizet, és néztem, mi lesz belőle.
+              </p>
+              <p className="mt-4 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                Lett belőle valami élő. Mozgott, nőtt, dolgoztak benne a gombák.{" "}
+                <strong className="font-medium text-[#2C1F14]">Olyan volt, mintha szerelmes lettem volna.</strong>{" "}
+                Reggel szívdobogva keltem fel, hogy megetessem, megdagasszam.
+              </p>
+              <blockquote className="my-7 border-l-2 border-[#9c6f3a] pl-6">
+                <p className="font-serif text-[1.2rem] italic leading-[1.6] text-[#2C1F14]">
+                  „Annyira meg kellett volna jegyeznem azt a pillanatot! Összekevertem a lisztet
+                  és a vizet — és ebből élet lett."
+                </p>
+              </blockquote>
+              <p className="text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                Az első kovász azóta is él. Ugyanaz, amit 2018-ban csináltam. Ma is azt használjuk.
+              </p>
+            </ScrollReveal>
+
+            {/* jobb doboz — Kata képe */}
+            <ScrollReveal variant="scale" delay={120}>
+              <div className="overflow-hidden rounded-xl border border-[rgba(156,111,58,0.2)] bg-[rgba(156,111,58,0.06)] p-5">
+                <div className="mb-4 overflow-hidden rounded-lg">
+                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                    <Image
+                      src="/images/DSC00043.JPG"
+                      alt="Kata a pékségben"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+                <h3 className="font-serif text-[1.6rem] leading-[1.15] text-[#2C1F14]">Öt hónap az első kenyérig.</h3>
+                <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                  Sokan vannak, akik elkezdik és két hét után feladják. Én öt hónapig próbáltam.
+                  Nem jött össze. A kovász élt, a kenyér nem lett jó. Tanultam, videókat néztem,
+                  recepteket olvastam, csatlakoztam a szakmai csoportokhoz.
+                </p>
+                <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                  Aztán egyszer kijött a kemencéből az első olyan kenyér, amit nem szégyelltem megmutatni.
+                  Megosztottam — először életemben ilyen okból.
+                </p>
+                <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                  <strong className="font-medium text-[#2C1F14]">Onnantól nem volt megállás.</strong>
+                </p>
+              </div>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
-      {/* Értékek */}
-      <section className="bg-white px-6 py-20 md:px-8 xl:px-10">
-        <div className="mx-auto max-w-5xl">
+      {/* ── Timeline ── */}
+      <section className="border-b border-[rgba(156,111,58,0.2)] px-6 py-20 md:px-8 xl:px-10">
+        <div className="mx-auto max-w-4xl">
           <ScrollReveal variant="up">
-            <div className="mb-12 text-center">
-              <div className="mx-auto mb-5 h-px w-10 bg-[#d0af77]" />
-              <h2 className="font-serif text-[2rem] text-[#3d2314] md:text-[2.6rem]">Amit hiszünk</h2>
-            </div>
+            <p className="mb-4 font-sans text-[0.68rem] font-medium uppercase tracking-[0.18em] text-[#9c6f3a]">
+              Hogyan jutottunk idáig
+            </p>
+            <h2 className="font-serif text-[clamp(1.9rem,3.5vw,2.6rem)] leading-[1.15] text-[#2C1F14]">
+              Patacstól<br />
+              <em className="italic text-[#9c6f3a]">a Salakhegyi útig.</em>
+            </h2>
           </ScrollReveal>
-          <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
-            {ERTEKEK.map(({ Icon, cim, szoveg }, i) => (
-              <ScrollReveal key={cim} variant="up" delay={i * 60}>
-                <div className="rounded-[20px] border border-[#ede8df] bg-[#fafaf8] p-6">
-                  <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#c79a66]/10">
-                    <Icon className="h-[15px] w-[15px] text-[#c79a66]" />
+
+          <div className="mt-8 flex flex-col">
+            {[
+              {
+                year: "2018",
+                cim: "Az első kovász",
+                szoveg: "Otthon voltam a gyermekeimmel. Összekevertem a lisztet és a vizet. Öt hónapba telt, mire az első kenyér valóban sikerült. Az óvónők voltak az első vevőim — ők kértek először tőlem kenyeret.",
+              },
+              {
+                year: "→",
+                cim: "A patacsi szuterén",
+                szoveg: "15–20 négyzetméter, egy kis pince. Ott kezdtük el igazán. Kézzel, kicsiben, minden nap. Nem volt mindig egyszerű, de mindig megoldódott.",
+              },
+              {
+                year: "2023",
+                cim: "Megnyílt a pékség",
+                szoveg: "Kinőttük a szuterénet. Átköltöztünk a Salakhegyi útra, ahol ma is vagyunk. A férjem vállalkozása működött itt korábban — átalakítottuk pékségnek. Az első három hónap nagyon húzós volt: hajnali háromkor keltem, hétre értem haza.",
+              },
+              {
+                year: "Ma",
+                cim: "Hatan vagyunk",
+                szoveg: "Én, a férjem és a két nagyobb fiam dolgozunk a pékségben — mellettük Hancsi és mások is segítenek. A két kicsi még 11 éves, ők most inkább csak hiányolnak otthonról. De igyekszem megoldani.",
+              },
+            ].map((item, i) => (
+              <ScrollReveal key={item.year + item.cim} variant="up" delay={i * 60}>
+                <div className="grid grid-cols-[70px_1fr] gap-8 border-b border-[rgba(156,111,58,0.2)] py-7 last:border-b-0 md:grid-cols-[90px_1fr]">
+                  <div className="font-serif text-[1.8rem] font-medium leading-none text-[#9c6f3a] pt-0.5">
+                    {item.year}
                   </div>
-                  <p className="font-serif text-[1.05rem] text-[#4b2e1f]">{cim}</p>
-                  <p className="mt-2 text-[0.83rem] leading-relaxed text-[#7c5a46]">{szoveg}</p>
+                  <div>
+                    <p className="mb-1 font-sans text-[0.85rem] font-medium text-[#2C1F14]">{item.cim}</p>
+                    <p className="text-[0.92rem] leading-[1.85] text-[#6b5a47]">{item.szoveg}</p>
+                  </div>
                 </div>
               </ScrollReveal>
             ))}
@@ -96,51 +186,99 @@ export default function RolunkPage() {
         </div>
       </section>
 
-      {/* Helyszín */}
-      <section className="px-6 py-20 md:px-8 xl:px-10">
-        <div className="mx-auto grid max-w-5xl items-center gap-12 md:grid-cols-2 md:gap-20">
-          <ScrollReveal variant="scale" className="order-2 md:order-1">
-            <div className="rounded-[20px] border border-[#ede8df] bg-white p-8">
-              <p className="mb-5 font-sans text-[11px] uppercase tracking-[0.22em] text-[#9a7a5d]">Látogass meg minket</p>
-              <div className="space-y-5">
-                {[
-                  { Icon: MapPin, label: "Cím", value: "Pécs, Salakhegyi út 14." },
-                  { Icon: Clock, label: "Nyitvatartás", value: "Kedd – Péntek: 8:00–17:00" },
-                  { Icon: Phone, label: "Telefon", value: "+36 ....." },
-                  { Icon: Mail, label: "Email", value: "hello@katakenyere.hu" },
-                ].map(({ Icon, label, value }) => (
-                  <div key={label} className="flex items-start gap-4">
-                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#c79a66]/10">
-                      <Icon className="h-3.5 w-3.5 text-[#c79a66]" />
-                    </div>
-                    <div>
-                      <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-[#9a7a5d]">{label}</p>
-                      <p className="mt-0.5 font-sans text-sm font-medium text-[#4b2e1f]">{value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </ScrollReveal>
-          <ScrollReveal variant="up" delay={120} className="order-1 md:order-2">
-            <div className="mb-5 h-px w-10 bg-[#d0af77]" />
-            <h2 className="font-serif text-[2rem] leading-tight text-[#3d2314] md:text-[2.6rem]">
-              Gyere be hozzánk,<br />
-              <span className="text-[#d0af77]">szívesen látunk.</span>
-            </h2>
-            <p className="mt-5 text-[0.95rem] leading-relaxed text-[#7c5a46]">
-              A pékség Pécs csendesebb részén, a Salakhegyi úton található. Ha átmész, friss kenyérillat fogad –
-              és Kata biztosan szívesen mesél a nap sütéséről.
+      {/* ── Értékek rács ── */}
+      <section id="ertekek" className="border-b border-[rgba(156,111,58,0.2)] px-6 py-20 md:px-8 xl:px-10">
+        <div className="mx-auto max-w-4xl">
+          <ScrollReveal variant="up">
+            <p className="mb-4 font-sans text-[0.68rem] font-medium uppercase tracking-[0.18em] text-[#9c6f3a]">
+              Amiben hiszünk
             </p>
+            <h2 className="font-serif text-[clamp(1.9rem,3.5vw,2.6rem)] leading-[1.15] text-[#2C1F14]">
+              Nincs benne trükk.<br />
+              <em className="italic text-[#9c6f3a]">Csak idő és szeretet.</em>
+            </h2>
+          </ScrollReveal>
+
+          <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-[rgba(156,111,58,0.2)] bg-[rgba(156,111,58,0.2)] md:grid-cols-3">
+            {ERTEKEK.map((e, i) => (
+              <ScrollReveal key={e.cim} variant="up" delay={i * 40}>
+                <div className="bg-[#F4F2EC] p-7">
+                  <div className="mb-2 font-serif text-[2.6rem] font-light leading-none text-[#9c6f3a]">
+                    {e.num}
+                  </div>
+                  <p className="mb-2 font-sans text-[0.85rem] font-medium text-[#2C1F14]">{e.cim}</p>
+                  <p className="text-[0.82rem] leading-[1.65] text-[#6b5a47]">{e.szoveg}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Csapat ── */}
+      <section className="border-b border-[rgba(156,111,58,0.2)] px-6 py-20 md:px-8 xl:px-10">
+        <div className="mx-auto max-w-4xl">
+          <ScrollReveal variant="up">
+            <p className="mb-4 font-sans text-[0.68rem] font-medium uppercase tracking-[0.18em] text-[#9c6f3a]">
+              A csapat
+            </p>
+            <h2 className="font-serif text-[clamp(1.9rem,3.5vw,2.6rem)] leading-[1.15] text-[#2C1F14]">
+              Egy igazi<br />
+              <em className="italic text-[#9c6f3a]">családi vállalkozás.</em>
+            </h2>
+            <p className="mt-4 max-w-[540px] text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+              Négy gyerekem van, a férjemmel hatan vagyunk. Nem meló ez.
+              Olyan, amit azért csinálunk, mert nem tudunk másképp.
+            </p>
+          </ScrollReveal>
+
+          <div className="mt-10 grid grid-cols-2 gap-6 md:grid-cols-4">
+            {CSAPAT.map((p, i) => (
+              <ScrollReveal key={p.nev} variant="up" delay={i * 60}>
+                <div className="text-center">
+                  <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full border border-[#9c6f3a] font-serif text-[1.2rem] font-medium text-[#9c6f3a]">
+                    {p.initial}
+                  </div>
+                  <p className="font-sans text-[0.9rem] font-medium text-[#2C1F14]">{p.nev}</p>
+                  <p className="mt-1 text-[0.78rem] leading-[1.5] text-[#6b5a47]">{p.szerep}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Záró CTA ── */}
+      <section className="px-6 py-24 text-center md:px-8">
+        <ScrollReveal variant="up">
+          <h2 className="font-serif text-[clamp(2rem,4vw,2.8rem)] leading-[1.15] text-[#2C1F14]">
+            Gyere be.<br />
+            <em className="italic text-[#9c6f3a]">Szívesen mesélünk.</em>
+          </h2>
+          <p className="mx-auto mt-5 max-w-[440px] text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+            Pécs, Salakhegyi út 14. — Kedd–péntek, 8:00–17:00.
+            Ha átmész, friss kenyérillat fogad. Ennél több ígéretünk nincs, de ennél több nem is kell.
+          </p>
+          <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/elorendeles"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#c79a66] px-7 py-[0.9rem] font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(199,154,102,0.32)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b98b58]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#9c6f3a] px-8 py-[0.9rem] font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(156,111,58,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#8a6030]"
             >
               Előrendelés
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-          </ScrollReveal>
-        </div>
+            <div className="flex items-center gap-6 text-[0.82rem] text-[#6b5a47]">
+              <span className="flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5 text-[#9c6f3a]" />
+                Salakhegyi út 14.
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-[#9c6f3a]" />
+                K–P 8–17
+              </span>
+            </div>
+          </div>
+        </ScrollReveal>
       </section>
     </div>
   );

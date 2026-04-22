@@ -31,8 +31,8 @@ export default function KapcsolatPage() {
           {[
             { Icon: MapPin, title: "Cím", lines: ["Pécs, Salakhegyi út 14.", "7624 Pécs"] },
             { Icon: Clock, title: "Nyitvatartás", lines: ["Kedd – Péntek: 8:00–17:00", "Hétvégén zárva"] },
-            { Icon: Phone, title: "Telefon", lines: ["+36 ....."] },
-            { Icon: Mail, title: "Email", lines: ["hello@katakenyere.hu"] },
+            { Icon: Phone, title: "Telefon", lines: ["+36 30 936 2058"] },
+            { Icon: Mail, title: "Email", lines: ["kataleskovar@gmail.com"] },
           ].map(({ Icon, title, lines }, i) => (
             <ScrollReveal key={title} variant="up" delay={i * 60}>
               <div className="flex items-start gap-5 rounded-[20px] border border-[#ede8df] bg-white p-5 transition-all duration-300 hover:border-[#c79a66]/40 hover:shadow-[0_8px_24px_rgba(91,56,38,0.07)]">

@@ -47,8 +47,15 @@ export default async function TermekekPage() {
               Kínálatunkból
             </h1>
             <p className="mt-3 max-w-lg text-[0.95rem] leading-relaxed text-[#7c5a46]">
-              Minden terméket természetes kovásszal kelesztünk, kézzel formázunk —
-              adalékanyag és tartósítószer nélkül.
+              Kenyereinket természetes kovásszal kelesztjük, kézzel formázzuk, a péksüteményeinket
+              ugyanezzel a gondossággal készítjük.{" "}
+              <Link
+                href="/rolunk#ertekek"
+                className="inline-flex items-center gap-1 font-medium text-[#c79a66] underline-offset-2 hover:underline"
+              >
+                Nézd meg, mi van benne
+                <ArrowRight className="h-3 w-3" />
+              </Link>
             </p>
           </ScrollReveal>
         </div>

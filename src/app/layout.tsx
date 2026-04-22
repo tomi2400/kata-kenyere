@@ -76,8 +76,8 @@ const localBusinessSchema = {
   description:
     "Kézműves kovászos pékség Pécsett. Kovásszal kelesztett, kézzel formázott kenyerek és péksütemények előrendelésre.",
   url: "https://katakenyere.hu",
-  telephone: "+36-XX-XXX-XXXX",
-  email: "hello@katakenyere.hu",
+  telephone: "+36-30-936-2058",
+  email: "kataleskovar@gmail.com",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Salakhegyi út 14.",

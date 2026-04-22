@@ -104,16 +104,16 @@ export default function TermekekPage() {
       </main>
 
       {/* Sticky bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-4">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 rounded-[20px] border border-[#fff5ea]/10 bg-[#3e2315]/96 px-5 py-4 shadow-[0_20px_40px_rgba(40,20,10,0.28)] backdrop-blur-md">
+      <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-5">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 rounded-[20px] border border-[#3e2315]/12 bg-white px-5 py-4 shadow-[0_-2px_0_rgba(0,0,0,0.04),0_8px_32px_rgba(40,20,10,0.18)]">
           <div>
             {totalItems > 0 ? (
               <>
-                <p className="font-sans text-xs uppercase tracking-[0.16em] text-[#e8d6c0]/50">{totalItems} tétel</p>
-                <p className="font-sans text-lg font-bold text-[#fff5ea]">{formatAr(dayTotal)}</p>
+                <p className="font-sans text-xs uppercase tracking-[0.16em] text-[#9a7a5d]">{totalItems} tétel</p>
+                <p className="font-sans text-lg font-bold text-[#3e2315]">{formatAr(dayTotal)}</p>
               </>
             ) : (
-              <p className="font-sans text-sm text-[#e8d6c0]/40">Még nem választottál erre a napra</p>
+              <p className="font-sans text-sm text-[#9a7a5d]">Még nem választottál erre a napra</p>
             )}
           </div>
           <button
@@ -121,8 +121,8 @@ export default function TermekekPage() {
             disabled={totalItems === 0}
             className={`flex items-center gap-2 rounded-full px-6 py-3 font-sans text-sm font-semibold transition-all duration-300 ${
               totalItems > 0
-                ? "bg-[#c79a66] text-[#fff9f0] hover:-translate-y-0.5 hover:bg-[#b98b58] cursor-pointer"
-                : "cursor-not-allowed bg-white/10 text-white/30"
+                ? "bg-[#c79a66] text-[#fff9f0] hover:-translate-y-0.5 hover:bg-[#b98b58] cursor-pointer shadow-[0_4px_14px_rgba(199,154,102,0.35)]"
+                : "cursor-not-allowed bg-[#ede8df] text-[#b8a898]"
             }`}
           >
             {isLastDay ? "Összesítés" : `${selectedDays[currentStep + 1]?.nap}i termékek`}
