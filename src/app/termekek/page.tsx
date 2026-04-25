@@ -109,9 +109,10 @@ export default async function TermekekPage() {
       ))}
 
       {/* Hullámos átmenet → barna CTA */}
-      <div className="pointer-events-none relative h-20 w-full overflow-hidden bg-[#3e2315]">
+      <div className="pointer-events-none relative h-20 w-full" style={{ background: "linear-gradient(to bottom, #fafaf8 50%, #3e2315 50%)" }}>
         <svg viewBox="0 0 1440 80" fill="none" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-          <path d="M0,0 L1440,0 L1440,40 C1200,12 960,76 720,48 C480,20 240,80 0,80 Z" fill="#fafaf8" />
+          <path d="M0,0 L1440,0 L1440,40 C1200,12 960,76 720,48 C480,20 240,80 0,56 L0,0 Z" fill="#fafaf8" />
+          <path d="M0,56 C240,80 480,20 720,48 C960,76 1200,12 1440,40 L1440,80 L0,80 Z" fill="#3e2315" />
         </svg>
       </div>
 

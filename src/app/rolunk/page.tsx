@@ -200,8 +200,8 @@ export default function RolunkPage() {
 
           <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-[rgba(156,111,58,0.2)] bg-[rgba(156,111,58,0.2)] md:grid-cols-3">
             {ERTEKEK.map((e, i) => (
-              <ScrollReveal key={e.cim} variant="up" delay={i * 40}>
-                <div className="bg-[#F4F2EC] p-7">
+              <ScrollReveal key={e.cim} variant="up" delay={i * 40} className="h-full">
+                <div className="h-full bg-[#F4F2EC] p-7">
                   <div className="mb-2 font-serif text-[2.6rem] font-light leading-none text-[#9c6f3a]">
                     {e.num}
                   </div>
