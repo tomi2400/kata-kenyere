@@ -74,7 +74,7 @@ export default function RolunkPage() {
             </p>
           </ScrollReveal>
 
-          <div className="grid items-start gap-10 md:grid-cols-[3fr_2fr]">
+          <div className="grid items-start gap-10 md:grid-cols-[3fr_1.6fr]">
             {/* bal oszlop */}
             <ScrollReveal variant="up" delay={60}>
               <h2 className="font-serif text-[clamp(1.9rem,3.5vw,2.6rem)] leading-[1.15] text-[#2C1F14]">
@@ -105,7 +105,7 @@ export default function RolunkPage() {
             <ScrollReveal variant="scale" delay={120}>
               <div className="overflow-hidden rounded-xl border border-[rgba(156,111,58,0.2)] bg-[rgba(156,111,58,0.06)] p-5">
                 <div className="mb-4 overflow-hidden rounded-lg">
-                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg">
                     <Image
                       src="/images/DSC00043.JPG"
                       alt="Kata a pékségben"
