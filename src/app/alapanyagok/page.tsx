@@ -43,27 +43,6 @@ export default function AlapanyagokPage() {
             Tudjuk, mi van a kenyereinkben és a péksüteményeinkben. Azt akarjuk, hogy te is tudd.
             Nem azért, mert muszáj, hanem mert így csináljuk.
           </p>
-
-          {/* Számok */}
-          <div className="mx-auto mt-10 flex max-w-[540px] overflow-hidden rounded-xl border border-[rgba(156,111,58,0.2)]">
-            {[
-              { big: "4",      label: "alapanyag\na kenyérben" },
-              { big: "2018",   label: "óta él\naz első kovász" },
-              { big: "18–24h", label: "érlelési\nidő" },
-            ].map((item, i) => (
-              <div
-                key={item.big}
-                className={`flex-1 px-4 py-5 text-center ${i < 2 ? "border-r border-[rgba(156,111,58,0.2)]" : ""}`}
-              >
-                <div className="font-serif text-[2.2rem] font-light leading-none text-[#9c6f3a]">
-                  {item.big}
-                </div>
-                <div className="mt-1 whitespace-pre-line font-sans text-[0.72rem] font-light leading-[1.4] text-[#6b5a47]">
-                  {item.label}
-                </div>
-              </div>
-            ))}
-          </div>
         </ScrollReveal>
       </section>
 
@@ -85,11 +64,11 @@ export default function AlapanyagokPage() {
               <p className="mt-5 text-[0.92rem] leading-[1.85] text-[#6b5a47]">
                 2018-ban összekevertem lisztet és vizet, és valami elindult. Mozgott, nőtt,
                 dolgoztak benne a gombák és a baktériumok. Az a kovász azóta is él.
-                Naponta etetjük, gondozzuk — minden kenyerünkben az van.
+                Naponta etetjük, gondozzuk, minden kenyerünkben az van.
               </p>
               <p className="mt-4 text-[0.92rem] leading-[1.85] text-[#6b5a47]">
                 A kovász az egyetlen kelesztőszer, amit a kenyereinkhez használunk.
-                Természetes erjedés útján könnyíti az emésztést, előemésztődik a glutén —
+                Természetes erjedés útján könnyíti az emésztést, előemésztődik a glutén,
                 és ez adja azt a mély, összetett ízt, ami semmivel sem pótolható.
               </p>
             </ScrollReveal>
@@ -136,7 +115,7 @@ export default function AlapanyagokPage() {
               <em className="italic text-[#9c6f3a]">Semmi több, semmi kevesebb.</em>
             </h2>
             <p className="mt-4 text-[0.92rem] leading-[1.85] text-[#6b5a47]">
-              Ha kérdezed, mi van a kenyeredben — bármikor tudunk válaszolni.
+              Ha kérdezed, mi van a kenyeredben, bármikor tudunk válaszolni.
             </p>
           </ScrollReveal>
 
@@ -148,11 +127,11 @@ export default function AlapanyagokPage() {
               },
               {
                 cim: "Víz",
-                szoveg: "Csapvíz, de pontosan kimért hőmérsékleten és mennyiségben. A tészta hidratációja határozza meg a bélzet szerkezetét.",
+                szoveg: "Csapvíz, de pontosan kimért hőmérsékleten és mennyiségben, mert a tészta hidratációja határozza meg, milyen lesz a bélzet szerkezete.",
               },
               {
                 cim: "Só",
-                szoveg: "Tengeri só, adalékmentes. Az ízért és a gluténszerkezet erősítéséért van benne, semmi más nem kerül bele.",
+                szoveg: "Tengeri só, adalékmentes. Az ízért, valamint azért van benne, mert erősíti a gluténszerkezetet. Semmi más nem kerül bele.",
               },
             ].map((k, i) => (
               <ScrollReveal key={k.cim} variant="up" delay={i * 60}>
@@ -178,7 +157,7 @@ export default function AlapanyagokPage() {
               <em className="italic text-[#9c6f3a]">Ez a titkunk.</em>
             </h2>
             <p className="mt-4 text-[0.92rem] leading-[1.85] text-[#6b5a47]">
-              Egy kenyér nálunk nem készül el pár óra alatt. Az érlelést nem siettetjük — mert nem lehet.
+              Egy kenyér nálunk nem készül el pár óra alatt. Az érlelést nem siettetjük, mert nem lehet.
             </p>
           </ScrollReveal>
 
@@ -223,8 +202,8 @@ export default function AlapanyagokPage() {
                 <em className="italic text-[#9c6f3a]">sem siettetjük.</em>
               </h2>
               <p className="mt-5 text-[0.92rem] leading-[1.85] text-[#6b5a47]">
-                A kiflit, a perecet, a csigákat este dagasztjuk, másnap pedig kisütjük.
-                Minimális élesztővel, hosszú érleléssel — mert hisszük, az ízben megérződik.
+                A kiflit, perecet, csigákat és apró péktermékeinket este dagasztjuk, másnap pedig kisütjük.
+                Minimális élesztővel, hosszú érleléssel, mert hisszük, az ízben megérződik.
               </p>
               <p className="mt-4 text-[0.92rem] leading-[1.85] text-[#6b5a47]">
                 A töltelékek háziasak és frissek. Semmi tartósított.
@@ -269,7 +248,7 @@ export default function AlapanyagokPage() {
             </h2>
             <p className="mt-5 max-w-[520px] font-sans text-[0.92rem] font-light leading-[1.8] text-[rgba(244,242,236,0.55)]">
               Addig fel sem tűnt, mi van a boltiban. Aztán egyszer csak nem tudtam visszamenni.
-              Azóta nálunk ezek sosem kerültek bele — és nem is fognak.
+              Azóta nálunk ezek sosem kerültek bele, és nem is fognak.
             </p>
           </ScrollReveal>
 
@@ -311,7 +290,7 @@ export default function AlapanyagokPage() {
                   Termékeink tartalmaznak{" "}
                   <strong className="font-medium text-[#2C1F14]">glutént</strong>{" "}
                   (búza, rozs, tönköly). Egyes termékek szezánt, napraforgót és lenmagot
-                  tartalmaznak. Ha allergiád vagy intoleranciád van, kérdezz bátran —
+                  tartalmaznak. Ha allergiád vagy intoleranciád van, kérdezz bátran,
                   szívesen segítünk megtalálni a számodra megfelelő terméket.
                 </p>
               </div>
