@@ -18,7 +18,7 @@ export const metadata = {
 const ERTEKEK = [
   { num: "18–24h", cim: "Érlelési idő",       szoveg: "A kovász nem siet. Mi sem sietünk. Ennyi idő alatt a glutén előemésztődik, nem a szervezetnek kell lebontania." },
   { num: "4",      cim: "Alapanyag",           szoveg: "Liszt, víz, só, kovász. Ha kérdezed, mi van a kenyeredben, tudunk válaszolni. Pont ennyi, és pont elég." },
-  { num: "1",      cim: "Az első kovász",      szoveg: "Amit 2018-ban csináltam, azóta is él. Minden kenyerünkben az a kovász van." },
+  { num: "1",      cim: "Az első kovász",      szoveg: "Amit 2018-ban csináltam, azóta is él. Nem dobtuk el, nem kezdtük újra, ugyanaz a kovász van ma is minden kenyerünkben." },
   { num: "0",      cim: "Adalékanyag",         szoveg: "Nulla. Nem azért, mert ez most divat. Hanem mert soha nem is tettünk bele. Nem szokásunk." },
   { num: "∞",      cim: "Kísérletezés",        szoveg: "Mindig van egy következő kísérlet. Ami beválik, az marad. Ami nem, az is megtanított valamit." },
   { num: "♥",      cim: "Olyat sütünk",        szoveg: "Amit a saját asztalunkra is felteszünk. Ez az egyetlen mérce, amit soha nem engedünk el." },
@@ -59,7 +59,7 @@ export default function RolunkPage() {
             <em className="italic text-[#9c6f3a]">Csak elkezdtük.</em>
           </h2>
           <p className="mx-auto mt-6 max-w-[560px] font-sans text-[1.05rem] font-light leading-[1.8] text-[#6b5a47]">
-            Ez egy édesanya, egy kovász és egy véletlenül összekevert tál liszt és víz története.
+            Egy édesanya, egy kovász és egy véletlenül összekevert tál liszt és víz története.
             Abból lett, ami most van.
           </p>
         </ScrollReveal>
@@ -87,9 +87,9 @@ export default function RolunkPage() {
                 Nem tudtam pontosan, mi az. Összekevertem a lisztet és a vizet, és néztem, mi lesz belőle.
               </p>
               <p className="mt-4 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-                Lett belőle valami élő. Mozgott, nőtt, dolgoztak benne a gombák.{" "}
+                Lett belőle valami élő. Mozgott, nőtt, dolgoztak benne a gombák és a baktériumok.{" "}
                 <strong className="font-medium text-[#2C1F14]">Olyan volt, mintha szerelmes lettem volna.</strong>{" "}
-                Reggel szívdobogva keltem fel, hogy megetessem, megdagasszam.
+                Reggel szívdobogva keltem fel, hogy megetessem.
               </p>
               <blockquote className="my-7 border-l-2 border-[#9c6f3a] pl-6">
                 <p className="font-serif text-[1.2rem] italic leading-[1.6] text-[#2C1F14]">
@@ -161,7 +161,7 @@ export default function RolunkPage() {
               {
                 year: "2023",
                 cim: "Megnyílt a pékség",
-                szoveg: "Kinőttük a szuterénet. Átköltöztünk a Salakhegyi útra, ahol ma is vagyunk. A férjem vállalkozása működött itt korábban — átalakítottuk pékségnek. Az első három hónap nagyon húzós volt: hajnali háromkor keltem, hétre értem haza.",
+                szoveg: "Kinőttük a szuterént. Átköltöztünk a Salakhegyi útra, ahol ma is vagyunk. A férjem vállalkozása működött itt korábban — átalakítottuk pékségnek. Az első három hónap nagyon húzós volt: hajnali háromkor keltem, hétre értem haza.",
               },
               {
                 year: "Ma",
@@ -254,7 +254,6 @@ export default function RolunkPage() {
             <em className="italic text-[#9c6f3a]">Szívesen mesélünk.</em>
           </h2>
           <p className="mx-auto mt-5 max-w-[440px] text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-            Pécs, Salakhegyi út 14. — Kedd–péntek, 8:00–17:00.
             Ha megérkezel, friss kenyérillat fogad. Ennél több ígéretünk nincs, de ennél több nem is kell.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
