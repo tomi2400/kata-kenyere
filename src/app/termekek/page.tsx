@@ -50,7 +50,7 @@ export default async function TermekekPage() {
               Kenyereinket természetes kovásszal kelesztjük, kézzel formázzuk, a péksüteményeinket
               ugyanezzel a gondossággal készítjük.{" "}
               <Link
-                href="/rolunk#ertekek"
+                href="/alapanyagok"
                 className="inline-flex items-center gap-1 font-medium text-[#c79a66] underline-offset-2 hover:underline"
               >
                 Nézd meg, mi van benne

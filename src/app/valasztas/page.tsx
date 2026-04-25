@@ -94,7 +94,7 @@ export default function TermekekPage() {
             <p className="mb-4 font-sans text-xs text-[#9a7a5d]">
               Az itt kiválasztott termékek csak a {currentDay.nap.toLowerCase()}i átvételhez kerülnek.
             </p>
-            <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {termekek.map((termek) => (
                 <ProductCard key={termek.id} termek={termek} datum={currentDay.datum} />
               ))}
