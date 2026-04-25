@@ -18,7 +18,7 @@ export const metadata = {
 const ERTEKEK = [
   { num: "18–24h", cim: "Érlelési idő",       szoveg: "A kovász nem siet. Mi sem sietünk. Ennyi idő alatt a glutén előemésztődik, nem a szervezetnek kell lebontania." },
   { num: "4",      cim: "Alapanyag",           szoveg: "Liszt, víz, só, kovász. Ha kérdezed, mi van a kenyeredben, tudunk válaszolni. Pont ennyi, és pont elég." },
-  { num: "1",      cim: "Az első kovász",      szoveg: "Amit 2018-ban csináltam, azóta is él. Nem dobtuk el, nem kezdtük újra, ugyanaz a kovász van ma is minden kenyerünkben." },
+  { num: "1",      cim: "Az első kovász",      szoveg: "Amit 2018-ban csináltam, azóta is él. Nem dobtuk el és kezdtük újra, ugyanazt a kovász használjuk ma is." },
   { num: "0",      cim: "Adalékanyag",         szoveg: "Nulla. Nem azért, mert ez most divat. Hanem mert soha nem is tettünk bele. Nem szokásunk." },
   { num: "∞",      cim: "Kísérletezés",        szoveg: "Mindig van egy következő kísérlet. Ami beválik, az marad. Ami nem, az is megtanított valamit." },
   { num: "♥",      cim: "Olyat sütünk",        szoveg: "Amit a saját asztalunkra is felteszünk. Ez az egyetlen mérce, amit soha nem engedünk el." },
