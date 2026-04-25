@@ -16,19 +16,19 @@ export const metadata = {
 };
 
 const ERTEKEK = [
-  { num: "18–24h", cim: "Érlelési idő",       szoveg: "A kovász nem siet. Mi sem sietünk. Ennyi idő alatt a glutén előemésztődik — nem a szervezetnek kell lebontania." },
-  { num: "4",      cim: "Alapanyag",           szoveg: "Liszt, víz, só, kovász. Ha kérdezed, mi van a kenyeredben — tudunk válaszolni. Semmi egyéb nincs benne." },
-  { num: "1",      cim: "Az az első kovász",   szoveg: "Amit 2018-ban csináltam, azóta is él. Minden kenyerünkben az a kovász van." },
+  { num: "18–24h", cim: "Érlelési idő",       szoveg: "A kovász nem siet. Mi sem sietünk. Ennyi idő alatt a glutén előemésztődik, nem a szervezetnek kell lebontania." },
+  { num: "4",      cim: "Alapanyag",           szoveg: "Liszt, víz, só, kovász. Ha kérdezed, mi van a kenyeredben, tudunk válaszolni. Pont ennyi, és pont elég." },
+  { num: "1",      cim: "Az első kovász",      szoveg: "Amit 2018-ban csináltam, azóta is él. Minden kenyerünkben az a kovász van." },
   { num: "0",      cim: "Adalékanyag",         szoveg: "Nulla. Nem azért, mert ez most divat. Hanem mert soha nem is tettünk bele. Nem szokásunk." },
-  { num: "∞",      cim: "Kísérletezés",        szoveg: "Tökmagos, kolbászos, aszaltparadicsommal, spirulinával — ami nem vált be, elengedjük. Ami igen, az marad." },
-  { num: "♥",      cim: "Olyat sütünk",        szoveg: "Amit a saját asztalunkra is felteszünk. Ez az egyetlen mérce, amit soha nem engedek el." },
+  { num: "∞",      cim: "Kísérletezés",        szoveg: "Mindig van egy következő kísérlet. Ami beválik, az marad. Ami nem, az is megtanított valamit." },
+  { num: "♥",      cim: "Olyat sütünk",        szoveg: "Amit a saját asztalunkra is felteszünk. Ez az egyetlen mérce, amit soha nem engedünk el." },
 ];
 
 const CSAPAT = [
-  { initial: "K",  nev: "Kata",   szerep: "Pék, alapító — és még mindig a legszigorúbb a saját kenyereivel" },
-  { initial: "M",  nev: "Máté",   szerep: "A nagyobbik fiam — a kávézón dolgozik, de a dagasztásban is benne van" },
-  { initial: "Mi", nev: "Misi",   szerep: "A spirulinás kenyér az ő ötlete volt. Nem lett termék, de legalább megpróbáltuk" },
-  { initial: "H",  nev: "Hancsi", szerep: "Ő csinálja a leveles töltelékeket — nélküle nem mennének a csigák" },
+  { initial: "K",  nev: "Kata",   szerep: "Pék, alapító — és még mindig én vagyok a legszigorúbb a saját kenyereinkkel." },
+  { initial: "M",  nev: "Máté",   szerep: "A nagyobbik fiam — a kávézón dolgozik, de a dagasztásban is segít." },
+  { initial: "Mi", nev: "Misi",   szerep: "A spirulinás kenyér az ő ötlete volt. Nem lett termék, de legalább megpróbáltuk." },
+  { initial: "H",  nev: "Hancsi", szerep: "Hancsi csinálja a leveles töltelékeket, nélküle nem mennének a péktermékeink." },
 ];
 
 export default function RolunkPage() {
@@ -59,7 +59,7 @@ export default function RolunkPage() {
             <em className="italic text-[#9c6f3a]">Csak elkezdtük.</em>
           </h2>
           <p className="mx-auto mt-6 max-w-[560px] font-sans text-[1.05rem] font-light leading-[1.8] text-[#6b5a47]">
-            Ez egy anyuka, egy kovász és egy véletlenül összekevert tál liszt és víz története.
+            Ez egy édesanya, egy kovász és egy véletlenül összekevert tál liszt és víz története.
             Abból lett, ami most van.
           </p>
         </ScrollReveal>
@@ -118,11 +118,11 @@ export default function RolunkPage() {
                 <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
                   Sokan vannak, akik elkezdik és két hét után feladják. Én öt hónapig próbáltam.
                   Nem jött össze. A kovász élt, a kenyér nem lett jó. Tanultam, videókat néztem,
-                  recepteket olvastam, csatlakoztam a szakmai csoportokhoz.
+                  recepteket olvastam, csatlakoztam a Kovászlabor csoporthoz.
                 </p>
                 <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
                   Aztán egyszer kijött a kemencéből az első olyan kenyér, amit nem szégyelltem megmutatni.
-                  Megosztottam — először életemben ilyen okból.
+                  Én nem szoktam posztolgatni, de ezt megosztottam, mert annyi vér és verejték volt benne, olyan őrült nagy dolognak tartottam!
                 </p>
                 <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
                   <strong className="font-medium text-[#2C1F14]">Onnantól nem volt megállás.</strong>
@@ -165,8 +165,8 @@ export default function RolunkPage() {
               },
               {
                 year: "Ma",
-                cim: "Hatan vagyunk",
-                szoveg: "Én, a férjem és a két nagyobb fiam dolgozunk a pékségben — mellettük Hancsi és mások is segítenek. A két kicsi még 11 éves, ők most inkább csak hiányolnak otthonról. De igyekszem megoldani.",
+                cim: "Ami most épül",
+                szoveg: "Már a következő lépésen dolgozunk. Hamarosan megnyílik a kávézónk a szomszédban, ahol a saját pékáruink mellett helyi termelői különlegességek is helyet kapnak. Mert mindig van hova fejlődni.",
               },
             ].map((item, i) => (
               <ScrollReveal key={item.year + item.cim} variant="up" delay={i * 60}>
@@ -226,8 +226,7 @@ export default function RolunkPage() {
               <em className="italic text-[#9c6f3a]">családi vállalkozás.</em>
             </h2>
             <p className="mt-4 max-w-[540px] text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-              Négy gyerekem van, a férjemmel hatan vagyunk. Nem meló ez.
-              Olyan, amit azért csinálunk, mert nem tudunk másképp.
+              Négy gyermekem van, a férjemmel hatan vagyunk. Nem munkának hívjuk, ez az életünk.
             </p>
           </ScrollReveal>
 
@@ -256,7 +255,7 @@ export default function RolunkPage() {
           </h2>
           <p className="mx-auto mt-5 max-w-[440px] text-[0.95rem] leading-[1.85] text-[#6b5a47]">
             Pécs, Salakhegyi út 14. — Kedd–péntek, 8:00–17:00.
-            Ha átmész, friss kenyérillat fogad. Ennél több ígéretünk nincs, de ennél több nem is kell.
+            Ha megérkezel, friss kenyérillat fogad. Ennél több ígéretünk nincs, de ennél több nem is kell.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
