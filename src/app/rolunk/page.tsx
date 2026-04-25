@@ -74,38 +74,40 @@ export default function RolunkPage() {
             </p>
           </ScrollReveal>
 
-          <div className="grid items-start gap-10 md:grid-cols-[3fr_1.6fr]">
+          <div className="grid items-stretch gap-10 md:gap-16 md:grid-cols-2">
             {/* bal oszlop */}
-            <ScrollReveal variant="up" delay={60}>
-              <h2 className="font-serif text-[clamp(1.9rem,3.5vw,2.6rem)] leading-[1.15] text-[#2C1F14]">
-                2018-ban összekevertem<br />
-                <em className="italic text-[#9c6f3a]">lisztet meg vizet.</em>
-              </h2>
-              <p className="mt-5 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-                Nem volt nagy terv mögötte. Otthon voltam a gyermekeimmel, minden nap sütöttem valamit
-                a családnak — csigát, buktát, lepényt. Aztán egy gasztroblogon megláttam a kovász szót.
-                Nem tudtam pontosan, mi az. Összekevertem a lisztet és a vizet, és néztem, mi lesz belőle.
-              </p>
-              <p className="mt-4 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-                Lett belőle valami élő. Mozgott, nőtt, dolgoztak benne a gombák és a baktériumok.{" "}
-                <strong className="font-medium text-[#2C1F14]">Olyan volt, mintha szerelmes lettem volna.</strong>{" "}
-                Reggel szívdobogva keltem fel, hogy megetessem.
-              </p>
-              <blockquote className="my-7 border-l-2 border-[#9c6f3a] pl-6">
-                <p className="font-serif text-[1.2rem] italic leading-[1.6] text-[#2C1F14]">
-                  {`„Annyira meg kellett volna jegyeznem azt a pillanatot! Összekevertem a lisztet és a vizet — és ebből élet lett."`}
+            <ScrollReveal variant="up" delay={60} className="h-full">
+              <div className="flex h-full flex-col justify-center">
+                <h2 className="font-serif text-[clamp(1.9rem,3.5vw,2.6rem)] leading-[1.15] text-[#2C1F14]">
+                  2018-ban összekevertem<br />
+                  <em className="italic text-[#9c6f3a]">lisztet meg vizet.</em>
+                </h2>
+                <p className="mt-5 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                  Nem volt nagy terv mögötte. Otthon voltam a gyermekeimmel, minden nap sütöttem valamit
+                  a családnak — csigát, buktát, lepényt. Aztán egy gasztroblogon megláttam a kovász szót.
+                  Nem tudtam pontosan, mi az. Összekevertem a lisztet és a vizet, és néztem, mi lesz belőle.
                 </p>
-              </blockquote>
-              <p className="text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-                Az első kovász azóta is él. Ugyanaz, amit 2018-ban csináltam. Ma is azt használjuk.
-              </p>
+                <p className="mt-4 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                  Lett belőle valami élő. Mozgott, nőtt, dolgoztak benne a gombák és a baktériumok.{" "}
+                  <strong className="font-medium text-[#2C1F14]">Olyan volt, mintha szerelmes lettem volna.</strong>{" "}
+                  Reggel szívdobogva keltem fel, hogy megetessem.
+                </p>
+                <blockquote className="my-7 border-l-2 border-[#9c6f3a] pl-6">
+                  <p className="font-serif text-[1.2rem] italic leading-[1.6] text-[#2C1F14]">
+                    {`„Annyira meg kellett volna jegyeznem azt a pillanatot! Összekevertem a lisztet és a vizet — és ebből élet lett."`}
+                  </p>
+                </blockquote>
+                <p className="text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                  Az első kovász azóta is él. Ugyanaz, amit 2018-ban csináltam. Ma is azt használjuk.
+                </p>
+              </div>
             </ScrollReveal>
 
             {/* jobb doboz — Kata képe */}
-            <ScrollReveal variant="scale" delay={120}>
-              <div className="overflow-hidden rounded-xl border border-[rgba(156,111,58,0.2)] bg-[rgba(156,111,58,0.06)] p-5">
-                <div className="mb-4 overflow-hidden rounded-lg">
-                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg">
+            <ScrollReveal variant="scale" delay={120} className="h-full">
+              <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[rgba(156,111,58,0.2)] bg-[rgba(156,111,58,0.06)] p-5">
+                <div className="mb-4 min-h-0 flex-1 overflow-hidden rounded-lg">
+                  <div className="relative h-full min-h-[180px] w-full overflow-hidden rounded-lg">
                     <Image
                       src="/images/DSC00043.JPG"
                       alt="Kata a pékségben"
@@ -114,19 +116,21 @@ export default function RolunkPage() {
                     />
                   </div>
                 </div>
-                <h3 className="font-serif text-[1.6rem] leading-[1.15] text-[#2C1F14]">Öt hónap az első kenyérig.</h3>
-                <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-                  Sokan vannak, akik elkezdik és két hét után feladják. Én öt hónapig próbáltam.
-                  Nem jött össze. A kovász élt, a kenyér nem lett jó. Tanultam, videókat néztem,
-                  recepteket olvastam, csatlakoztam a Kovászlabor csoporthoz.
-                </p>
-                <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-                  Aztán egyszer kijött a kemencéből az első olyan kenyér, amit nem szégyelltem megmutatni.
-                  Én nem szoktam posztolgatni, de ezt megosztottam, mert annyi vér és verejték volt benne, olyan őrült nagy dolognak tartottam!
-                </p>
-                <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-                  <strong className="font-medium text-[#2C1F14]">Onnantól nem volt megállás.</strong>
-                </p>
+                <div className="shrink-0">
+                  <h3 className="font-serif text-[1.6rem] leading-[1.15] text-[#2C1F14]">Öt hónap az első kenyérig.</h3>
+                  <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                    Sokan vannak, akik elkezdik és két hét után feladják. Én öt hónapig próbáltam.
+                    Nem jött össze. A kovász élt, a kenyér nem lett jó. Tanultam, videókat néztem,
+                    recepteket olvastam, csatlakoztam a Kovászlabor csoporthoz.
+                  </p>
+                  <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                    Aztán egyszer kijött a kemencéből az első olyan kenyér, amit nem szégyelltem megmutatni.
+                    Én nem szoktam posztolgatni, de ezt megosztottam, mert annyi vér és verejték volt benne, olyan őrült nagy dolognak tartottam!
+                  </p>
+                  <p className="mt-3 text-[0.95rem] leading-[1.85] text-[#6b5a47]">
+                    <strong className="font-medium text-[#2C1F14]">Onnantól nem volt megállás.</strong>
+                  </p>
+                </div>
               </div>
             </ScrollReveal>
           </div>
