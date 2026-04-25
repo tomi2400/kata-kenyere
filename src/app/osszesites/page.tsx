@@ -18,11 +18,12 @@ export default function OsszesitesPage() {
   const { selectedDays, carts, getTotal, clearCart, setCurrentStep } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ nev: "", email: "", telefon: "", megjegyzes: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => { setMounted(true); }, []);
-  useEffect(() => { if (mounted && selectedDays.length === 0) router.replace("/"); }, [mounted, selectedDays, router]);
+  useEffect(() => { if (mounted && selectedDays.length === 0 && !submitted) router.replace("/"); }, [mounted, selectedDays, submitted, router]);
 
   if (!mounted || selectedDays.length === 0) {
     return (
@@ -60,9 +61,12 @@ export default function OsszesitesPage() {
       });
       const data = await res.json().catch(() => null);
       if (res.ok) {
+        setSubmitted(true);
         clearCart();
-        const rendelesSzam = data?.rendelesSzam ? `?rendelesSzam=${encodeURIComponent(data.rendelesSzam)}` : "";
-        router.push(`/koszonjuk${rendelesSzam}`);
+        if (data?.rendelesSzam) {
+          sessionStorage.setItem("rendelesSzam", data.rendelesSzam);
+        }
+        router.push("/koszonjuk");
       } else { alert("Hiba történt, kérlek próbáld újra!"); }
     } catch { alert("Hiba történt, kérlek próbáld újra!"); }
     finally { setLoading(false); }

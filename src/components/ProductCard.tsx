@@ -43,9 +43,6 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
           sizes="(max-width: 640px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brown-dark/55 via-transparent to-white/10" />
-        <div className="absolute left-3 top-3 rounded-full bg-cream/90 px-2.5 py-1 text-[10px] font-sans font-semibold uppercase tracking-[0.18em] text-brown-dark">
-          Frissen sütve
-        </div>
         {isSelected && (
           <div className="absolute top-3 right-3 bg-gold text-brown-dark text-xs font-bold font-sans px-2.5 py-1 rounded-full shadow-sm">
             {qty} db

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
 import GalleryStrip from "@/components/GalleryStrip";
+import CookieSettingsButton from "@/components/CookieSettingsButton";
 import {
   ArrowRight,
   Flame,
@@ -473,6 +474,7 @@ export default async function Home() {
                 <Link href="/adatvedelmi" className="block text-[0.82rem] text-[#e8d6c0] transition-colors hover:text-white">
                   Adatvédelem
                 </Link>
+                <CookieSettingsButton />
               </div>
             </div>
 

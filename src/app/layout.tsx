@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Playfair_Display, DM_Sans } from "next/font/google";
+import CookieConsentBanner from "@/components/CookieConsentBanner";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -118,6 +119,29 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="hu" className={`${playfair.variable} ${dmSans.variable}`}>
+      <head>
+        <Script
+          id="gtm-consent-default"
+          strategy="beforeInteractive"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'analytics_storage': 'denied',
+                'functionality_storage': 'denied',
+                'personalization_storage': 'denied',
+                'security_storage': 'granted',
+                'wait_for_update': 500
+              });
+            `,
+          }}
+        />
+      </head>
       <body className="font-sans antialiased bg-cream text-brown-dark">
         <Script
           id="local-business-schema"
@@ -127,6 +151,7 @@ export default function RootLayout({
           {JSON.stringify(localBusinessSchema)}
         </Script>
         {children}
+        <CookieConsentBanner />
       </body>
     </html>
   );

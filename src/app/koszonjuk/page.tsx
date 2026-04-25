@@ -1,14 +1,21 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense } from "react";
+import { useRouter } from "next/navigation";
+import { Suspense, useState, useEffect } from "react";
 import Image from "next/image";
 import { MapPin, Clock, Mail } from "lucide-react";
 
 function KoszonjukContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const rendelesSzam = searchParams.get("rendelesSzam");
+  const [rendelesSzam, setRendelesSzam] = useState<string | null>(null);
+
+  useEffect(() => {
+    const szam = sessionStorage.getItem("rendelesSzam");
+    if (szam) {
+      setRendelesSzam(szam);
+      sessionStorage.removeItem("rendelesSzam");
+    }
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#F4F2EC] px-5 py-16">
@@ -77,7 +84,7 @@ function KoszonjukContent() {
           <p className="font-serif text-[1.05rem] italic leading-[1.7] text-[rgba(244,242,236,0.85)]">
             {`„Frissen sütjük neked. Várunk szeretettel."`}
           </p>
-          <p className="mt-2 font-sans text-[0.75rem] text-[rgba(244,242,236,0.4)]">— Kata és csapata</p>
+          <p className="mt-2 font-sans text-[0.75rem] text-[rgba(244,242,236,0.85)]">— Kata Kenyere</p>
         </div>
 
         {/* CTA */}
