@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
 import { ArrowRight } from "lucide-react";
+import { defaultOpenGraphImage } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Alapanyagok – Kata Kenyere | Tudd, mi van a kenyeredben",
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
     title: "Alapanyagok – Kata Kenyere",
     description: "Négy alapanyag, nulla adalékanyag. Tudd, mi van a kenyeredben.",
     url: "https://katakenyere.hu/alapanyagok",
+    images: [defaultOpenGraphImage],
   },
 };
 

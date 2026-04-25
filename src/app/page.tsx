@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
 import GalleryStrip from "@/components/GalleryStrip";
 import CookieSettingsButton from "@/components/CookieSettingsButton";
+import { defaultOpenGraphImage } from "@/lib/seo";
 import {
   ArrowRight,
   Flame,
@@ -18,16 +19,18 @@ import {
 
 export const dynamic = "force-dynamic";
 
+const pageDescription =
+  "Kovásszal kelesztett kenyerek és kézzel formázott pékáruk – minden nap frissen sütve, természetes alapanyagokból.";
+
 export const metadata: Metadata = {
   title: "Kata Kenyere – Kézműves pékség Pécsett",
-  description:
-    "Pécs kézműves kovászos pékségéből rendelhetsz előre friss kenyeret, csigát, kiflit. Adalékanyagmentes, természetes kovász. Kedd–Péntek, Salakhegyi út 14.",
+  description: pageDescription,
   alternates: { canonical: "https://katakenyere.hu" },
   openGraph: {
     title: "Kata Kenyere – Kovászos kenyér Pécs, előrendelésre",
-    description:
-      "Kézzel formázott, kovásszal kelesztett pékáruk frissen. Rendelj online, vedd át személyesen Pécsett.",
+    description: pageDescription,
     url: "https://katakenyere.hu",
+    images: [defaultOpenGraphImage],
   },
 };
 

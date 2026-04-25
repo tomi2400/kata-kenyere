@@ -7,6 +7,7 @@ import { type Termek, getTermekFoto, formatAr, csoportositByKategoria } from "@/
 import { supabase } from "@/lib/supabase/client";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
+import { defaultOpenGraphImage } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
     title: "Kata Kenyere kínálata – Kovászos kenyerek és péksütemények",
     description: "Kézzel formázott kovászos kenyerek, csigák, kiflik és különlegességek. Minden nap frissen sütve.",
     url: "https://katakenyere.hu/termekek",
+    images: [defaultOpenGraphImage],
   },
 };
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
+import { defaultOpenGraphImage } from "@/lib/seo";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -16,14 +17,16 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+const siteDescription =
+  "Kovásszal kelesztett kenyerek és kézzel formázott pékáruk – minden nap frissen sütve, természetes alapanyagokból.";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://katakenyere.hu"),
   title: {
     default: "Kata Kenyere – Kézműves pékség Pécsett",
     template: "%s – Kata Kenyere",
   },
-  description:
-    "Kézműves kovászos pékség Pécsett. Kovásszal kelesztett, kézzel formázott kenyerek és péksütemények – minden nap frissen sütve, előrendelésre. Pécs, Salakhegyi út 14.",
+  description: siteDescription,
   keywords: [
     "kovászos kenyér Pécs",
     "kézműves pékség Pécs",
@@ -41,18 +44,17 @@ export const metadata: Metadata = {
   publisher: "Kata Kenyere",
   openGraph: {
     title: "Kata Kenyere – Kézműves kovászos pékség, Pécs",
-    description:
-      "Kovásszal kelesztett, kézzel formázott kenyerek minden nap frissen – előrendelésre. Pécs, Salakhegyi út 14.",
+    description: siteDescription,
     locale: "hu_HU",
     type: "website",
     url: "https://katakenyere.hu",
     siteName: "Kata Kenyere",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Kata Kenyere – Kézműves pékség Pécsett" }],
+    images: [defaultOpenGraphImage],
   },
   twitter: {
     card: "summary_large_image",
     title: "Kata Kenyere – Kézműves kovászos pékség, Pécs",
-    description: "Kovásszal kelesztett, kézzel formázott kenyerek – előrendelésre.",
+    description: siteDescription,
     images: ["/opengraph-image"],
   },
   alternates: {

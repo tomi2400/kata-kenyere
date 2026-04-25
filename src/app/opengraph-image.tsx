@@ -89,13 +89,17 @@ export default async function Image() {
           <div
             style={{
               display: "flex",
+              flexDirection: "column",
+              gap: 4,
               color: "rgba(245,237,217,0.7)",
               fontSize: 22,
               fontFamily: "sans-serif",
+              lineHeight: 1.35,
               marginTop: 8,
             }}
           >
-            Kovásszal kelesztett kenyerek · előrendelésre · katakenyere.hu
+            <span>Kovásszal kelesztett kenyerek és kézzel formázott pékáruk</span>
+            <span>minden nap frissen sütve, természetes alapanyagokból.</span>
           </div>
         </div>
       </div>

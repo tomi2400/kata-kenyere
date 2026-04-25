@@ -3,6 +3,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
 import { ArrowRight, MapPin, Clock } from "lucide-react";
+import { defaultOpenGraphImage } from "@/lib/seo";
 
 export const metadata = {
   title: "Kézműves kovászos pékség Pécsről – A mi történetünk",
@@ -12,6 +13,7 @@ export const metadata = {
     title: "Rólunk – Kata Kenyere kovászos pékség Pécs",
     description: "A kovász, az idő és a kéz munkája – ez a Kata Kenyere.",
     url: "https://katakenyere.hu/rolunk",
+    images: [defaultOpenGraphImage],
   },
 };
 
