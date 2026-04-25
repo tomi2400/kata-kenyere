@@ -184,7 +184,7 @@ export default function OsszesitesPage() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#c79a66] py-4 font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(199,154,102,0.32)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b98b58] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#c79a66] py-4 font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(199,154,102,0.38)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b98b58] hover:shadow-[0_14px_32px_rgba(199,154,102,0.44)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />Küldés...</>

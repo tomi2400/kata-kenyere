@@ -263,7 +263,7 @@ export default function RolunkPage() {
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/elorendeles"
-              className="inline-flex items-center gap-2 rounded-full bg-[#9c6f3a] px-8 py-[0.9rem] font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(156,111,58,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#8a6030]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#9c6f3a] px-8 py-[0.9rem] font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(156,111,58,0.32)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#8a6030] hover:shadow-[0_14px_32px_rgba(156,111,58,0.42)]"
             >
               Előrendelés
               <ArrowRight className="h-3.5 w-3.5" />
