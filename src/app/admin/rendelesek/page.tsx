@@ -135,7 +135,11 @@ export default function RendelesekPage() {
       }));
   };
 
+  const calculateTetelTotal = (tetelek: Tetel[]) =>
+    tetelek.reduce((sum, tetel) => sum + (tetel.reszosszeg || tetel.egysegar * tetel.mennyiseg), 0);
+
   const selected = rendelesek.find((r) => r.id === selectedId) ?? null;
+  const selectedTetelTotal = selected ? calculateTetelTotal(selected.rendeles_tetelek) : 0;
 
   useEffect(() => {
     if (!selected) return;
@@ -416,7 +420,7 @@ export default function RendelesekPage() {
                 <div className="mt-2 pt-2 border-t border-cream-dark flex justify-between">
                   <span className="font-sans text-xs text-brown/40">Összesen</span>
                   <span className="font-sans text-sm font-bold text-brown-dark">
-                    {selected.vegosszeg.toLocaleString("hu-HU")} Ft
+                    {selectedTetelTotal.toLocaleString("hu-HU")} Ft
                   </span>
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { nev, email, telefon, megjegyzes, rendelesek, vegosszeg } = body;
+    const { nev, email, telefon, megjegyzes, rendelesek } = body;
 
     // Validáció
     if (!nev?.trim()) {
@@ -19,6 +19,12 @@ export async function POST(request: Request) {
     if (!rendelesek || rendelesek.length === 0) {
       return NextResponse.json({ error: "Legalább egy tétel szükséges" }, { status: 400 });
     }
+
+    const szamoltVegosszeg = rendelesek.reduce(
+      (sum: number, r: { egysegar: number; mennyiseg: number }) =>
+        sum + Number(r.egysegar || 0) * Number(r.mennyiseg || 0),
+      0
+    );
 
     // Rendelésszám generálása: KK-YYYYMMDD-NNN
     const today = new Date().toISOString().split("T")[0].replace(/-/g, "");
@@ -38,7 +44,7 @@ export async function POST(request: Request) {
         email: email.trim(),
         telefon: telefon.trim(),
         megjegyzes: megjegyzes?.trim() || null,
-        vegosszeg,
+        vegosszeg: szamoltVegosszeg,
         allapot: "uj",
       })
       .select("id")

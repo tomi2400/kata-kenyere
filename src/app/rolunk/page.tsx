@@ -27,10 +27,48 @@ const ERTEKEK = [
 ];
 
 const CSAPAT = [
-  { initial: "K",  nev: "Kata",   szerep: "Pék, alapító — és még mindig én vagyok a legszigorúbb a saját kenyereinkkel." },
-  { initial: "M",  nev: "Máté",   szerep: "A nagyobbik fiam — a kávézón dolgozik, de a dagasztásban is segít." },
-  { initial: "Mi", nev: "Misi",   szerep: "A spirulinás kenyér az ő ötlete volt. Nem lett termék, de legalább megpróbáltuk." },
-  { initial: "H",  nev: "Hancsi", szerep: "Hancsi csinálja a leveles töltelékeket, nélküle nem mennének a péktermékeink." },
+  {
+    initial: "K",
+    nev: "Kata",
+    szerep: "Pék, alapító",
+    szoveg: "És még mindig én vagyok a legszigorúbb a saját kenyereinkkel.",
+  },
+  {
+    initial: "M",
+    nev: "Máté",
+    szerep: "Kávézó",
+    szoveg: "A kávézó az ő világa, de ha kell, dagaszt is. A nagyobbik fiam mindent csinál, amit kell.",
+  },
+  {
+    initial: "Mi",
+    nev: "Misi",
+    szerep: "Kenyértészta",
+    szoveg: "Ami kenyértészta, az az ő asztala. Komolyan mondom, jobb érzéke van hozzá, mint nekem tizenévesen.",
+  },
+  {
+    initial: "H",
+    nev: "Hancsi",
+    szerep: "Leveles tészták",
+    szoveg: "A leveles tésztákat ő csinálja, és a töltelékeket is. Nélküle egészen más lenne a pult.",
+  },
+  {
+    initial: "M",
+    nev: "Máté",
+    szerep: "Kenyérsütés",
+    szoveg: "Misi barátja, de már szinte családtag. Kenyérsütésben segít, meg mindenben, ami épp kell.",
+  },
+  {
+    initial: "B",
+    nev: "Brigi",
+    szerep: "Péksütemények",
+    szoveg: "A péksütemények az ő keze alól jönnek ki. Aki a kakaóscsigánkat szereti, azt Briginek köszönheti.",
+  },
+  {
+    initial: "E",
+    nev: "Ervin",
+    szerep: "Rendben tartja az egészet",
+    szoveg: "Ha Ervin nincs, mi sem vagyunk.",
+  },
 ];
 
 export default function RolunkPage() {
@@ -232,19 +270,30 @@ export default function RolunkPage() {
               <em className="italic text-[#9c6f3a]">családi vállalkozás.</em>
             </h2>
             <p className="mt-4 max-w-[540px] text-[0.95rem] leading-[1.85] text-[#6b5a47]">
-              Négy gyermekem van, a férjemmel hatan vagyunk. Nem munkának hívjuk, ez az életünk.
+              Családi pékségként indultunk, és az is maradtunk, csak közben többen lettünk.
+              Nem munkának hívjuk: ez az életünk.
             </p>
           </ScrollReveal>
 
-          <div className="mt-10 grid grid-cols-2 gap-6 md:grid-cols-4">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {CSAPAT.map((p, i) => (
-              <ScrollReveal key={p.nev} variant="up" delay={i * 60}>
-                <div className="text-center">
-                  <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full border border-[#9c6f3a] font-serif text-[1.2rem] font-medium text-[#9c6f3a]">
-                    {p.initial}
+              <ScrollReveal
+                key={`${p.nev}-${i}`}
+                variant="up"
+                delay={i * 60}
+                className={`h-full ${i === CSAPAT.length - 1 ? "lg:col-start-2" : ""}`}
+              >
+                <div className="flex h-full flex-col rounded-xl border border-[rgba(156,111,58,0.22)] bg-[rgba(255,249,240,0.38)] p-5">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#9c6f3a] font-serif text-[1.05rem] font-medium text-[#9c6f3a]">
+                      {p.initial}
+                    </div>
+                    <div>
+                      <p className="font-sans text-[0.95rem] font-medium text-[#2C1F14]">{p.nev}</p>
+                      <p className="mt-0.5 text-[0.72rem] font-medium uppercase tracking-[0.14em] text-[#9c6f3a]">{p.szerep}</p>
+                    </div>
                   </div>
-                  <p className="font-sans text-[0.9rem] font-medium text-[#2C1F14]">{p.nev}</p>
-                  <p className="mt-1 text-[0.78rem] leading-[1.5] text-[#6b5a47]">{p.szerep}</p>
+                  <p className="text-[0.86rem] leading-[1.7] text-[#6b5a47]">{p.szoveg}</p>
                 </div>
               </ScrollReveal>
             ))}

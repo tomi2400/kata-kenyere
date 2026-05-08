@@ -15,7 +15,7 @@ function formatDatum(datum: string): string {
 
 export default function OsszesitesPage() {
   const router = useRouter();
-  const { selectedDays, carts, getTotal, clearCart, setCurrentStep } = useCartStore();
+  const { selectedDays, carts, clearCart, setCurrentStep } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -33,7 +33,14 @@ export default function OsszesitesPage() {
     );
   }
 
-  const total = getTotal();
+  const selectedDayCarts = selectedDays.map((day) => ({
+    ...day,
+    items: carts[day.datum] ?? [],
+  }));
+  const total = selectedDayCarts.reduce(
+    (sum, day) => sum + day.items.reduce((daySum, item) => daySum + item.ar * item.mennyiseg, 0),
+    0
+  );
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -47,8 +54,8 @@ export default function OsszesitesPage() {
   const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true);
-    const rendelesek = selectedDays.flatMap((day) =>
-      (carts[day.datum] ?? []).map((item) => ({
+    const rendelesek = selectedDayCarts.flatMap((day) =>
+      day.items.map((item) => ({
         nap: day.nap, datum: day.datum, termekId: item.termekId,
         nev: item.nev, mennyiseg: item.mennyiseg, egysegar: item.ar, reszosszeg: item.ar * item.mennyiseg,
       }))
@@ -96,8 +103,8 @@ export default function OsszesitesPage() {
 
         {/* Napok */}
         <section className="space-y-3">
-          {selectedDays.map((day) => {
-            const items = carts[day.datum] ?? [];
+          {selectedDayCarts.map((day) => {
+            const items = day.items;
             if (items.length === 0) return null;
             const dayTotal = items.reduce((s, i) => s + i.ar * i.mennyiseg, 0);
             return (

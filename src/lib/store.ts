@@ -35,7 +35,15 @@ export const useCartStore = create<CartStore>()(
       carts: {},
       currentStep: 0,
 
-      setSelectedDays: (days) => set({ selectedDays: days, currentStep: 0 }),
+      setSelectedDays: (days) =>
+        set((state) => {
+          const selectedDates = new Set(days.map((day) => day.datum));
+          const carts = Object.fromEntries(
+            Object.entries(state.carts).filter(([datum]) => selectedDates.has(datum))
+          );
+
+          return { selectedDays: days, carts, currentStep: 0 };
+        }),
 
       setCurrentStep: (step) => set({ currentStep: step }),
 
@@ -64,8 +72,11 @@ export const useCartStore = create<CartStore>()(
       },
 
       getTotal: () => {
-        const { carts } = get();
-        return Object.values(carts)
+        const { carts, selectedDays } = get();
+        const dates = selectedDays.map((day) => day.datum);
+
+        return dates
+          .flatMap((datum) => carts[datum] ?? [])
           .flat()
           .reduce((sum, i) => sum + i.ar * i.mennyiseg, 0);
       },

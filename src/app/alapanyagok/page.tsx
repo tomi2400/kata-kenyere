@@ -125,15 +125,15 @@ export default function AlapanyagokPage() {
             {[
               {
                 cim: "Liszt",
-                szoveg: "Magyar malmokból. Fehér kenyérhez BL-80 kenyérliszt a Marosmalmomból, teljes kiőrlésűhöz BIOM köves bio malomból őrölt búzaliszt.",
+                szoveg: "Magyar malmokból. Fehér kenyérhez BL-80 kenyérliszt a Marosmalomból, teljes kiőrlésűhöz BIOM köves bio malomból őrölt búzaliszt. A rozsliszt a Kukutyin Műhelyből érkezik.",
               },
               {
                 cim: "Víz",
-                szoveg: "Csapvíz, de pontosan kimért hőmérsékleten és mennyiségben, mert a tészta hidratációja határozza meg, milyen lesz a bélzet szerkezete.",
+                szoveg: "Csapvíz, de pontosan kimért hőmérsékleten és mennyiségben, mert a tészta hidratációja határozza meg, milyen lesz a bélzet szerkezete. Kicsi különbség és már más a kenyér.",
               },
               {
                 cim: "Só",
-                szoveg: "Tengeri só, adalékmentes. Az ízért, valamint azért van benne, mert erősíti a gluténszerkezetet. Semmi más nem kerül bele.",
+                szoveg: "Tengeri só, adalékmentes. Az ízért, valamint azért van benne, mert erősíti a gluténszerkezetet. Semmi más nem kerül bele, se javító, se adalék, semmi.",
               },
             ].map((k, i) => (
               <ScrollReveal key={k.cim} variant="up" delay={i * 60} className="h-full">
