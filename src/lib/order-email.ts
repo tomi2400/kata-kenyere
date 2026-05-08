@@ -134,6 +134,7 @@ function buildTextEmail(customer: OrderCustomer, order: CalendarOrderData) {
     "",
     `Teljes összeg: ${formatFt(order.vegosszeg)}`,
     "",
+    ...(customer.megjegyzes?.trim() ? ["Megjegyzésed", customer.megjegyzes.trim(), ""] : []),
     "Átvétel",
     `${PICKUP_LOCATION}`,
     `Útvonaltervezés: ${buildMapsUrl()}`,
@@ -186,29 +187,29 @@ function buildHtmlEmail(customer: OrderCustomer, order: CalendarOrderData) {
               </tr>
             </table>
 
-            <div style="border-top:1px solid #eadcc9;margin:0 0 18px;padding:16px 0 0;">
+            ${
+              note
+                ? `<section style="border-top:1px solid #eadcc9;margin:0 0 18px;padding:16px 0 0;"><p style="margin:0 0 8px;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#9c6f3a;font-weight:700;">Megjegyzésed</p><p style="margin:0;color:#4b3a2a;line-height:1.6;font-size:14px;">${textToHtml(note)}</p></section>`
+                : ""
+            }
+
+            <div style="border-top:1px solid #eadcc9;margin:0 0 18px;padding:16px 0 0;text-align:center;">
               <p style="margin:0 0 6px;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#9c6f3a;font-weight:700;">Átvétel</p>
-              <p style="margin:0;font-size:14px;line-height:1.6;color:#2c1f14;">${escapeHtml(PICKUP_LOCATION)}</p>
+              <p style="margin:0 auto;font-size:14px;line-height:1.6;color:#2c1f14;">${escapeHtml(PICKUP_LOCATION)}</p>
               <p style="margin:10px 0 0;font-size:13px;">
                 <a href="${mapsUrl}" style="display:inline-block;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-weight:700;padding:8px 13px;">Útvonaltervezés</a>
               </p>
             </div>
 
-            <section style="margin:0 0 18px;">
-              <p style="margin:0 0 10px;font-size:13px;line-height:1.65;color:#7a624b;">Ha szeretnél emlékeztetőt beállítani, az átvételi napot hozzáadhatod a naptáradhoz.</p>
+            <section style="margin:0 0 18px;text-align:center;">
+              <p style="margin:0 auto 10px;font-size:13px;line-height:1.65;color:#7a624b;max-width:390px;">Ha szeretnél emlékeztetőt beállítani, az átvételi napot hozzáadhatod a naptáradhoz.</p>
               ${buildGoogleCalendarLinks(order)}
               <p style="margin:2px 0 0;">
                 <a href="${icsUrl}" style="display:inline-block;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-size:13px;font-weight:700;padding:8px 13px;">Apple / Outlook naptár</a>
               </p>
             </section>
 
-            ${
-              note
-                ? `<section style="margin:22px 0;"><p style="margin:0 0 8px;font-weight:700;color:#2c1f14;">Megjegyzésed</p><p style="margin:0;color:#4b3a2a;line-height:1.6;">${textToHtml(note)}</p></section>`
-                : ""
-            }
-
-            <p style="font-size:13px;line-height:1.65;margin:20px 0 0;color:#7a624b;">Ha kérdésed van, válaszolj erre az emailre.</p>
+            <p style="font-size:13px;line-height:1.65;margin:20px 0 0;color:#7a624b;text-align:center;">Ha kérdésed van, válaszolj erre az emailre.</p>
 
             <div style="border-top:1px solid #eadcc9;margin:18px 0 0;padding:18px 0 0;text-align:center;">
               <p style="font-family:Georgia,serif;font-size:18px;line-height:1.35;margin:0 0 8px;color:#2c1f14;">Ízlett, amit hazavittél?</p>
@@ -219,7 +220,7 @@ function buildHtmlEmail(customer: OrderCustomer, order: CalendarOrderData) {
             </div>
 
             <div style="margin:16px 0 0;padding:4px 0 0;text-align:center;">
-              <p style="font-size:12px;line-height:1.5;margin:0 0 9px;color:#9a846b;">Találkozunk itt is</p>
+              <p style="font-size:12px;line-height:1.5;margin:0 0 9px;color:#9a846b;">Találkozzunk itt is</p>
               <a href="${INSTAGRAM_URL}" aria-label="Instagram" style="display:inline-block;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-size:12px;font-weight:700;margin:0 4px;padding:7px 11px;">Instagram</a>
               <a href="${FACEBOOK_URL}" aria-label="Facebook" style="display:inline-block;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-size:12px;font-weight:700;margin:0 4px;padding:7px 11px;">Facebook</a>
             </div>
