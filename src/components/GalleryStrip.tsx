@@ -19,6 +19,31 @@ const IMG_H_MOBILE = 200;
 const IMG_H_DESKTOP = 380;
 const GAP = 10;
 
+function PhotoItem({ img, index, compact = false }: { img: (typeof PHOTOS)[number]; index: number; compact?: boolean }) {
+  const mobileW = Math.round(IMG_H_MOBILE * img.aspect);
+  const desktopW = Math.round(IMG_H_DESKTOP * img.aspect);
+
+  return (
+    <div
+      className={`relative shrink-0 overflow-hidden ${compact ? "snap-center rounded-xl" : "rounded-2xl"}`}
+      style={{
+        width: compact ? `${mobileW}px` : `clamp(${mobileW}px, ${desktopW / 14}vw, ${desktopW}px)`,
+        aspectRatio: `${img.aspect}`,
+      }}
+    >
+      <Image
+        src={img.src}
+        alt={`Kata Kenyere galéria ${index + 1}`}
+        fill
+        className="object-cover"
+        sizes={compact ? "170px" : "(max-width: 768px) 160px, 380px"}
+        draggable={false}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(40,20,10,0.15)] via-transparent to-transparent" />
+    </div>
+  );
+}
+
 export default function GalleryStrip() {
   const trackRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -93,6 +118,7 @@ export default function GalleryStrip() {
   }, []);
 
   const onPointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse") return;
     pointerActive.current = true;
     pointerLastX.current = e.clientX;
     velocityRef.current = 0;
@@ -101,6 +127,7 @@ export default function GalleryStrip() {
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse") return;
     if (!pointerActive.current) return;
     const track = trackRef.current;
     if (!track) return;
@@ -129,13 +156,18 @@ export default function GalleryStrip() {
   return (
     <div className="relative">
       {/* Gradient maszk a széleken */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 sm:w-28 md:w-44 bg-gradient-to-r from-[#fafaf8] to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 sm:w-28 md:w-44 bg-gradient-to-l from-[#fafaf8] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-[#fafaf8] to-transparent md:w-44" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-[#fafaf8] to-transparent md:w-44" />
+
+      <div className="scrollbar-none flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-6 pb-1 md:hidden">
+        {PHOTOS.map((img, index) => (
+          <PhotoItem key={`${img.src}-${index}`} img={img} index={index} compact />
+        ))}
+      </div>
 
       <div
         ref={wrapRef}
-        className="cursor-grab overflow-hidden active:cursor-grabbing select-none touch-pan-y"
-        style={{ touchAction: "pan-y" }}
+        className="hidden cursor-grab select-none overflow-hidden active:cursor-grabbing md:block"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -149,31 +181,9 @@ export default function GalleryStrip() {
         >
           {[0, 1].map((set) => (
             <div key={set} className="flex items-end" style={{ gap: GAP }}>
-              {PHOTOS.map((img, i) => {
-                const mobileW = Math.round(IMG_H_MOBILE * img.aspect);
-                const desktopW = Math.round(IMG_H_DESKTOP * img.aspect);
-                return (
-                  <div
-                    key={i}
-                    className="relative shrink-0 overflow-hidden rounded-2xl"
-                    style={{
-                      // CSS clamp: mobilon kisebb, asztali gépen nagyobb
-                      width: `clamp(${mobileW}px, ${desktopW / 14}vw, ${desktopW}px)`,
-                      aspectRatio: `${img.aspect}`,
-                    }}
-                  >
-                    <Image
-                      src={img.src}
-                      alt="Kata Kenyere"
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 160px, 380px"
-                      draggable={false}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[rgba(40,20,10,0.15)] via-transparent to-transparent" />
-                  </div>
-                );
-              })}
+              {PHOTOS.map((img, i) => (
+                <PhotoItem key={`${set}-${img.src}-${i}`} img={img} index={i} />
+              ))}
             </div>
           ))}
         </div>
