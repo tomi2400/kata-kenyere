@@ -9,6 +9,7 @@ import {
   formatCalendarDateLabel,
   type CalendarOrderData,
 } from "@/lib/order-calendar";
+import { GOOGLE_REVIEW_URL } from "@/lib/review";
 
 function KoszonjukContent() {
   const router = useRouter();
@@ -164,6 +165,22 @@ function KoszonjukContent() {
             {`„Frissen sütjük neked. Várunk szeretettel."`}
           </p>
           <p className="mt-2 font-sans text-[0.72rem] text-[rgba(244,242,236,0.85)] sm:text-[0.75rem]">— Kata Kenyere</p>
+        </div>
+
+        {/* Értékelés */}
+        <div className="mb-6 text-center sm:mb-8">
+          <p className="font-sans text-[0.78rem] leading-[1.6] text-[#6b5a47]">
+            Ízlett, amit hazavittél? Nagyon sokat jelent nekünk, ha írsz pár sort Google-on.
+          </p>
+          <a
+            href={GOOGLE_REVIEW_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1.5 inline-flex items-center gap-1.5 font-sans text-[0.78rem] font-medium text-[#9c6f3a] underline underline-offset-4 transition-colors hover:text-[#8a6030]"
+          >
+            Google értékelés írása
+            <ExternalLink className="h-3 w-3" />
+          </a>
         </div>
 
         {/* CTA */}

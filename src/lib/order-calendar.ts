@@ -19,6 +19,8 @@ export type CalendarOrderData = {
 };
 
 const TIMEZONE = "Europe/Budapest";
+// TODO: Az átvételi idősávot később adminból vezérelt napi nyitvatartásból kell venni.
+// Ennek a Google/ICS naptáreseményekben és a visszaigazoló emailben is ugyanazt kell jelentenie.
 const PICKUP_START = "080000";
 const PICKUP_END = "170000";
 export const PICKUP_LOCATION = "Kata Kenyere, Pécs, Salakhegyi út 14.";

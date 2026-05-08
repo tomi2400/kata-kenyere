@@ -6,6 +6,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import GalleryStrip from "@/components/GalleryStrip";
 import CookieSettingsButton from "@/components/CookieSettingsButton";
 import { defaultOpenGraphImage } from "@/lib/seo";
+import { SOCIAL_LINKS } from "@/lib/social";
 import {
   ArrowRight,
   Flame,
@@ -467,7 +468,7 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Jobb: dokumentumok */}
+            {/* Jobb: dokumentumok + social */}
             <div className="shrink-0">
               <p className="text-[10px] uppercase tracking-[0.2em] text-[#b89471]">Dokumentumok</p>
               <div className="mt-3.5 space-y-2">
@@ -478,6 +479,21 @@ export default async function Home() {
                   Adatvédelem
                 </Link>
                 <CookieSettingsButton />
+              </div>
+              <p className="mt-6 text-[10px] uppercase tracking-[0.2em] text-[#b89471]">Kövess minket</p>
+              <div className="mt-3 flex gap-2">
+                {SOCIAL_LINKS.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-8 min-w-8 items-center justify-center rounded-full border border-[#b89471]/35 px-2 text-[0.68rem] font-semibold text-[#e8d6c0] transition-colors hover:border-[#e8d6c0] hover:text-white"
+                    aria-label={link.label}
+                  >
+                    {link.label === "Instagram" ? "IG" : "f"}
+                  </a>
+                ))}
               </div>
             </div>
 

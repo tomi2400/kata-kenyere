@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
 import { ArrowRight, MapPin, Clock, Phone, Mail } from "lucide-react";
 import { defaultOpenGraphImage } from "@/lib/seo";
+import { SOCIAL_LINKS } from "@/lib/social";
 
 export const metadata = {
   title: "Kapcsolat és elérhetőségek – Pécs, Salakhegyi út 14.",
@@ -55,15 +56,15 @@ export default function KapcsolatPage() {
         <ScrollReveal variant="up" delay={240} className="mt-10">
           <h2 className="mb-4 font-serif text-xl text-[#3d2314]">Kövess minket</h2>
           <div className="flex gap-3">
-            {["Instagram", "Facebook"].map((platform) => (
+            {SOCIAL_LINKS.map((platform) => (
               <a
-                key={platform}
-                href="https://www.instagram.com"
+                key={platform.href}
+                href={platform.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-full border border-[#c79a66]/40 px-5 py-2.5 font-sans text-sm font-medium text-[#5b3826] transition-all duration-300 hover:border-[#c79a66] hover:bg-[#c79a66]/6"
               >
-                {platform}
+                {platform.label}
               </a>
             ))}
           </div>

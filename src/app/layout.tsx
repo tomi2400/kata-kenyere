@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import { defaultOpenGraphImage } from "@/lib/seo";
+import { FACEBOOK_URL, INSTAGRAM_URL } from "@/lib/social";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -106,8 +107,8 @@ const localBusinessSchema = {
     worstRating: "1",
   },
   sameAs: [
-    "https://www.instagram.com/katakenyere",
-    "https://www.facebook.com/katakenyere",
+    INSTAGRAM_URL,
+    FACEBOOK_URL,
   ],
   hasMap: "https://maps.google.com/?q=Kata+Kenyere+P%C3%A9cs",
   image: "https://katakenyere.hu/images/logo.png",
