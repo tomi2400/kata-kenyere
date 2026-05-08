@@ -3,19 +3,41 @@
 import { useRouter } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
 import Image from "next/image";
-import { MapPin, Clock, Mail } from "lucide-react";
+import { CalendarPlus, Clock, Download, ExternalLink, Mail, MapPin } from "lucide-react";
+import {
+  buildGoogleCalendarUrl,
+  formatCalendarDateLabel,
+  type CalendarOrderData,
+} from "@/lib/order-calendar";
 
 function KoszonjukContent() {
   const router = useRouter();
   const [rendelesSzam, setRendelesSzam] = useState<string | null>(null);
+  const [calendarOrder, setCalendarOrder] = useState<CalendarOrderData | null>(null);
 
   useEffect(() => {
     const szam = sessionStorage.getItem("rendelesSzam");
+    const naptar = sessionStorage.getItem("rendelesNaptar");
+
     if (szam) {
       setRendelesSzam(szam);
-      sessionStorage.removeItem("rendelesSzam");
+    }
+
+    if (naptar) {
+      try {
+        const parsed = JSON.parse(naptar) as CalendarOrderData;
+        setCalendarOrder(parsed);
+        if (!szam && parsed.rendelesSzam) setRendelesSzam(parsed.rendelesSzam);
+      } catch {
+        sessionStorage.removeItem("rendelesNaptar");
+      }
     }
   }, []);
+
+  const naptarRendelesSzam = calendarOrder?.rendelesSzam ?? rendelesSzam;
+  const icsHref = naptarRendelesSzam
+    ? `/api/rendeles/${encodeURIComponent(naptarRendelesSzam)}/naptar`
+    : null;
 
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-start bg-[#F4F2EC] px-4 pb-8 pt-8 sm:justify-center sm:px-5 sm:py-16">
@@ -59,6 +81,63 @@ function KoszonjukContent() {
             </p>
           </div>
         </div>
+
+        {/* Naptár */}
+        {(calendarOrder || icsHref) && (
+          <div className="mb-3 overflow-hidden rounded-2xl border border-[rgba(156,111,58,0.2)] bg-white shadow-[0_2px_12px_rgba(44,31,20,0.06)] sm:mb-4 sm:rounded-xl">
+            <div className="border-b border-[rgba(156,111,58,0.12)] px-4 py-3 sm:px-5">
+              <div className="flex items-center gap-2">
+                <CalendarPlus className="h-3.5 w-3.5 text-[#9c6f3a]" />
+                <p className="font-sans text-[0.62rem] font-medium uppercase tracking-[0.16em] text-[#9c6f3a] sm:text-[0.65rem] sm:tracking-[0.18em]">
+                  Naptár
+                </p>
+              </div>
+            </div>
+
+            <div className="px-4 py-4 sm:px-5">
+              <p className="font-sans text-[0.84rem] font-medium leading-snug text-[#2C1F14]">
+                Ne maradjon ki az átvétel
+              </p>
+              <p className="mt-1 font-sans text-[0.78rem] leading-[1.55] text-[#6b5a47] sm:text-[0.8rem] sm:leading-[1.65]">
+                Több nap esetén külön esemény kerül a naptárba, emlékeztetővel és rendelési részletekkel.
+              </p>
+
+              {icsHref && (
+                <a
+                  href={icsHref}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#9c6f3a] px-4 py-3 font-sans text-[0.82rem] font-semibold text-[#fff9f0] shadow-[0_8px_20px_rgba(156,111,58,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#8a6030]"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Apple / Outlook naptár
+                </a>
+              )}
+
+              {calendarOrder && calendarOrder.napok.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {calendarOrder.napok.map((day) => (
+                    <a
+                      key={day.datum}
+                      href={buildGoogleCalendarUrl(calendarOrder, day)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between gap-3 rounded-xl border border-[rgba(156,111,58,0.18)] bg-[#F4F2EC] px-3 py-2.5 transition-colors hover:border-[#9c6f3a]"
+                    >
+                      <span className="min-w-0">
+                        <span className="block font-sans text-[0.8rem] font-medium text-[#2C1F14]">
+                          Google Naptár
+                        </span>
+                        <span className="block truncate font-sans text-[0.72rem] text-[#6b5a47]">
+                          {formatCalendarDateLabel(day)}
+                        </span>
+                      </span>
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-[#9c6f3a]" />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Átvétel */}
         <div className="mb-3 overflow-hidden rounded-2xl border border-[rgba(156,111,58,0.2)] bg-white shadow-[0_2px_12px_rgba(44,31,20,0.06)] sm:mb-4 sm:rounded-xl">

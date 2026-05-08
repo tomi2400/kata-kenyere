@@ -1,5 +1,29 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { sendOrderConfirmationEmail } from "@/lib/order-email";
+
+type SubmittedOrderItem = {
+  nap: string;
+  datum: string;
+  termekId: string;
+  nev: string;
+  mennyiseg: number;
+  egysegar: number;
+  reszosszeg: number;
+};
+
+type OrderInsertItem = {
+  rendeles_id: string;
+  rendeles_nap_id: string | null;
+  termek_id: string | null;
+  datum: string;
+  nap: string;
+  termek_nev: string;
+  mennyiseg: number;
+  egysegar: number;
+  reszosszeg: number;
+  allapot: "uj";
+};
 
 export async function POST(request: Request) {
   try {
@@ -67,33 +91,30 @@ export async function POST(request: Request) {
 
     // Rendelési napok feloldása dátum alapján
     const datumok = Array.from(new Set(rendelesek.map((r: { datum: string }) => r.datum))) as string[];
-    const { data: napok } = await supabaseAdmin
+    const { data: rendelesNapok } = await supabaseAdmin
       .from("rendeles_napok")
       .select("id, datum")
       .in("datum", datumok);
 
-    const datumMap = new Map(napok?.map((n) => [n.datum, n.id]) ?? []);
+    const datumMap = new Map(rendelesNapok?.map((n) => [n.datum, n.id]) ?? []);
 
-    const tetelek = rendelesek.map((r: {
-      nap: string;
-      datum: string;
-      termekId: string;
-      nev: string;
-      mennyiseg: number;
-      egysegar: number;
-      reszosszeg: number;
-    }) => ({
-      rendeles_id: rendeles.id,
-      rendeles_nap_id: datumMap.get(r.datum) || null,
-      termek_id: slugMap.get(r.termekId) || null,
-      datum: r.datum,
-      nap: r.nap,
-      termek_nev: r.nev,
-      mennyiseg: r.mennyiseg,
-      egysegar: r.egysegar,
-      reszosszeg: r.reszosszeg,
-      allapot: "uj",
-    }));
+    const tetelek: OrderInsertItem[] = rendelesek.map((r: SubmittedOrderItem) => {
+      const mennyiseg = Number(r.mennyiseg || 0);
+      const egysegar = Number(r.egysegar || 0);
+
+      return {
+        rendeles_id: rendeles.id,
+        rendeles_nap_id: datumMap.get(r.datum) || null,
+        termek_id: slugMap.get(r.termekId) || null,
+        datum: r.datum,
+        nap: r.nap,
+        termek_nev: r.nev,
+        mennyiseg,
+        egysegar,
+        reszosszeg: mennyiseg * egysegar,
+        allapot: "uj",
+      };
+    });
 
     const { error: tetelError } = await supabaseAdmin
       .from("rendeles_tetelek")
@@ -104,7 +125,40 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Hiba a tételek mentésekor" }, { status: 500 });
     }
 
-    // TODO: Email küldés (Resend) - következő lépésben
+    const emailNapok = Array.from(new Set(tetelek.map((tetel) => tetel.datum)))
+      .sort()
+      .map((datum) => {
+        const napiTetelek = tetelek.filter((tetel) => tetel.datum === datum);
+
+        return {
+          datum,
+          nap: napiTetelek[0]?.nap || datum,
+          items: napiTetelek.map((tetel) => ({
+            nev: tetel.termek_nev,
+            mennyiseg: tetel.mennyiseg,
+            egysegar: tetel.egysegar,
+            reszosszeg: tetel.reszosszeg,
+          })),
+        };
+      });
+
+    try {
+      await sendOrderConfirmationEmail({
+        customer: {
+          nev: nev.trim(),
+          email: email.trim(),
+          telefon: telefon.trim(),
+          megjegyzes: megjegyzes?.trim() || null,
+        },
+        order: {
+          rendelesSzam,
+          vegosszeg: szamoltVegosszeg,
+          napok: emailNapok,
+        },
+      });
+    } catch (emailError) {
+      console.error("Visszaigazoló email küldési hiba:", emailError);
+    }
 
     return NextResponse.json({
       success: true,

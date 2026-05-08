@@ -69,10 +69,30 @@ export default function OsszesitesPage() {
       const data = await res.json().catch(() => null);
       if (res.ok) {
         setSubmitted(true);
-        clearCart();
         if (data?.rendelesSzam) {
+          sessionStorage.setItem(
+            "rendelesNaptar",
+            JSON.stringify({
+              rendelesSzam: data.rendelesSzam,
+              vegosszeg: total,
+              napok: selectedDayCarts
+                .filter((day) => day.items.length > 0)
+                .map((day) => ({
+                  nap: day.nap,
+                  datum: day.datum,
+                  items: day.items.map((item) => ({
+                    nev: item.nev,
+                    mennyiseg: item.mennyiseg,
+                    egysegar: item.ar,
+                    reszosszeg: item.ar * item.mennyiseg,
+                    egyseg: item.egyseg,
+                  })),
+                })),
+            })
+          );
           sessionStorage.setItem("rendelesSzam", data.rendelesSzam);
         }
+        clearCart();
         router.push("/koszonjuk");
       } else { alert("Hiba történt, kérlek próbáld újra!"); }
     } catch { alert("Hiba történt, kérlek próbáld újra!"); }
