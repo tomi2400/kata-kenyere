@@ -102,8 +102,8 @@ function buildGoogleCalendarLinks(order: CalendarOrderData) {
   return order.napok
     .map(
       (day) => `
-        <p style="margin:0 0 8px;">
-          <a href="${buildGoogleCalendarUrl(order, day)}" style="color:#9c6f3a;text-decoration:underline;font-size:13px;font-weight:700;">Google Naptár erre a napra - ${escapeHtml(formatCalendarDateLabel(day))}</a>
+        <p style="margin:0 0 9px;">
+          <a href="${buildGoogleCalendarUrl(order, day)}" style="display:inline-block;border:1px solid #d1ad68;border-radius:999px;color:#9c6f3a;text-decoration:none;font-size:13px;font-weight:700;padding:8px 13px;">Google Naptár erre a napra - ${escapeHtml(formatCalendarDateLabel(day))}</a>
         </p>
       `
     )
@@ -130,13 +130,13 @@ function buildTextEmail(customer: OrderCustomer, order: CalendarOrderData) {
     "",
     `Rendelésszám: ${order.rendelesSzam}`,
     "",
-    "Átvétel",
-    `${PICKUP_LOCATION}`,
-    `Útvonaltervezés: ${buildMapsUrl()}`,
-    "",
     dayBlocks,
     "",
     `Teljes összeg: ${formatFt(order.vegosszeg)}`,
+    "",
+    "Átvétel",
+    `${PICKUP_LOCATION}`,
+    `Útvonaltervezés: ${buildMapsUrl()}`,
     "",
     "Ha szeretnél emlékeztetőt beállítani, az átvételi napot hozzáadhatod a naptáradhoz.",
     ...order.napok.map((day) => `Google Naptár erre a napra (${formatCalendarDateLabel(day)}): ${buildGoogleCalendarUrl(order, day)}`),
@@ -162,22 +162,18 @@ function buildHtmlEmail(customer: OrderCustomer, order: CalendarOrderData) {
   return `
     <!doctype html>
     <html lang="hu">
-      <body style="margin:0;background:#f4f2ec;font-family:Arial,Helvetica,sans-serif;color:#2c1f14;">
+      <body style="margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#2c1f14;">
         <div style="display:none;max-height:0;overflow:hidden;">Köszönjük a rendelésed. Rendelésszám: ${escapeHtml(order.rendelesSzam)}</div>
-        <main style="max-width:560px;margin:0 auto;padding:24px 14px;">
-          <div style="background:#fffdf8;border:1px solid #e6d8c4;border-radius:8px;padding:24px;">
-            <p style="margin:0 0 12px;color:#9c6f3a;text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:700;">Kata Kenyere</p>
-            <h1 style="font-family:Georgia,serif;font-size:24px;line-height:1.25;margin:0 0 18px;color:#2c1f14;font-weight:400;">Köszönjük a rendelésed, ${escapeHtml(customer.nev)}!</h1>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;background:#ffffff;border-collapse:collapse;">
+          <tr>
+            <td align="center" style="padding:28px 14px;">
+              <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="width:100%;max-width:560px;background:#ffffff;border:1px solid #e5ddd3;border-top:5px solid #c59b47;border-radius:8px;border-collapse:separate;">
+                <tr>
+                  <td style="padding:30px 24px 26px;font-family:Arial,Helvetica,sans-serif;color:#2c1f14;">
+            <p style="margin:0 0 10px;text-align:center;color:#9c6f3a;text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:700;">Kata Kenyere</p>
+            <h1 style="font-family:Georgia,serif;font-size:25px;line-height:1.25;margin:0 0 18px;text-align:center;color:#2c1f14;font-weight:400;">Köszönjük a rendelésed, ${escapeHtml(customer.nev)}!</h1>
 
             <p style="margin:0 0 18px;font-size:14px;color:#7a624b;">Rendelésszám: <strong style="color:#2c1f14;">${escapeHtml(order.rendelesSzam)}</strong></p>
-
-            <section style="background:#f8efe3;border-radius:8px;padding:14px 16px;margin:0 0 18px;">
-              <p style="margin:0 0 6px;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#9c6f3a;font-weight:700;">Átvétel</p>
-              <p style="margin:0;font-size:14px;line-height:1.6;color:#2c1f14;">${escapeHtml(PICKUP_LOCATION)}</p>
-              <p style="margin:10px 0 0;font-size:13px;">
-                <a href="${mapsUrl}" style="color:#9c6f3a;text-decoration:underline;font-weight:700;">Útvonaltervezés</a>
-              </p>
-            </section>
 
             <p style="margin:0 0 4px;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#9c6f3a;font-weight:700;">Rendelésed</p>
 
@@ -190,11 +186,19 @@ function buildHtmlEmail(customer: OrderCustomer, order: CalendarOrderData) {
               </tr>
             </table>
 
+            <div style="border-top:1px solid #eadcc9;margin:0 0 18px;padding:16px 0 0;">
+              <p style="margin:0 0 6px;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#9c6f3a;font-weight:700;">Átvétel</p>
+              <p style="margin:0;font-size:14px;line-height:1.6;color:#2c1f14;">${escapeHtml(PICKUP_LOCATION)}</p>
+              <p style="margin:10px 0 0;font-size:13px;">
+                <a href="${mapsUrl}" style="display:inline-block;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-weight:700;padding:8px 13px;">Útvonaltervezés</a>
+              </p>
+            </div>
+
             <section style="margin:0 0 18px;">
               <p style="margin:0 0 10px;font-size:13px;line-height:1.65;color:#7a624b;">Ha szeretnél emlékeztetőt beállítani, az átvételi napot hozzáadhatod a naptáradhoz.</p>
               ${buildGoogleCalendarLinks(order)}
               <p style="margin:2px 0 0;">
-                <a href="${icsUrl}" style="color:#9c6f3a;text-decoration:underline;font-size:13px;font-weight:700;">Apple / Outlook naptár</a>
+                <a href="${icsUrl}" style="display:inline-block;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-size:13px;font-weight:700;padding:8px 13px;">Apple / Outlook naptár</a>
               </p>
             </section>
 
@@ -206,20 +210,25 @@ function buildHtmlEmail(customer: OrderCustomer, order: CalendarOrderData) {
 
             <p style="font-size:13px;line-height:1.65;margin:20px 0 0;color:#7a624b;">Ha kérdésed van, válaszolj erre az emailre.</p>
 
-            <div style="border-top:1px solid #eadcc9;margin:18px 0 0;padding:16px 0 0;">
-              <p style="font-size:13px;line-height:1.65;margin:0;color:#7a624b;">Ízlett, amit hazavittél? Nagyon sokat jelent nekünk, ha írsz pár sort Google-on.</p>
-              <p style="margin:6px 0 0;font-size:13px;">
-                <a href="${GOOGLE_REVIEW_URL}" style="color:#9c6f3a;text-decoration:underline;">Google értékelés írása</a>
+            <div style="border-top:1px solid #eadcc9;margin:18px 0 0;padding:18px 0 0;text-align:center;">
+              <p style="font-family:Georgia,serif;font-size:18px;line-height:1.35;margin:0 0 8px;color:#2c1f14;">Ízlett, amit hazavittél?</p>
+              <p style="font-size:13px;line-height:1.65;margin:0 auto;max-width:350px;color:#7a624b;">Nagyon sokat jelent nekünk, ha írsz pár sort Google-on.</p>
+              <p style="margin:12px 0 0;font-size:13px;">
+                <a href="${GOOGLE_REVIEW_URL}" style="display:inline-block;background:#9c6f3a;border:1px solid #9c6f3a;border-radius:999px;color:#ffffff;text-decoration:none;font-weight:700;padding:9px 15px;">Google értékelés írása</a>
               </p>
             </div>
 
-            <div style="border-top:1px solid #eadcc9;margin:16px 0 0;padding:14px 0 0;text-align:center;">
-              <p style="font-size:12px;line-height:1.5;margin:0 0 8px;color:#9a846b;">Kövess minket</p>
-              <a href="${INSTAGRAM_URL}" aria-label="Instagram" style="display:inline-block;width:28px;height:28px;line-height:28px;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-size:11px;font-weight:700;margin:0 4px;">IG</a>
-              <a href="${FACEBOOK_URL}" aria-label="Facebook" style="display:inline-block;width:28px;height:28px;line-height:28px;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-size:14px;font-weight:700;margin:0 4px;">f</a>
+            <div style="margin:16px 0 0;padding:4px 0 0;text-align:center;">
+              <p style="font-size:12px;line-height:1.5;margin:0 0 9px;color:#9a846b;">Találkozunk itt is</p>
+              <a href="${INSTAGRAM_URL}" aria-label="Instagram" style="display:inline-block;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-size:12px;font-weight:700;margin:0 4px;padding:7px 11px;">Instagram</a>
+              <a href="${FACEBOOK_URL}" aria-label="Facebook" style="display:inline-block;border:1px solid #d8c5ab;border-radius:999px;color:#9c6f3a;text-decoration:none;font-size:12px;font-weight:700;margin:0 4px;padding:7px 11px;">Facebook</a>
             </div>
-          </div>
-        </main>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
     </html>
   `;
