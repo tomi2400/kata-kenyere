@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
+import MarketingAttributionTracker from "@/components/MarketingAttributionTracker";
 import { defaultOpenGraphImage } from "@/lib/seo";
 import { FACEBOOK_URL, INSTAGRAM_URL } from "@/lib/social";
 import "./globals.css";
@@ -153,6 +154,7 @@ export default function RootLayout({
         >
           {JSON.stringify(localBusinessSchema)}
         </Script>
+        <MarketingAttributionTracker />
         {children}
         <CookieConsentBanner />
       </body>

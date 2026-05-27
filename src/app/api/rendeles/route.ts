@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { sendOrderConfirmationEmail } from "@/lib/order-email";
+import { getPrimaryMarketingTouch, sanitizeMarketingAttribution } from "@/lib/tracking";
 
 type SubmittedOrderItem = {
   nap: string;
@@ -25,26 +26,62 @@ type OrderInsertItem = {
   allapot: "uj";
 };
 
+function isMissingMarketingColumnsError(error: { code?: string; message?: string; details?: string | null }) {
+  const text = `${error.code ?? ""} ${error.message ?? ""} ${error.details ?? ""}`.toLowerCase();
+
+  return (
+    text.includes("marketing_attribution") ||
+    text.includes("traffic_source") ||
+    text.includes("traffic_medium") ||
+    text.includes("utm_") ||
+    text.includes("gclid") ||
+    text.includes("fbclid") ||
+    text.includes("msclkid")
+  );
+}
+
+function isSubmittedOrderItem(item: unknown): item is SubmittedOrderItem {
+  if (!item || typeof item !== "object") return false;
+
+  const candidate = item as Record<string, unknown>;
+
+  return (
+    typeof candidate.datum === "string" &&
+    typeof candidate.termekId === "string" &&
+    typeof candidate.nev === "string" &&
+    Number(candidate.mennyiseg) > 0
+  );
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { nev, email, telefon, megjegyzes, rendelesek } = body;
+    const isManualOrder = body.source === "admin_manual" || body.manual === true;
+    const sendEmail = body.sendEmail !== false;
+    const vevoNev = typeof nev === "string" ? nev.trim() : "";
+    const vevoEmail = typeof email === "string" ? email.trim() : "";
+    const vevoTelefon = typeof telefon === "string" ? telefon.trim() : "";
+    const vevoMegjegyzes = typeof megjegyzes === "string" && megjegyzes.trim() ? megjegyzes.trim() : null;
+    const submittedRendelesek = Array.isArray(rendelesek) ? rendelesek.filter(isSubmittedOrderItem) : [];
+    const marketingAttribution = sanitizeMarketingAttribution(body.marketingAttribution);
+    const primaryMarketingTouch = getPrimaryMarketingTouch(marketingAttribution);
 
     // Validáció
-    if (!nev?.trim()) {
+    if (!isManualOrder && !vevoNev) {
       return NextResponse.json({ error: "Név megadása kötelező" }, { status: 400 });
     }
-    if (!email?.trim() || !/\S+@\S+\.\S+/.test(email)) {
+    if (!isManualOrder && (!vevoEmail || !/\S+@\S+\.\S+/.test(vevoEmail))) {
       return NextResponse.json({ error: "Érvényes email cím szükséges" }, { status: 400 });
     }
-    if (!telefon?.trim()) {
+    if (!isManualOrder && !vevoTelefon) {
       return NextResponse.json({ error: "Telefonszám megadása kötelező" }, { status: 400 });
     }
-    if (!rendelesek || rendelesek.length === 0) {
+    if (submittedRendelesek.length === 0) {
       return NextResponse.json({ error: "Legalább egy tétel szükséges" }, { status: 400 });
     }
 
-    const szamoltVegosszeg = rendelesek.reduce(
+    const szamoltVegosszeg = submittedRendelesek.reduce(
       (sum: number, r: { egysegar: number; mennyiseg: number }) =>
         sum + Number(r.egysegar || 0) * Number(r.mennyiseg || 0),
       0
@@ -60,19 +97,52 @@ export async function POST(request: Request) {
     const rendelesSzam = `KK-${today}-${sorszam}`;
 
     // Rendelés mentése
-    const { data: rendeles, error: rendelesError } = await supabaseAdmin
+    const baseRendelesInsert = {
+      rendeles_szam: rendelesSzam,
+      nev: vevoNev,
+      email: vevoEmail,
+      telefon: vevoTelefon,
+      megjegyzes: vevoMegjegyzes,
+      vegosszeg: szamoltVegosszeg,
+      allapot: "uj",
+    };
+    const marketingRendelesInsert = {
+      marketing_attribution: marketingAttribution ?? {},
+      traffic_source: primaryMarketingTouch?.traffic_source ?? null,
+      traffic_medium: primaryMarketingTouch?.traffic_medium ?? null,
+      utm_source: primaryMarketingTouch?.utm_source ?? null,
+      utm_medium: primaryMarketingTouch?.utm_medium ?? null,
+      utm_campaign: primaryMarketingTouch?.utm_campaign ?? null,
+      utm_content: primaryMarketingTouch?.utm_content ?? null,
+      utm_term: primaryMarketingTouch?.utm_term ?? null,
+      gclid: primaryMarketingTouch?.gclid ?? null,
+      fbclid: primaryMarketingTouch?.fbclid ?? null,
+      msclkid: primaryMarketingTouch?.msclkid ?? null,
+      landing_page: primaryMarketingTouch?.landing_page ?? null,
+      referrer: primaryMarketingTouch?.referrer ?? null,
+    };
+
+    let { data: rendeles, error: rendelesError } = await supabaseAdmin
       .from("rendelesek")
-      .insert({
-        rendeles_szam: rendelesSzam,
-        nev: nev.trim(),
-        email: email.trim(),
-        telefon: telefon.trim(),
-        megjegyzes: megjegyzes?.trim() || null,
-        vegosszeg: szamoltVegosszeg,
-        allapot: "uj",
-      })
+      .insert({ ...baseRendelesInsert, ...marketingRendelesInsert })
       .select("id")
       .single();
+
+    if (rendelesError && isMissingMarketingColumnsError(rendelesError)) {
+      console.warn(
+        "Marketing attribution columns are missing from rendelesek. Retrying order insert without attribution fields.",
+        rendelesError
+      );
+
+      const retryResult = await supabaseAdmin
+        .from("rendelesek")
+        .insert(baseRendelesInsert)
+        .select("id")
+        .single();
+
+      rendeles = retryResult.data;
+      rendelesError = retryResult.error;
+    }
 
     if (rendelesError || !rendeles) {
       console.error("Rendelés mentési hiba:", rendelesError);
@@ -81,7 +151,7 @@ export async function POST(request: Request) {
 
     // Tételek mentése
     // Termék slug → UUID feloldás
-    const slugok = Array.from(new Set(rendelesek.map((r: { termekId: string }) => r.termekId))) as string[];
+    const slugok = Array.from(new Set(submittedRendelesek.map((r: { termekId: string }) => r.termekId))) as string[];
     const { data: termekek } = await supabaseAdmin
       .from("termekek")
       .select("id, slug")
@@ -90,7 +160,7 @@ export async function POST(request: Request) {
     const slugMap = new Map(termekek?.map((t) => [t.slug, t.id]) ?? []);
 
     // Rendelési napok feloldása dátum alapján
-    const datumok = Array.from(new Set(rendelesek.map((r: { datum: string }) => r.datum))) as string[];
+    const datumok = Array.from(new Set(submittedRendelesek.map((r: { datum: string }) => r.datum))) as string[];
     const { data: rendelesNapok } = await supabaseAdmin
       .from("rendeles_napok")
       .select("id, datum")
@@ -98,7 +168,7 @@ export async function POST(request: Request) {
 
     const datumMap = new Map(rendelesNapok?.map((n) => [n.datum, n.id]) ?? []);
 
-    const tetelek: OrderInsertItem[] = rendelesek.map((r: SubmittedOrderItem) => {
+    const tetelek: OrderInsertItem[] = submittedRendelesek.map((r: SubmittedOrderItem) => {
       const mennyiseg = Number(r.mennyiseg || 0);
       const egysegar = Number(r.egysegar || 0);
 
@@ -142,22 +212,24 @@ export async function POST(request: Request) {
         };
       });
 
-    try {
-      await sendOrderConfirmationEmail({
-        customer: {
-          nev: nev.trim(),
-          email: email.trim(),
-          telefon: telefon.trim(),
-          megjegyzes: megjegyzes?.trim() || null,
-        },
-        order: {
-          rendelesSzam,
-          vegosszeg: szamoltVegosszeg,
-          napok: emailNapok,
-        },
-      });
-    } catch (emailError) {
-      console.error("Visszaigazoló email küldési hiba:", emailError);
+    if (sendEmail && vevoEmail) {
+      try {
+        await sendOrderConfirmationEmail({
+          customer: {
+            nev: vevoNev,
+            email: vevoEmail,
+            telefon: vevoTelefon,
+            megjegyzes: vevoMegjegyzes,
+          },
+          order: {
+            rendelesSzam,
+            vegosszeg: szamoltVegosszeg,
+            napok: emailNapok,
+          },
+        });
+      } catch (emailError) {
+        console.error("Visszaigazoló email küldési hiba:", emailError);
+      }
     }
 
     return NextResponse.json({

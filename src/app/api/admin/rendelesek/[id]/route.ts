@@ -21,12 +21,95 @@ function getNapNev(datum: string) {
   return NAP_NEVEK[date.getDay()];
 }
 
+async function updateRendelesAllapot(rendelesId: string, fallback?: string | null) {
+  const { data: tetelek, error: tetelekError } = await supabaseAdmin
+    .from("rendeles_tetelek")
+    .select("allapot, datum, nap")
+    .eq("rendeles_id", rendelesId);
+
+  if (tetelekError) {
+    return { data: null, error: tetelekError };
+  }
+
+  const rendelesAllapot = deriveRendelesDisplayAllapot(tetelek ?? [], fallback);
+  const persistedAllapot = rendelesAllapot === "reszben" ? "uj" : rendelesAllapot;
+
+  return supabaseAdmin
+    .from("rendelesek")
+    .update({ allapot: persistedAllapot })
+    .eq("id", rendelesId)
+    .select()
+    .single();
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   const body = await request.json();
-  const { allapot, datum, ujDatum } = body;
+  const { allapot, datum, ujDatum, tetelId } = body;
+
+  if (tetelId && ujDatum) {
+    if (typeof tetelId !== "string" || !isValidDateInput(ujDatum)) {
+      return NextResponse.json({ error: "Érvénytelen tétel vagy dátum" }, { status: 400 });
+    }
+
+    const { data: napRecord, error: napError } = await supabaseAdmin
+      .from("rendeles_napok")
+      .select("id, nap")
+      .eq("datum", ujDatum)
+      .maybeSingle();
+
+    if (napError) {
+      return NextResponse.json({ error: napError.message }, { status: 500 });
+    }
+
+    const { error: tetelError } = await supabaseAdmin
+      .from("rendeles_tetelek")
+      .update({
+        datum: ujDatum,
+        nap: napRecord?.nap ?? getNapNev(ujDatum),
+        rendeles_nap_id: napRecord?.id ?? null,
+      })
+      .eq("id", tetelId)
+      .eq("rendeles_id", params.id);
+
+    if (tetelError) {
+      return NextResponse.json({ error: tetelError.message }, { status: 500 });
+    }
+
+    const { data, error } = await updateRendelesAllapot(params.id);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ rendeles: data });
+  }
+
+  if (tetelId && allapot) {
+    if (typeof tetelId !== "string" || !isTetelAllapot(allapot)) {
+      return NextResponse.json({ error: "Érvénytelen tétel vagy állapot" }, { status: 400 });
+    }
+
+    const { error: tetelError } = await supabaseAdmin
+      .from("rendeles_tetelek")
+      .update({ allapot })
+      .eq("id", tetelId)
+      .eq("rendeles_id", params.id);
+
+    if (tetelError) {
+      return NextResponse.json({ error: tetelError.message }, { status: 500 });
+    }
+
+    const { data, error } = await updateRendelesAllapot(params.id, allapot);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ rendeles: data });
+  }
 
   if (datum && ujDatum) {
     if (!isValidDateInput(datum) || !isValidDateInput(ujDatum)) {
@@ -57,23 +140,7 @@ export async function PATCH(
       return NextResponse.json({ error: tetelError.message }, { status: 500 });
     }
 
-    const { data: tetelek, error: tetelekError } = await supabaseAdmin
-      .from("rendeles_tetelek")
-      .select("allapot, datum, nap")
-      .eq("rendeles_id", params.id);
-
-    if (tetelekError) {
-      return NextResponse.json({ error: tetelekError.message }, { status: 500 });
-    }
-
-    const rendelesAllapot = deriveRendelesDisplayAllapot(tetelek ?? []);
-
-    const { data, error } = await supabaseAdmin
-      .from("rendelesek")
-      .update({ allapot: rendelesAllapot })
-      .eq("id", params.id)
-      .select()
-      .single();
+    const { data, error } = await updateRendelesAllapot(params.id);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -97,23 +164,7 @@ export async function PATCH(
       return NextResponse.json({ error: tetelError.message }, { status: 500 });
     }
 
-    const { data: tetelek, error: tetelekError } = await supabaseAdmin
-      .from("rendeles_tetelek")
-      .select("allapot, datum, nap")
-      .eq("rendeles_id", params.id);
-
-    if (tetelekError) {
-      return NextResponse.json({ error: tetelekError.message }, { status: 500 });
-    }
-
-    const rendelesAllapot = deriveRendelesDisplayAllapot(tetelek ?? [], allapot);
-
-    const { data, error } = await supabaseAdmin
-      .from("rendelesek")
-      .update({ allapot: rendelesAllapot })
-      .eq("id", params.id)
-      .select()
-      .single();
+    const { data, error } = await updateRendelesAllapot(params.id, allapot);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

@@ -27,11 +27,23 @@ function updateGTMConsent(analyticsGranted: boolean, marketingGranted: boolean) 
   });
 }
 
+function pushConsentState(analyticsGranted: boolean, marketingGranted: boolean) {
+  if (typeof window === "undefined") return;
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: "consent_updated",
+    analytics_consent: analyticsGranted,
+    marketing_consent: marketingGranted,
+  });
+}
+
 function applyConsent(categories: string[]) {
   const analyticsAccepted = categories.includes("analytics");
   const marketingAccepted = categories.includes("marketing");
 
   updateGTMConsent(analyticsAccepted, marketingAccepted);
+  pushConsentState(analyticsAccepted, marketingAccepted);
 
   if (analyticsAccepted || marketingAccepted) {
     loadGTM();

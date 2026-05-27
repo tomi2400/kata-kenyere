@@ -7,6 +7,7 @@ import { type Termek, getTermekFoto, formatAr, csoportositByKategoria } from "@/
 import { supabase } from "@/lib/supabase/client";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
+import TrackedLink from "@/components/TrackedLink";
 import { defaultOpenGraphImage } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -76,8 +77,17 @@ export default async function TermekekPage() {
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 xl:grid-cols-4">
               {termekLista.map((termek, i) => (
                 <ScrollReveal key={termek.id} variant="up" delay={i * 60}>
-                  <Link
+                  <TrackedLink
                     href="/elorendeles"
+                    trackingEvent="product_preorder_clicked"
+                    trackingData={{
+                      product_id: termek.slug,
+                      product_name: termek.nev,
+                      price: termek.ar,
+                      currency: "HUF",
+                      item_category: termek.kategoria,
+                      cta_location: "products_listing",
+                    }}
                     className="group block overflow-hidden rounded-[20px] border border-[#ede8df] bg-white transition-all duration-300 hover:-translate-y-1.5 hover:border-[#c79a66]/50 hover:shadow-[0_16px_36px_rgba(91,56,38,0.10)]"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
@@ -102,7 +112,7 @@ export default async function TermekekPage() {
                         <p className="mt-1.5 font-sans text-[0.75rem] leading-relaxed text-[#7c5a46] line-clamp-2 md:mt-2 md:text-[0.8rem]">{termek.leiras}</p>
                       )}
                     </div>
-                  </Link>
+                  </TrackedLink>
                 </ScrollReveal>
               ))}
             </div>
@@ -127,13 +137,17 @@ export default async function TermekekPage() {
             <p className="mx-auto mt-4 max-w-sm font-sans text-[0.9rem] leading-relaxed text-[#e8d6c0]/70">
               Válaszd ki a napot, add le a rendelésedet, és vedd át frissen sütve.
             </p>
-            <Link
+            <TrackedLink
               href="/elorendeles"
+              trackingData={{
+                cta_location: "products_final",
+                cta_label: "Előrendelés indítása",
+              }}
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#c79a66] px-8 py-[0.95rem] font-sans text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(199,154,102,0.38)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b98b58] hover:shadow-[0_14px_32px_rgba(199,154,102,0.44)]"
             >
               Előrendelés indítása
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </TrackedLink>
           </div>
         </ScrollReveal>
       </section>

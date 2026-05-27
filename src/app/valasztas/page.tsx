@@ -7,10 +7,11 @@ import { useCartStore } from "@/lib/store";
 import { type Termek, csoportositByKategoria, formatAr } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import DayProgress from "@/components/DayProgress";
+import { pushDataLayerEvent } from "@/lib/tracking";
 
 export default function TermekekPage() {
   const router = useRouter();
-  const { selectedDays, carts, getDayTotal, currentStep, setCurrentStep } = useCartStore();
+  const { selectedDays, carts, getDayTotal, getTotal, currentStep, setCurrentStep } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [termekek, setTermekek] = useState<Termek[]>([]);
   const [kategoriak, setKategoriak] = useState<string[]>([]);
@@ -48,9 +49,40 @@ export default function TermekekPage() {
   const isLastDay = currentStep === selectedDays.length - 1;
   const dayTotal = getDayTotal(currentDay.datum);
   const totalItems = (carts[currentDay.datum] ?? []).reduce((s, i) => s + i.mennyiseg, 0);
+  const buildCheckoutPayload = () => {
+    const items = selectedDays.flatMap((day) =>
+      (carts[day.datum] ?? []).map((item) => ({
+        item_id: item.termekId,
+        item_name: item.nev,
+        price: item.ar,
+        quantity: item.mennyiseg,
+        pickup_date: day.datum,
+        pickup_day: day.nap,
+      }))
+    );
+    const orderItemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    const value = getTotal();
+
+    return {
+      value,
+      currency: "HUF",
+      pickup_days_count: selectedDays.length,
+      pickup_dates: selectedDays.map((day) => day.datum),
+      order_items_count: orderItemsCount,
+      ecommerce: {
+        currency: "HUF",
+        value,
+        items,
+      },
+    };
+  };
 
   const handleNext = () => {
-    if (isLastDay) { setCurrentStep(currentStep); router.push("/osszesites"); }
+    if (isLastDay) {
+      pushDataLayerEvent("checkout_started", buildCheckoutPayload());
+      setCurrentStep(currentStep);
+      router.push("/osszesites");
+    }
     else { setCurrentStep(currentStep + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }
   };
 

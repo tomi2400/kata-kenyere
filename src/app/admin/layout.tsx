@@ -7,8 +7,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 
 const NAV_ITEMS = [
-  { href: "/admin/gyartas", label: "Gyártás", icon: "clipboard" },
-  { href: "/admin/rendelesek", label: "Rendelések", icon: "package" },
+  { href: "/admin/muhely", label: "Műhely", icon: "clipboard" },
   { href: "/admin/termekek", label: "Termékek", icon: "bread" },
   { href: "/admin/napok", label: "Napok", icon: "calendar" },
   { href: "/admin/statisztika", label: "Statisztika", icon: "chart" },
@@ -131,7 +130,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="hidden md:flex flex-col w-56 bg-brown-dark min-h-screen fixed left-0 top-0">
         {/* Logo */}
         <div className="p-4 border-b border-cream/10">
-          <Link href="/admin/gyartas" className="flex items-center gap-3">
+          <Link href="/admin/muhely" className="flex items-center gap-3">
             <Image src="/images/logo.png" alt="Kata Kenyere" width={32} height={32} />
             <div>
               <p className="font-serif text-sm text-cream">Kata Kenyere</p>

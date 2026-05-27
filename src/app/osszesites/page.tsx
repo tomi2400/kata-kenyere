@@ -7,6 +7,7 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { useCartStore } from "@/lib/store";
 import { formatAr } from "@/lib/products";
+import { getStoredMarketingAttribution, pushDataLayerEvent } from "@/lib/tracking";
 
 function formatDatum(datum: string): string {
   const d = new Date(datum);
@@ -41,6 +42,34 @@ export default function OsszesitesPage() {
     (sum, day) => sum + day.items.reduce((daySum, item) => daySum + item.ar * item.mennyiseg, 0),
     0
   );
+  const buildOrderTrackingPayload = (transactionId?: string) => {
+    const items = selectedDayCarts.flatMap((day) =>
+      day.items.map((item) => ({
+        item_id: item.termekId,
+        item_name: item.nev,
+        price: item.ar,
+        quantity: item.mennyiseg,
+        pickup_date: day.datum,
+        pickup_day: day.nap,
+      }))
+    );
+    const orderItemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+    return {
+      transaction_id: transactionId,
+      value: total,
+      currency: "HUF",
+      pickup_days_count: selectedDayCarts.filter((day) => day.items.length > 0).length,
+      pickup_dates: selectedDayCarts.filter((day) => day.items.length > 0).map((day) => day.datum),
+      order_items_count: orderItemsCount,
+      ecommerce: {
+        transaction_id: transactionId,
+        currency: "HUF",
+        value: total,
+        items,
+      },
+    };
+  };
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -60,16 +89,26 @@ export default function OsszesitesPage() {
         nev: item.nev, mennyiseg: item.mennyiseg, egysegar: item.ar, reszosszeg: item.ar * item.mennyiseg,
       }))
     );
+    const marketingAttribution = getStoredMarketingAttribution();
+    const orderTrackingPayload = buildOrderTrackingPayload();
+
+    pushDataLayerEvent("order_submitted", orderTrackingPayload);
+
     try {
       const res = await fetch("/api/rendeles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, rendelesek, vegosszeg: total }),
+        body: JSON.stringify({ ...form, rendelesek, vegosszeg: total, marketingAttribution }),
       });
       const data = await res.json().catch(() => null);
       if (res.ok) {
         setSubmitted(true);
         if (data?.rendelesSzam) {
+          pushDataLayerEvent(
+            "purchase",
+            buildOrderTrackingPayload(data.rendelesSzam),
+            { eventId: `purchase:${data.rendelesSzam}` }
+          );
           sessionStorage.setItem(
             "rendelesNaptar",
             JSON.stringify({

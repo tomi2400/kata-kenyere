@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.push("/admin/gyartas");
+    router.push("/admin/muhely");
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCartStore } from "@/lib/store";
 import { formatAr, getTermekFoto, type Termek } from "@/lib/products";
+import { pushDataLayerEvent } from "@/lib/tracking";
 
 export default function ProductCard({ termek, datum }: { termek: Termek; datum: string }) {
   const { carts, setQuantity } = useCartStore();
@@ -12,6 +13,34 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
 
   const change = (delta: number) => {
     const newQty = Math.max(0, qty + delta);
+    const eventName = delta > 0 ? "product_added" : "product_quantity_changed";
+
+    pushDataLayerEvent(eventName, {
+      product_id: termek.slug,
+      product_name: termek.nev,
+      item_category: termek.kategoria,
+      pickup_date: datum,
+      previous_quantity: qty,
+      quantity: newQty,
+      quantity_delta: delta,
+      value: delta > 0 ? termek.ar : newQty * termek.ar,
+      currency: "HUF",
+      ecommerce: {
+        currency: "HUF",
+        value: delta > 0 ? termek.ar : newQty * termek.ar,
+        items: [
+          {
+            item_id: termek.slug,
+            item_name: termek.nev,
+            item_category: termek.kategoria,
+            price: termek.ar,
+            quantity: delta > 0 ? 1 : newQty,
+            pickup_date: datum,
+          },
+        ],
+      },
+    });
+
     setQuantity(
       datum,
       {

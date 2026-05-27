@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type ChangeEvent, type DragEvent } from "react";
 import Image from "next/image";
+import { ImagePlus, LinkIcon, Trash2, UploadCloud } from "lucide-react";
+import { getTermekFoto } from "@/lib/products";
+import { supabase } from "@/lib/supabase/client";
 
 type Termek = {
   id: string;
@@ -22,7 +25,7 @@ type Kategoria = {
   sorrend: number;
 };
 
-type FormData = {
+type ProductFormData = {
   nev: string;
   slug: string;
   leiras: string;
@@ -32,7 +35,7 @@ type FormData = {
   foto_url: string;
 };
 
-const emptyForm: FormData = {
+const emptyForm: ProductFormData = {
   nev: "",
   slug: "",
   leiras: "",
@@ -42,6 +45,9 @@ const emptyForm: FormData = {
   foto_url: "",
 };
 
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+
 // ─── TERMÉKEK TAB ────────────────────────────────────────────────────────────
 
 function TermekekTab() {
@@ -50,10 +56,15 @@ function TermekekTab() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<FormData>(emptyForm);
+  const [form, setForm] = useState<ProductFormData>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<Record<string, string>>({});
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [draggingImage, setDraggingImage] = useState(false);
+  const [pendingUploadPath, setPendingUploadPath] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchTermekek = () => {
     setLoading(true);
@@ -70,12 +81,18 @@ function TermekekTab() {
   useEffect(() => { fetchTermekek(); }, []);
 
   const openNew = () => {
+    setUploadError("");
+    setDraggingImage(false);
+    setPendingUploadPath(null);
     setEditingId(null);
     setForm({ ...emptyForm, kategoria: kategoriak[0] || "" });
     setShowForm(true);
   };
 
   const openEdit = (t: Termek) => {
+    setUploadError("");
+    setDraggingImage(false);
+    setPendingUploadPath(null);
     setDeleteError((prev) => ({ ...prev, [t.id]: "" }));
     setEditingId(t.id);
     setForm({
@@ -86,28 +103,133 @@ function TermekekTab() {
     setShowForm(true);
   };
 
+  const deleteUploadedImage = async (path: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.access_token) return;
+
+    await fetch("/api/admin/termekek/upload", {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ path }),
+    });
+  };
+
+  const clearPendingUpload = async () => {
+    if (!pendingUploadPath) return;
+
+    const path = pendingUploadPath;
+    setPendingUploadPath(null);
+    await deleteUploadedImage(path).catch(() => undefined);
+  };
+
+  const closeForm = async () => {
+    await clearPendingUpload();
+    setShowForm(false);
+  };
+
+  const uploadImageFile = async (file: File | null | undefined) => {
+    if (!file) return;
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      setUploadError("Csak JPG, PNG vagy WebP kép tölthető fel.");
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      setUploadError("A kép legfeljebb 5 MB lehet.");
+      return;
+    }
+
+    setUploadError("");
+    setUploadingImage(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        throw new Error("A feltöltéshez újra be kell jelentkezni.");
+      }
+
+      const payload = new FormData();
+      payload.append("file", file);
+      payload.append("slug", form.slug || form.nev || "termek");
+
+      const response = await fetch("/api/admin/termekek/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: payload,
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || typeof data.url !== "string" || typeof data.path !== "string") {
+        throw new Error(data.error || "Nem sikerült feltölteni a képet.");
+      }
+
+      const previousPendingUploadPath = pendingUploadPath;
+      setForm((current) => ({ ...current, foto_url: data.url }));
+      setPendingUploadPath(data.path);
+
+      if (previousPendingUploadPath) {
+        void deleteUploadedImage(previousPendingUploadPath);
+      }
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Nem sikerült feltölteni a képet.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleImageInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    await uploadImageFile(event.target.files?.[0]);
+    event.target.value = "";
+  };
+
+  const handleImageDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDraggingImage(false);
+    void uploadImageFile(event.dataTransfer.files?.[0]);
+  };
+
   const handleSave = async () => {
     setSaving(true);
-    if (editingId) {
-      await fetch(`/api/admin/termekek/${editingId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nev: form.nev, slug: form.slug, leiras: form.leiras,
-          kategoria: form.kategoria, ar: Number(form.ar),
-          egyseg: form.egyseg, foto_url: form.foto_url || null,
-        }),
-      });
-    } else {
-      await fetch("/api/admin/termekek", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+    setUploadError("");
+
+    try {
+      const response = editingId
+        ? await fetch(`/api/admin/termekek/${editingId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nev: form.nev, slug: form.slug, leiras: form.leiras,
+              kategoria: form.kategoria, ar: Number(form.ar),
+              egyseg: form.egyseg, foto_url: form.foto_url || null,
+            }),
+          })
+        : await fetch("/api/admin/termekek", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(form),
+          });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Nem sikerült menteni a terméket.");
+      }
+
+      setPendingUploadPath(null);
+      setShowForm(false);
+      fetchTermekek();
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Nem sikerült menteni a terméket.");
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    setShowForm(false);
-    fetchTermekek();
   };
 
   const toggleAktiv = async (t: Termek) => {
@@ -185,7 +307,7 @@ function TermekekTab() {
                   <div className="flex items-center gap-3">
                     <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-cream-dark flex-shrink-0">
                       <Image
-                        src={t.foto_url || "/images/termek-placeholder.jpg"}
+                        src={getTermekFoto(t)}
                         alt={t.nev} fill className="object-cover" sizes="56px"
                       />
                     </div>
@@ -282,20 +404,115 @@ function TermekekTab() {
                   className="w-full px-3 py-2 rounded-lg border border-cream-dark font-sans text-sm bg-white focus:border-gold focus:outline-none resize-none" />
               </div>
               <div>
-                <label className="block font-sans text-xs text-brown/60 mb-1">Fotó URL</label>
-                <input type="text" value={form.foto_url}
-                  onChange={(e) => setForm({ ...form, foto_url: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-cream-dark font-sans text-sm bg-white focus:border-gold focus:outline-none"
-                  placeholder="https://..." />
+                <label className="block font-sans text-xs text-brown/60 mb-1">Kép</label>
+                <div
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    setDraggingImage(true);
+                  }}
+                  onDragLeave={() => setDraggingImage(false)}
+                  onDrop={handleImageDrop}
+                  className={`rounded-xl border border-dashed p-3 transition-colors ${
+                    draggingImage ? "border-gold bg-gold/10" : "border-cream-dark bg-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-cream-dark">
+                      <Image
+                        src={getTermekFoto({
+                          id: "",
+                          slug: "",
+                          nev: form.nev || "Termékkép",
+                          leiras: "",
+                          kategoria: "",
+                          ar: 0,
+                          egyseg: "",
+                          foto_url: form.foto_url || null,
+                        })}
+                        alt="Termékkép előnézet"
+                        fill
+                        className="object-cover"
+                        sizes="80px"
+                      />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploadingImage}
+                          className="inline-flex items-center gap-2 rounded-lg bg-brown-dark px-3 py-2 font-sans text-xs font-semibold text-cream transition-colors hover:bg-brown disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {uploadingImage ? (
+                            <UploadCloud className="h-4 w-4 animate-pulse" />
+                          ) : (
+                            <ImagePlus className="h-4 w-4" />
+                          )}
+                          {uploadingImage ? "Feltöltés..." : form.foto_url ? "Kép cseréje" : "Kép kiválasztása"}
+                        </button>
+                        {form.foto_url && (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              setUploadError("");
+                              await clearPendingUpload();
+                              setForm((current) => ({ ...current, foto_url: "" }));
+                            }}
+                            disabled={uploadingImage}
+                            className="inline-flex items-center gap-2 rounded-lg border border-cream-dark bg-white px-3 py-2 font-sans text-xs font-semibold text-brown/60 transition-colors hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Törlés
+                          </button>
+                        )}
+                      </div>
+                      <p className="mt-2 font-sans text-xs text-brown/45">
+                        JPG, PNG vagy WebP · max. 5 MB
+                      </p>
+                      {form.foto_url && (
+                        <p className="mt-1 truncate font-sans text-[11px] text-brown/35">
+                          {form.foto_url}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleImageInputChange}
+                    className="hidden"
+                  />
+                </div>
+                {uploadError && (
+                  <p className="mt-2 font-sans text-xs text-red-500">{uploadError}</p>
+                )}
+                <div className="mt-3">
+                  <label className="mb-1 flex items-center gap-1.5 font-sans text-xs text-brown/50">
+                    <LinkIcon className="h-3 w-3" />
+                    Kép URL
+                  </label>
+                  <input
+                    type="text"
+                    value={form.foto_url}
+                    onChange={(e) => {
+                      if (pendingUploadPath) void clearPendingUpload();
+                      setForm({ ...form, foto_url: e.target.value });
+                    }}
+                    className="w-full rounded-lg border border-cream-dark bg-white px-3 py-2 font-sans text-sm focus:border-gold focus:outline-none"
+                    placeholder="/images/... vagy Supabase Storage URL"
+                  />
+                </div>
               </div>
             </div>
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setShowForm(false)}
+              <button onClick={closeForm}
                 className="flex-1 py-2.5 rounded-lg font-sans text-sm border border-cream-dark text-brown/60 hover:bg-cream-dark transition-colors cursor-pointer">
                 Mégsem
               </button>
               <button onClick={handleSave}
-                disabled={saving || !form.nev || !form.slug || !form.ar}
+                disabled={saving || uploadingImage || !form.nev || !form.slug || !form.ar}
                 className="flex-1 py-2.5 rounded-lg font-sans text-sm font-semibold bg-gold text-brown-dark hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
                 {saving ? "Mentés..." : "Mentés"}
               </button>

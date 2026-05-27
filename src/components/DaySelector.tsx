@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/store";
+import { pushDataLayerEvent } from "@/lib/tracking";
 
 type Day = {
   nap: string;
@@ -79,6 +80,18 @@ export default function DaySelector({
     const chosenDays = days
       .filter((d) => selected.includes(d.datum))
       .map((d) => ({ nap: d.nap, datum: d.datum }));
+
+    pushDataLayerEvent("preorder_started", {
+      selected_pickup_days_count: chosenDays.length,
+      pickup_dates: chosenDays.map((day) => day.datum),
+      pickup_days: chosenDays.map((day) => day.nap),
+    });
+    pushDataLayerEvent("pickup_date_selected", {
+      selected_pickup_days_count: chosenDays.length,
+      pickup_dates: chosenDays.map((day) => day.datum),
+      pickup_days: chosenDays.map((day) => day.nap),
+    });
+
     setSelectedDays(chosenDays);
     router.push(redirectTo);
   };

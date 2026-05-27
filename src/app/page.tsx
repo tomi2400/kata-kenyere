@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
 import GalleryStrip from "@/components/GalleryStrip";
 import CookieSettingsButton from "@/components/CookieSettingsButton";
+import TrackedLink from "@/components/TrackedLink";
 import { defaultOpenGraphImage } from "@/lib/seo";
 import { SOCIAL_LINKS } from "@/lib/social";
 import {
@@ -124,12 +125,16 @@ export default async function Home() {
               </p>
 
               <div className="mt-9 flex flex-wrap gap-3 reveal-up delay-3">
-                <Link
+                <TrackedLink
                   href="/elorendeles"
+                  trackingData={{
+                    cta_location: "home_hero",
+                    cta_label: "Előrendelés",
+                  }}
                   className="inline-flex min-w-[10.5rem] items-center justify-center rounded-full bg-[#c79a66] px-7 py-[0.95rem] font-sans text-[0.875rem] font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(199,154,102,0.38)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b98b58] hover:shadow-[0_14px_32px_rgba(199,154,102,0.44)]"
                 >
                   Előrendelés
-                </Link>
+                </TrackedLink>
                 <Link
                   href="#kinalat"
                   className="inline-flex min-w-[10.5rem] items-center justify-center gap-2 rounded-full border border-[#f3e4d1]/28 bg-white/8 px-7 py-[0.95rem] font-sans text-[0.875rem] font-medium text-[#fff2e3] backdrop-blur-sm transition-all duration-300 hover:border-[#f3e4d1]/44 hover:bg-white/14"
@@ -388,13 +393,17 @@ export default async function Home() {
             </p>
 
             {/* Arany CTA — pontosan mint a hero primary gombja */}
-            <Link
+            <TrackedLink
               href="/elorendeles"
+              trackingData={{
+                cta_location: "home_final",
+                cta_label: "Előrendelés indítása",
+              }}
               className="mt-8 inline-flex cursor-pointer items-center gap-2.5 rounded-full bg-[#c79a66] px-8 py-[0.95rem] text-sm font-semibold text-[#fff9f0] shadow-[0_8px_24px_rgba(199,154,102,0.38)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b98b58] hover:shadow-[0_14px_32px_rgba(199,154,102,0.44)]"
             >
               Előrendelés indítása
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </TrackedLink>
 
             {/* Trust strip — azonos pattern mint a hero trust stripje */}
             <div className="mt-8">

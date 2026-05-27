@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { pushDataLayerEvent } from "@/lib/tracking";
 
 const LINKS = [
   { href: "/termekek", label: "Termékek" },
@@ -76,6 +77,12 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
             <div className="flex items-center gap-3 justify-self-end">
               <Link
                 href="/elorendeles"
+                onClick={() =>
+                  pushDataLayerEvent("cta_clicked", {
+                    cta_location: "navbar_desktop",
+                    cta_label: "Előrendelés",
+                  })
+                }
                 className="hidden sm:flex items-center gap-1.5 rounded-full px-5 py-2.5 font-sans text-sm font-semibold bg-[#c79a66] text-[#fff7eb] hover:bg-[#b98b58] transition-colors reveal-up delay-2"
               >
                 Előrendelés
@@ -118,7 +125,13 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
             <div className="pt-2">
               <Link
                 href="/elorendeles"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  pushDataLayerEvent("cta_clicked", {
+                    cta_location: "navbar_mobile",
+                    cta_label: "Előrendelés",
+                  });
+                  setOpen(false);
+                }}
                 className="flex items-center justify-center gap-2 w-full py-3 rounded-full font-sans font-bold text-sm bg-[#c79a66] text-[#fff7eb]"
               >
                 Előrendelés →

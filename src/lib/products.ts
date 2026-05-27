@@ -9,9 +9,33 @@ export type Termek = {
   foto_url: string | null;
 };
 
+const TERMEK_PLACEHOLDER_FOTO = "/images/termek-placeholder.jpg";
+
+function isSupportedImageSrc(src: string): boolean {
+  if (src.startsWith("/")) return true;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) return false;
+
+  try {
+    const imageUrl = new URL(src);
+    const storageUrl = new URL(supabaseUrl);
+
+    return (
+      imageUrl.protocol === "https:" &&
+      imageUrl.hostname === storageUrl.hostname &&
+      imageUrl.pathname.startsWith("/storage/v1/object/public/")
+    );
+  } catch {
+    return false;
+  }
+}
+
 // Placeholder fotó ha nincs saját kép
 export function getTermekFoto(termek: Termek): string {
-  return termek.foto_url || "/images/termek-placeholder.jpg";
+  const fotoUrl = termek.foto_url?.trim();
+
+  return fotoUrl && isSupportedImageSrc(fotoUrl) ? fotoUrl : TERMEK_PLACEHOLDER_FOTO;
 }
 
 // Termékek csoportosítása kategóriánként (API válaszból)
