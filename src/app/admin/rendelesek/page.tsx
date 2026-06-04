@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/lib/admin-api";
 
 type Tetel = {
   id: string;
@@ -59,7 +60,7 @@ export default function RendelesekPage() {
     if (allapot !== "mind") params.set("allapot", allapot);
     if (datum) params.set("datum", datum);
 
-    fetch(`/api/admin/rendelesek?${params}`)
+    adminFetch(`/api/admin/rendelesek?${params}`)
       .then((res) => res.json())
       .then((data) => {
         setRendelesek(data.rendelesek ?? []);
@@ -75,7 +76,7 @@ export default function RendelesekPage() {
   const updateNapiAllapot = async (id: string, datum: string, allapot: string) => {
     const key = `${id}_${datum}_${allapot}`;
     setUpdatingKey(key);
-    await fetch(`/api/admin/rendelesek/${id}`, {
+    await adminFetch(`/api/admin/rendelesek/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ datum, allapot }),
@@ -90,7 +91,7 @@ export default function RendelesekPage() {
 
     const key = `${id}_${datum}_date`;
     setUpdatingKey(key);
-    await fetch(`/api/admin/rendelesek/${id}`, {
+    await adminFetch(`/api/admin/rendelesek/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ datum, ujDatum: trimmedUjDatum }),

@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 // GET: visszaadja az engedélyezett termék ID-kat erre a napra
 // Üres tömb = minden termék elérhető (nincs korlátozás)
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: { nap_id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   const { data, error } = await supabaseAdmin
     .from("napi_termekek")
     .select("termek_id")
@@ -26,6 +32,9 @@ export async function PUT(
   request: Request,
   { params }: { params: { nap_id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   const body = await request.json();
   const { termek_ids }: { termek_ids: string[] } = body;
 

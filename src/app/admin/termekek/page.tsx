@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef, type ChangeEvent, type DragEvent } from "react";
 import Image from "next/image";
 import { ImagePlus, LinkIcon, Trash2, UploadCloud } from "lucide-react";
+import { adminFetch } from "@/lib/admin-api";
 import { getTermekFoto } from "@/lib/products";
-import { supabase } from "@/lib/supabase/client";
 
 type Termek = {
   id: string;
@@ -68,7 +68,7 @@ function TermekekTab() {
 
   const fetchTermekek = () => {
     setLoading(true);
-    fetch("/api/admin/termekek")
+    adminFetch("/api/admin/termekek")
       .then((r) => r.json())
       .then((d) => {
         setTermekek(d.termekek ?? []);
@@ -104,14 +104,9 @@ function TermekekTab() {
   };
 
   const deleteUploadedImage = async (path: string) => {
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (!session?.access_token) return;
-
-    await fetch("/api/admin/termekek/upload", {
+    await adminFetch("/api/admin/termekek/upload", {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${session.access_token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ path }),
@@ -148,21 +143,12 @@ function TermekekTab() {
     setUploadingImage(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session?.access_token) {
-        throw new Error("A feltöltéshez újra be kell jelentkezni.");
-      }
-
       const payload = new FormData();
       payload.append("file", file);
       payload.append("slug", form.slug || form.nev || "termek");
 
-      const response = await fetch("/api/admin/termekek/upload", {
+      const response = await adminFetch("/api/admin/termekek/upload", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
         body: payload,
       });
       const data = await response.json().catch(() => ({}));
@@ -202,7 +188,7 @@ function TermekekTab() {
 
     try {
       const response = editingId
-        ? await fetch(`/api/admin/termekek/${editingId}`, {
+        ? await adminFetch(`/api/admin/termekek/${editingId}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -211,7 +197,7 @@ function TermekekTab() {
               egyseg: form.egyseg, foto_url: form.foto_url || null,
             }),
           })
-        : await fetch("/api/admin/termekek", {
+        : await adminFetch("/api/admin/termekek", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(form),
@@ -233,7 +219,7 @@ function TermekekTab() {
   };
 
   const toggleAktiv = async (t: Termek) => {
-    await fetch(`/api/admin/termekek/${t.id}`, {
+    await adminFetch(`/api/admin/termekek/${t.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ aktiv: !t.aktiv }),
@@ -248,7 +234,7 @@ function TermekekTab() {
     if (!biztos) return;
 
     setDeletingId(t.id);
-    const res = await fetch(`/api/admin/termekek/${t.id}`, { method: "DELETE" });
+    const res = await adminFetch(`/api/admin/termekek/${t.id}`, { method: "DELETE" });
     setDeletingId(null);
 
     if (res.ok) {
@@ -538,7 +524,7 @@ function KategoriakTab() {
 
   const fetchKategoriak = () => {
     setLoading(true);
-    fetch("/api/admin/kategoriak")
+    adminFetch("/api/admin/kategoriak")
       .then((r) => r.json())
       .then((d) => {
         setKategoriak(d.kategoriak ?? []);
@@ -552,7 +538,7 @@ function KategoriakTab() {
   const handleAdd = async () => {
     if (!newNev.trim()) return;
     setAdding(true);
-    await fetch("/api/admin/kategoriak", {
+    await adminFetch("/api/admin/kategoriak", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nev: newNev.trim() }),
@@ -573,7 +559,7 @@ function KategoriakTab() {
       setEditingId(null);
       return;
     }
-    await fetch(`/api/admin/kategoriak/${k.id}`, {
+    await adminFetch(`/api/admin/kategoriak/${k.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nev: editNev.trim() }),
@@ -589,12 +575,12 @@ function KategoriakTab() {
     if (!swapWith) return;
 
     await Promise.all([
-      fetch(`/api/admin/kategoriak/${k.id}`, {
+      adminFetch(`/api/admin/kategoriak/${k.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sorrend: swapWith.sorrend }),
       }),
-      fetch(`/api/admin/kategoriak/${swapWith.id}`, {
+      adminFetch(`/api/admin/kategoriak/${swapWith.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sorrend: k.sorrend }),
@@ -605,7 +591,7 @@ function KategoriakTab() {
 
   const handleDelete = async (k: Kategoria) => {
     setDeleteError((prev) => ({ ...prev, [k.id]: "" }));
-    const res = await fetch(`/api/admin/kategoriak/${k.id}`, { method: "DELETE" });
+    const res = await adminFetch(`/api/admin/kategoriak/${k.id}`, { method: "DELETE" });
     if (res.ok) {
       fetchKategoriak();
     } else {

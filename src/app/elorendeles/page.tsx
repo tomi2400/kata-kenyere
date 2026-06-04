@@ -35,10 +35,28 @@ export default async function ElorendelesPage() {
 
   const days = (napok ?? [])
     .filter((nap) => nap.hatarido && new Date(nap.hatarido) > now)
+    .slice(0, 90);
+  const dayIds = days.map((nap) => nap.id);
+  const { data: napiTermekek } = dayIds.length > 0
+    ? await supabaseAdmin
+      .from("napi_termekek")
+      .select("rendeles_nap_id, termek_id")
+      .in("rendeles_nap_id", dayIds)
+    : { data: [] };
+  const korlatozasokByDay = new Map<string, string[]>();
+
+  for (const row of napiTermekek ?? []) {
+    const ids = korlatozasokByDay.get(row.rendeles_nap_id) ?? [];
+    ids.push(row.termek_id);
+    korlatozasokByDay.set(row.rendeles_nap_id, ids);
+  }
+
+  const selectableDays = days
     .map((nap) => ({
       nap: nap.nap as string,
       datum: nap.datum,
       hatarido: formatHatarido(nap.hatarido),
+      korlatozott_termek_ids: korlatozasokByDay.get(nap.id) ?? [],
     }));
 
   return (
@@ -88,7 +106,7 @@ export default async function ElorendelesPage() {
           ))}
         </div>
 
-        <DaySelector days={days} redirectTo="/valasztas" />
+        <DaySelector days={selectableDays} redirectTo="/valasztas" />
 
         {/* Info sáv */}
         <div className="mt-10 grid grid-cols-3 gap-3 text-center">

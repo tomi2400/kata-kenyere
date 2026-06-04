@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: { datum: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   const { datum } = params;
 
   // Napi gyartasi osszesito: termekenkent ossz mennyiseg

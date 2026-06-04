@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { deriveRendelesDisplayAllapot, isTetelAllapot } from "@/lib/rendeles-allapot";
+
+export const dynamic = "force-dynamic";
 
 const NAP_NEVEK: Record<number, string> = {
   0: "Vasárnap",
@@ -46,6 +49,9 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   const body = await request.json();
   const { allapot, datum, ujDatum, tetelId } = body;
 

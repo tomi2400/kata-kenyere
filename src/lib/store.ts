@@ -16,11 +16,17 @@ export type DayCart = {
   items: CartItem[];
 };
 
+export type SelectedOrderDay = {
+  nap: string;
+  datum: string;
+  korlatozott_termek_ids?: string[];
+};
+
 type CartStore = {
-  selectedDays: { nap: string; datum: string }[];
+  selectedDays: SelectedOrderDay[];
   carts: Record<string, CartItem[]>; // datum -> items
   currentStep: number;
-  setSelectedDays: (days: { nap: string; datum: string }[]) => void;
+  setSelectedDays: (days: SelectedOrderDay[]) => void;
   setCurrentStep: (step: number) => void;
   setQuantity: (datum: string, item: Omit<CartItem, "mennyiseg">, qty: number) => void;
   getTotal: () => number;

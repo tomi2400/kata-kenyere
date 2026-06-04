@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import {
   deriveNapiAllapotok,
@@ -6,6 +7,8 @@ import {
   matchesAllapotFilter,
   normalizeTetelAllapot,
 } from "@/lib/rendeles-allapot";
+
+export const dynamic = "force-dynamic";
 
 type ProductRow = {
   id: string;
@@ -129,6 +132,9 @@ function isMissingStockTable(error: { message?: string; code?: string } | null) 
 }
 
 export async function GET(request: Request) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   const { searchParams } = new URL(request.url);
   const { tol, ig } = getDateRange(searchParams);
   const query = (searchParams.get("q") ?? "").trim().toLowerCase();

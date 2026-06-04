@@ -1,13 +1,19 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 // Kovetkezo 2 het kedd-pentek napjainak automatikus generelasa
-export async function POST() {
+export async function POST(request: Request) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   const NAP_NEVEK: Record<number, string> = {
     2: "Kedd",
     3: "Szerda",
-    4: "Csutortok",
-    5: "Pentek",
+    4: "Csütörtök",
+    5: "Péntek",
   };
 
   const today = new Date();

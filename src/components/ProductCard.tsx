@@ -5,6 +5,8 @@ import { useCartStore } from "@/lib/store";
 import { formatAr, getTermekFoto, type Termek } from "@/lib/products";
 import { pushDataLayerEvent } from "@/lib/tracking";
 
+const MAX_ITEM_QUANTITY = 99;
+
 export default function ProductCard({ termek, datum }: { termek: Termek; datum: string }) {
   const { carts, setQuantity } = useCartStore();
   const dayItems = carts[datum] ?? [];
@@ -12,7 +14,9 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
   const qty = item?.mennyiseg ?? 0;
 
   const change = (delta: number) => {
-    const newQty = Math.max(0, qty + delta);
+    const newQty = Math.min(MAX_ITEM_QUANTITY, Math.max(0, qty + delta));
+    if (newQty === qty) return;
+
     const eventName = delta > 0 ? "product_added" : "product_quantity_changed";
 
     pushDataLayerEvent(eventName, {
@@ -121,6 +125,7 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
               <span className="font-sans text-xs font-bold text-brown-dark sm:text-sm">{qty} db</span>
               <button
                 onClick={() => change(1)}
+                disabled={qty >= MAX_ITEM_QUANTITY}
                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-brown-dark text-sm font-bold text-cream transition-colors hover:bg-brown sm:h-9 sm:w-9 sm:text-base"
                 aria-label="Több"
               >

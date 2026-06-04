@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 type OrderRow = {
   id: string;
@@ -44,6 +47,9 @@ function getWeekdayLabel(dateStr: string) {
 }
 
 export async function GET(request: Request) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   const { searchParams } = new URL(request.url);
 
   let tolStr: string;

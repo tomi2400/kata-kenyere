@@ -44,8 +44,11 @@ export default function TermekekPage() {
     );
   }
 
-  const termekekByKategoria = csoportositByKategoria(termekek, kategoriak);
   const currentDay = selectedDays[currentStep];
+  const availableTermekek = currentDay.korlatozott_termek_ids?.length
+    ? termekek.filter((termek) => currentDay.korlatozott_termek_ids?.includes(termek.id))
+    : termekek;
+  const termekekByKategoria = csoportositByKategoria(availableTermekek, kategoriak);
   const isLastDay = currentStep === selectedDays.length - 1;
   const dayTotal = getDayTotal(currentDay.datum);
   const totalItems = (carts[currentDay.datum] ?? []).reduce((s, i) => s + i.mennyiseg, 0);

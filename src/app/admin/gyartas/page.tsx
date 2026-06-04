@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { adminFetch } from "@/lib/admin-api";
 
 type GyartasItem = {
   termek_nev: string;
@@ -24,7 +25,7 @@ export default function GyartasPage() {
   // Gyártási lista betöltése a kiválasztott napra
   const loadItems = useCallback((datum: string) => {
     setLoading(true);
-    fetch(`/api/admin/gyartas/${datum}`)
+    adminFetch(`/api/admin/gyartas/${datum}`)
       .then((res) => res.json())
       .then((data) => {
         const normalized = (data.items ?? []).map((item: GyartasItem) => ({

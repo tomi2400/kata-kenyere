@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { requireAdmin } from "@/lib/admin-auth";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -15,43 +16,10 @@ const ALLOWED_IMAGE_TYPES: Record<string, string> = {
 
 let bucketReady = false;
 
+export const dynamic = "force-dynamic";
+
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
-}
-
-function getBearerToken(request: Request) {
-  const authHeader = request.headers.get("authorization") ?? "";
-  const [scheme, token] = authHeader.split(" ");
-
-  if (scheme.toLowerCase() !== "bearer" || !token) return null;
-
-  return token;
-}
-
-async function requireAdmin(request: Request, supabase: SupabaseClient) {
-  const token = getBearerToken(request);
-
-  if (!token) {
-    return jsonError("Nincs bejelentkezett admin felhasználó.", 401);
-  }
-
-  const { data: userData, error: userError } = await supabase.auth.getUser(token);
-
-  if (userError || !userData.user) {
-    return jsonError("Érvénytelen vagy lejárt bejelentkezés.", 401);
-  }
-
-  const { data: adminRow, error: adminError } = await supabase
-    .from("admin_users")
-    .select("id")
-    .eq("id", userData.user.id)
-    .maybeSingle();
-
-  if (adminError || !adminRow) {
-    return jsonError("Ehhez a művelethez admin jogosultság szükséges.", 403);
-  }
-
-  return null;
 }
 
 async function ensureProductImageBucket(supabase: SupabaseClient) {

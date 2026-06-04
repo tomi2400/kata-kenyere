@@ -44,7 +44,14 @@ export function csoportositByKategoria(
   kategoriak: string[]
 ): Record<string, Termek[]> {
   const result: Record<string, Termek[]> = {};
-  for (const kat of kategoriak) {
+  const rendezettKategoriak = [
+    ...kategoriak,
+    ...Array.from(new Set(termekek.map((termek) => termek.kategoria))).filter(
+      (kategoria) => !kategoriak.includes(kategoria)
+    ),
+  ];
+
+  for (const kat of rendezettKategoriak) {
     const items = termekek.filter((t) => t.kategoria === kat);
     if (items.length > 0) result[kat] = items;
   }

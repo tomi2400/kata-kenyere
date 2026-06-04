@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { adminFetch } from "@/lib/admin-api";
 
 type ProductStat = {
   nev: string;
@@ -195,7 +196,7 @@ export default function StatisztikaPage() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/admin/statisztika?tol=${tol}&ig=${ig}`)
+    adminFetch(`/api/admin/statisztika?tol=${tol}&ig=${ig}`)
       .then((response) => response.json())
       .then((data) => {
         setStats(data);

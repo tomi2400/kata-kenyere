@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
+import { unstable_noStore as noStore } from "next/cache";
 import { supabase } from "@/lib/supabase/client";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
+  noStore();
+
   const now = new Date();
 
   // Nyitott, jövőbeli napok lekérése

@@ -9,6 +9,7 @@ type Day = {
   nap: string;
   datum: string;
   hatarido: string;
+  korlatozott_termek_ids?: string[];
 };
 
 const HU_MONTHS = [
@@ -79,7 +80,11 @@ export default function DaySelector({
     if (selected.length === 0) return;
     const chosenDays = days
       .filter((d) => selected.includes(d.datum))
-      .map((d) => ({ nap: d.nap, datum: d.datum }));
+      .map((d) => ({
+        nap: d.nap,
+        datum: d.datum,
+        korlatozott_termek_ids: d.korlatozott_termek_ids ?? [],
+      }));
 
     pushDataLayerEvent("preorder_started", {
       selected_pickup_days_count: chosenDays.length,

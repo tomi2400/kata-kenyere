@@ -14,11 +14,11 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Kovászos kenyerek és péksütemények – Kínálatunk",
-  description: "Fehér kovászos kenyér, rozsos cipó, kakaós csiga, fahéjas batyu, kifli és sok más kézműves pékáru. Természetes alapanyagok, adalékanyag nélkül. Pécs, Salakhegyi út 14.",
+  description: "Kovászos kenyerek, ízesített és teljes kiőrlésű kenyerek, kalácsok, babka, kakaós csiga, pogácsák, kiflik és sós péksütemények. Pécs, Salakhegyi út 14.",
   alternates: { canonical: "https://katakenyere.hu/termekek" },
   openGraph: {
     title: "Kata Kenyere kínálata – Kovászos kenyerek és péksütemények",
-    description: "Kézzel formázott kovászos kenyerek, csigák, kiflik és különlegességek. Minden nap frissen sütve.",
+    description: "Kézzel formázott kovászos kenyerek, kalácsok, édes és sós péksütemények. Minden nap frissen sütve.",
     url: "https://katakenyere.hu/termekek",
     images: [defaultOpenGraphImage],
   },

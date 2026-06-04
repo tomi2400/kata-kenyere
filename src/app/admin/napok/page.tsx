@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { adminFetch } from "@/lib/admin-api";
 
 type RendelesNap = {
   id: string;
@@ -89,7 +90,7 @@ export default function NapokPage() {
     setLoading(true);
     const tol = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-01`;
     const ig = toLocalDateStr(new Date(viewYear, viewMonth + 1, 0));
-    fetch(`/api/admin/rendeles-napok?tol=${tol}&ig=${ig}`)
+    adminFetch(`/api/admin/rendeles-napok?tol=${tol}&ig=${ig}`)
       .then((r) => r.json())
       .then((d) => {
         setNapok(d.napok ?? []);
@@ -104,7 +105,7 @@ export default function NapokPage() {
 
   // Termékek betöltése (egyszer)
   useEffect(() => {
-    fetch("/api/admin/termekek")
+    adminFetch("/api/admin/termekek")
       .then((r) => r.json())
       .then((d) => {
         setAllTermekek((d.termekek ?? []).filter((t: Termek) => t.aktiv));
@@ -116,7 +117,7 @@ export default function NapokPage() {
   useEffect(() => {
     if (!editNap) return;
     setNapiTermekIds(null);
-    fetch(`/api/admin/napi-termekek/${editNap.id}`)
+    adminFetch(`/api/admin/napi-termekek/${editNap.id}`)
       .then((r) => r.json())
       .then((d) => setNapiTermekIds(d.termek_ids ?? []));
   }, [editNap]);
@@ -143,7 +144,7 @@ export default function NapokPage() {
 
   const createDay = async (datum: string) => {
     setCreating(true);
-    const res = await fetch("/api/admin/rendeles-napok", {
+    const res = await adminFetch("/api/admin/rendeles-napok", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ datum }),
@@ -173,7 +174,7 @@ export default function NapokPage() {
       ? new Date(editHatarido).toISOString()
       : null;
 
-    await fetch(`/api/admin/rendeles-napok/${editNap.id}`, {
+    await adminFetch(`/api/admin/rendeles-napok/${editNap.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nyitott: editNyitott, hatarido: hatarisoISO }),
@@ -192,7 +193,7 @@ export default function NapokPage() {
     if (!editNap) return;
     setDeleting(true);
     setDeleteError("");
-    const res = await fetch(`/api/admin/rendeles-napok/${editNap.id}`, { method: "DELETE" });
+    const res = await adminFetch(`/api/admin/rendeles-napok/${editNap.id}`, { method: "DELETE" });
     const data = await res.json();
     setDeleting(false);
     if (res.ok) {
@@ -206,7 +207,7 @@ export default function NapokPage() {
   const saveTermekek = async (newIds: string[]) => {
     if (!editNap) return;
     setTermekSaving(true);
-    await fetch(`/api/admin/napi-termekek/${editNap.id}`, {
+    await adminFetch(`/api/admin/napi-termekek/${editNap.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ termek_ids: newIds }),

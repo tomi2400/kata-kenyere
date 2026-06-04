@@ -1,7 +1,12 @@
+import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { sendOrderConfirmationEmail } from "@/lib/order-email";
 import { getPrimaryMarketingTouch, sanitizeMarketingAttribution } from "@/lib/tracking";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 type SubmittedOrderItem = {
   nap: string;
@@ -25,6 +30,88 @@ type OrderInsertItem = {
   reszosszeg: number;
   allapot: "uj";
 };
+
+type PreparedOrderItem = Omit<OrderInsertItem, "rendeles_id" | "allapot">;
+
+type ProductRow = {
+  id: string;
+  slug: string;
+  nev: string;
+  ar: number;
+  egyseg: string;
+};
+
+type OrderDayRow = {
+  id: string;
+  datum: string;
+  nap: string;
+  nyitott: boolean;
+  hatarido: string | null;
+};
+
+type NapiTermekRow = {
+  rendeles_nap_id: string;
+  termek_id: string;
+};
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_ITEM_QUANTITY = 99;
+
+const NAP_NEVEK: Record<number, string> = {
+  0: "Vasárnap",
+  1: "Hétfő",
+  2: "Kedd",
+  3: "Szerda",
+  4: "Csütörtök",
+  5: "Péntek",
+  6: "Szombat",
+};
+
+function getBudapestDateStamp() {
+  const parts = new Intl.DateTimeFormat("hu-HU", {
+    timeZone: "Europe/Budapest",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+
+  const year = parts.find((part) => part.type === "year")?.value ?? "0000";
+  const month = parts.find((part) => part.type === "month")?.value ?? "00";
+  const day = parts.find((part) => part.type === "day")?.value ?? "00";
+
+  return `${year}${month}${day}`;
+}
+
+function getBudapestDateInput() {
+  const stamp = getBudapestDateStamp();
+
+  return `${stamp.slice(0, 4)}-${stamp.slice(4, 6)}-${stamp.slice(6, 8)}`;
+}
+
+function generateRendelesSzam() {
+  const suffix = randomUUID().replace(/-/g, "").slice(0, 6).toUpperCase();
+
+  return `KK-${getBudapestDateStamp()}-${suffix}`;
+}
+
+function getNapNev(datum: string) {
+  return NAP_NEVEK[new Date(`${datum}T12:00:00`).getDay()] ?? datum;
+}
+
+function toSafeQuantity(value: unknown) {
+  const numberValue = Number(value);
+
+  if (!Number.isFinite(numberValue) || numberValue <= 0) return null;
+
+  const rounded = Math.round(numberValue);
+  if (rounded > MAX_ITEM_QUANTITY) return null;
+
+  return rounded;
+}
+
+function isDuplicateOrderNumberError(error: { code?: string; message?: string } | null) {
+  return error?.code === "23505" && (error.message ?? "").toLowerCase().includes("rendeles_szam");
+}
 
 function isMissingMarketingColumnsError(error: { code?: string; message?: string; details?: string | null }) {
   const text = `${error.code ?? ""} ${error.message ?? ""} ${error.details ?? ""}`.toLowerCase();
@@ -53,12 +140,161 @@ function isSubmittedOrderItem(item: unknown): item is SubmittedOrderItem {
   );
 }
 
+async function prepareOrderItems(
+  submittedItems: SubmittedOrderItem[],
+  isManualOrder: boolean
+): Promise<
+  | { ok: true; items: PreparedOrderItem[]; total: number }
+  | { ok: false; error: string; status: number }
+> {
+  const aggregated = new Map<string, { datum: string; termekSlug: string; mennyiseg: number }>();
+
+  for (const item of submittedItems) {
+    if (!DATE_RE.test(item.datum)) {
+      return { ok: false, error: "Érvénytelen átvételi dátum.", status: 400 };
+    }
+
+    const mennyiseg = toSafeQuantity(item.mennyiseg);
+    if (!mennyiseg) {
+      return {
+        ok: false,
+        error: `Egy tételből legfeljebb ${MAX_ITEM_QUANTITY} darab rendelhető egyszerre.`,
+        status: 400,
+      };
+    }
+
+    const termekSlug = item.termekId.trim();
+    const key = `${item.datum}__${termekSlug}`;
+    const current = aggregated.get(key);
+    const nextQuantity = (current?.mennyiseg ?? 0) + mennyiseg;
+
+    if (nextQuantity > MAX_ITEM_QUANTITY) {
+      return {
+        ok: false,
+        error: `Egy tételből legfeljebb ${MAX_ITEM_QUANTITY} darab rendelhető egyszerre.`,
+        status: 400,
+      };
+    }
+
+    aggregated.set(key, {
+      datum: item.datum,
+      termekSlug,
+      mennyiseg: nextQuantity,
+    });
+  }
+
+  const requestedItems = Array.from(aggregated.values());
+  const slugok = Array.from(new Set(requestedItems.map((item) => item.termekSlug)));
+  const datumok = Array.from(new Set(requestedItems.map((item) => item.datum)));
+
+  const { data: termekek, error: termekError } = await supabaseAdmin
+    .from("termekek")
+    .select("id, slug, nev, ar, egyseg")
+    .eq("aktiv", true)
+    .in("slug", slugok);
+
+  if (termekError) {
+    return { ok: false, error: "Hiba a termékek ellenőrzésekor.", status: 500 };
+  }
+
+  const productBySlug = new Map(((termekek ?? []) as ProductRow[]).map((termek) => [termek.slug, termek]));
+  const missingProduct = slugok.find((slug) => !productBySlug.has(slug));
+
+  if (missingProduct) {
+    return {
+      ok: false,
+      error: "A kosárban van olyan termék, ami már nem rendelhető. Frissítsd az oldalt és ellenőrizd a kosarat.",
+      status: 400,
+    };
+  }
+
+  const { data: napok, error: napError } = await supabaseAdmin
+    .from("rendeles_napok")
+    .select("id, datum, nap, nyitott, hatarido")
+    .in("datum", datumok);
+
+  if (napError) {
+    return { ok: false, error: "Hiba az átvételi napok ellenőrzésekor.", status: 500 };
+  }
+
+  const now = new Date();
+  const today = getBudapestDateInput();
+  const dayByDate = new Map(((napok ?? []) as OrderDayRow[]).map((nap) => [nap.datum, nap]));
+
+  if (!isManualOrder) {
+    for (const datum of datumok) {
+      const nap = dayByDate.get(datum);
+      const hatarido = nap?.hatarido ? new Date(nap.hatarido) : null;
+
+      if (!nap || !nap.nyitott || datum < today || !hatarido || hatarido <= now) {
+        return {
+          ok: false,
+          error: "A kiválasztott átvételi nap már nem rendelhető. Kérlek válassz új napot.",
+          status: 400,
+        };
+      }
+    }
+  }
+
+  const napIds = Array.from(new Set((napok ?? []).map((nap) => nap.id)));
+  const { data: napiTermekek, error: napiTermekekError } = napIds.length > 0
+    ? await supabaseAdmin
+      .from("napi_termekek")
+      .select("rendeles_nap_id, termek_id")
+      .in("rendeles_nap_id", napIds)
+    : { data: [], error: null };
+
+  if (napiTermekekError) {
+    return { ok: false, error: "Hiba a napi kínálat ellenőrzésekor.", status: 500 };
+  }
+
+  const allowedProductsByDayId = new Map<string, Set<string>>();
+  for (const row of (napiTermekek ?? []) as NapiTermekRow[]) {
+    const current = allowedProductsByDayId.get(row.rendeles_nap_id) ?? new Set<string>();
+    current.add(row.termek_id);
+    allowedProductsByDayId.set(row.rendeles_nap_id, current);
+  }
+
+  const items: PreparedOrderItem[] = [];
+
+  for (const item of requestedItems) {
+    const product = productBySlug.get(item.termekSlug)!;
+    const nap = dayByDate.get(item.datum) ?? null;
+    const allowedProducts = nap ? allowedProductsByDayId.get(nap.id) : undefined;
+
+    if (!isManualOrder && allowedProducts && allowedProducts.size > 0 && !allowedProducts.has(product.id)) {
+      return {
+        ok: false,
+        error: `${product.nev} a kiválasztott átvételi napon már nem elérhető.`,
+        status: 400,
+      };
+    }
+
+    items.push({
+      rendeles_nap_id: nap?.id ?? null,
+      termek_id: product.id,
+      datum: item.datum,
+      nap: nap?.nap ?? getNapNev(item.datum),
+      termek_nev: product.nev,
+      mennyiseg: item.mennyiseg,
+      egysegar: product.ar,
+      reszosszeg: item.mennyiseg * product.ar,
+    });
+  }
+
+  return {
+    ok: true,
+    items,
+    total: items.reduce((sum, item) => sum + item.reszosszeg, 0),
+  };
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { nev, email, telefon, megjegyzes, rendelesek } = body;
     const isManualOrder = body.source === "admin_manual" || body.manual === true;
-    const sendEmail = body.sendEmail !== false;
+    const sendEmail = isManualOrder ? body.sendEmail !== false : true;
     const vevoNev = typeof nev === "string" ? nev.trim() : "";
     const vevoEmail = typeof email === "string" ? email.trim() : "";
     const vevoTelefon = typeof telefon === "string" ? telefon.trim() : "";
@@ -66,6 +302,11 @@ export async function POST(request: Request) {
     const submittedRendelesek = Array.isArray(rendelesek) ? rendelesek.filter(isSubmittedOrderItem) : [];
     const marketingAttribution = sanitizeMarketingAttribution(body.marketingAttribution);
     const primaryMarketingTouch = getPrimaryMarketingTouch(marketingAttribution);
+
+    if (isManualOrder) {
+      const authError = await requireAdmin(request);
+      if (authError) return authError;
+    }
 
     // Validáció
     if (!isManualOrder && !vevoNev) {
@@ -81,31 +322,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Legalább egy tétel szükséges" }, { status: 400 });
     }
 
-    const szamoltVegosszeg = submittedRendelesek.reduce(
-      (sum: number, r: { egysegar: number; mennyiseg: number }) =>
-        sum + Number(r.egysegar || 0) * Number(r.mennyiseg || 0),
-      0
-    );
+    const preparedOrder = await prepareOrderItems(submittedRendelesek, isManualOrder);
 
-    // Rendelésszám generálása: KK-YYYYMMDD-NNN
-    const today = new Date().toISOString().split("T")[0].replace(/-/g, "");
-    const { count } = await supabaseAdmin
-      .from("rendelesek")
-      .select("*", { count: "exact", head: true })
-      .like("rendeles_szam", `KK-${today}-%`);
-    const sorszam = String((count ?? 0) + 1).padStart(3, "0");
-    const rendelesSzam = `KK-${today}-${sorszam}`;
+    if (!preparedOrder.ok) {
+      return NextResponse.json({ error: preparedOrder.error }, { status: preparedOrder.status });
+    }
+
+    const szamoltVegosszeg = preparedOrder.total;
 
     // Rendelés mentése
-    const baseRendelesInsert = {
-      rendeles_szam: rendelesSzam,
-      nev: vevoNev,
-      email: vevoEmail,
-      telefon: vevoTelefon,
-      megjegyzes: vevoMegjegyzes,
-      vegosszeg: szamoltVegosszeg,
-      allapot: "uj",
-    };
     const marketingRendelesInsert = {
       marketing_attribution: marketingAttribution ?? {},
       traffic_source: primaryMarketingTouch?.traffic_source ?? null,
@@ -122,26 +347,50 @@ export async function POST(request: Request) {
       referrer: primaryMarketingTouch?.referrer ?? null,
     };
 
-    let { data: rendeles, error: rendelesError } = await supabaseAdmin
-      .from("rendelesek")
-      .insert({ ...baseRendelesInsert, ...marketingRendelesInsert })
-      .select("id")
-      .single();
+    let rendelesSzam = "";
+    let rendeles: { id: string } | null = null;
+    let rendelesError: { code?: string; message?: string; details?: string | null } | null = null;
 
-    if (rendelesError && isMissingMarketingColumnsError(rendelesError)) {
-      console.warn(
-        "Marketing attribution columns are missing from rendelesek. Retrying order insert without attribution fields.",
-        rendelesError
-      );
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      rendelesSzam = generateRendelesSzam();
 
-      const retryResult = await supabaseAdmin
+      const baseRendelesInsert = {
+        rendeles_szam: rendelesSzam,
+        nev: vevoNev,
+        email: vevoEmail,
+        telefon: vevoTelefon,
+        megjegyzes: vevoMegjegyzes,
+        vegosszeg: szamoltVegosszeg,
+        allapot: "uj",
+      };
+
+      let insertResult = await supabaseAdmin
         .from("rendelesek")
-        .insert(baseRendelesInsert)
+        .insert({ ...baseRendelesInsert, ...marketingRendelesInsert })
         .select("id")
         .single();
 
-      rendeles = retryResult.data;
-      rendelesError = retryResult.error;
+      if (insertResult.error && isMissingMarketingColumnsError(insertResult.error)) {
+        console.warn(
+          "Marketing attribution columns are missing from rendelesek. Retrying order insert without attribution fields.",
+          insertResult.error
+        );
+
+        insertResult = await supabaseAdmin
+          .from("rendelesek")
+          .insert(baseRendelesInsert)
+          .select("id")
+          .single();
+      }
+
+      if (insertResult.error && isDuplicateOrderNumberError(insertResult.error)) {
+        rendelesError = insertResult.error;
+        continue;
+      }
+
+      rendeles = insertResult.data;
+      rendelesError = insertResult.error;
+      break;
     }
 
     if (rendelesError || !rendeles) {
@@ -149,48 +398,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Hiba a rendelés mentésekor" }, { status: 500 });
     }
 
-    // Tételek mentése
-    // Termék slug → UUID feloldás
-    const slugok = Array.from(new Set(submittedRendelesek.map((r: { termekId: string }) => r.termekId))) as string[];
-    const { data: termekek } = await supabaseAdmin
-      .from("termekek")
-      .select("id, slug")
-      .in("slug", slugok);
-
-    const slugMap = new Map(termekek?.map((t) => [t.slug, t.id]) ?? []);
-
-    // Rendelési napok feloldása dátum alapján
-    const datumok = Array.from(new Set(submittedRendelesek.map((r: { datum: string }) => r.datum))) as string[];
-    const { data: rendelesNapok } = await supabaseAdmin
-      .from("rendeles_napok")
-      .select("id, datum")
-      .in("datum", datumok);
-
-    const datumMap = new Map(rendelesNapok?.map((n) => [n.datum, n.id]) ?? []);
-
-    const tetelek: OrderInsertItem[] = submittedRendelesek.map((r: SubmittedOrderItem) => {
-      const mennyiseg = Number(r.mennyiseg || 0);
-      const egysegar = Number(r.egysegar || 0);
-
-      return {
-        rendeles_id: rendeles.id,
-        rendeles_nap_id: datumMap.get(r.datum) || null,
-        termek_id: slugMap.get(r.termekId) || null,
-        datum: r.datum,
-        nap: r.nap,
-        termek_nev: r.nev,
-        mennyiseg,
-        egysegar,
-        reszosszeg: mennyiseg * egysegar,
-        allapot: "uj",
-      };
-    });
+    const tetelek: OrderInsertItem[] = preparedOrder.items.map((item) => ({
+      ...item,
+      rendeles_id: rendeles.id,
+      allapot: "uj",
+    }));
 
     const { error: tetelError } = await supabaseAdmin
       .from("rendeles_tetelek")
       .insert(tetelek);
 
     if (tetelError) {
+      await supabaseAdmin
+        .from("rendelesek")
+        .delete()
+        .eq("id", rendeles.id);
       console.error("Tétel mentési hiba:", tetelError);
       return NextResponse.json({ error: "Hiba a tételek mentésekor" }, { status: 500 });
     }

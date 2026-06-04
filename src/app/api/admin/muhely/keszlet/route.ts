@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -15,6 +18,9 @@ function isMissingStockTable(error: { message?: string; code?: string } | null) 
 }
 
 export async function PATCH(request: Request) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   const body = await request.json();
   const {
     datum,

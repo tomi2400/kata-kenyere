@@ -215,17 +215,20 @@ export default function OsszesitesPage() {
           <h2 className="mb-5 font-serif text-xl text-[#3d2314]">Adataid</h2>
           <div className="space-y-4">
             {[
-              { key: "nev", label: "Teljes neved", type: "text", placeholder: "Kovács Katalin" },
-              { key: "email", label: "Email cím", type: "email", placeholder: "pelda@email.com" },
-              { key: "telefon", label: "Telefonszám", type: "tel", placeholder: "+36 30 123 4567" },
-            ].map(({ key, label, type, placeholder }) => (
+              { key: "nev", label: "Teljes neved", type: "text", placeholder: "Kovács Katalin", autoComplete: "name" },
+              { key: "email", label: "Email cím", type: "email", placeholder: "pelda@email.com", autoComplete: "email" },
+              { key: "telefon", label: "Telefonszám", type: "tel", placeholder: "+36 30 123 4567", autoComplete: "tel" },
+            ].map(({ key, label, type, placeholder, autoComplete }) => (
               <div key={key}>
-                <label className="mb-1 block font-sans text-sm font-medium text-[#4b2e1f]">
+                <label htmlFor={`checkout-${key}`} className="mb-1 block font-sans text-sm font-medium text-[#4b2e1f]">
                   {label} <span className="text-red-400">*</span>
                 </label>
                 <input
+                  id={`checkout-${key}`}
+                  name={key}
                   type={type}
                   placeholder={placeholder}
+                  autoComplete={autoComplete}
                   value={form[key as keyof typeof form]}
                   onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
                   className={`w-full rounded-[12px] border px-4 py-3 font-sans text-sm outline-none transition-colors bg-[#fafaf8] ${
@@ -236,11 +239,14 @@ export default function OsszesitesPage() {
               </div>
             ))}
             <div>
-              <label className="mb-1 block font-sans text-sm font-medium text-[#4b2e1f]">
+              <label htmlFor="checkout-megjegyzes" className="mb-1 block font-sans text-sm font-medium text-[#4b2e1f]">
                 Megjegyzés <span className="font-normal text-[#9a7a5d]">(opcionális)</span>
               </label>
               <textarea
+                id="checkout-megjegyzes"
+                name="megjegyzes"
                 placeholder="Pl. speciális kérés, allergia..."
+                autoComplete="off"
                 value={form.megjegyzes}
                 onChange={(e) => setForm((f) => ({ ...f, megjegyzes: e.target.value }))}
                 rows={3}

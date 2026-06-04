@@ -14,6 +14,7 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react";
+import { adminFetch } from "@/lib/admin-api";
 
 type Product = {
   id: string;
@@ -250,7 +251,7 @@ export default function MuhelyPage() {
     if (selectedProductIds.length > 0) params.set("termekek", selectedProductIds.join(","));
 
     try {
-      const res = await fetch(`/api/admin/muhely?${params.toString()}`, { cache: "no-store" });
+      const res = await adminFetch(`/api/admin/muhely?${params.toString()}`, { cache: "no-store" });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Nem sikerült betölteni a műhely adatokat.");
       setData(json);
@@ -424,7 +425,7 @@ export default function MuhelyPage() {
     setNotice("");
 
     try {
-      const res = await fetch("/api/admin/muhely/keszlet", {
+      const res = await adminFetch("/api/admin/muhely/keszlet", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -449,7 +450,7 @@ export default function MuhelyPage() {
   const updateTetelAllapot = async (orderId: string, tetelId: string, nextAllapot: string) => {
     const key = `${orderId}_${tetelId}_${nextAllapot}`;
     setUpdatingKey(key);
-    await fetch(`/api/admin/rendelesek/${orderId}`, {
+    await adminFetch(`/api/admin/rendelesek/${orderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tetelId, allapot: nextAllapot }),
@@ -462,7 +463,7 @@ export default function MuhelyPage() {
     if (!ujDatum || ujDatum === currentDatum) return;
     const key = `${orderId}_${tetelId}_date`;
     setUpdatingKey(key);
-    await fetch(`/api/admin/rendelesek/${orderId}`, {
+    await adminFetch(`/api/admin/rendelesek/${orderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tetelId, ujDatum }),
@@ -528,7 +529,7 @@ export default function MuhelyPage() {
       .filter(Boolean);
 
     try {
-      const res = await fetch("/api/rendeles", {
+      const res = await adminFetch("/api/rendeles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

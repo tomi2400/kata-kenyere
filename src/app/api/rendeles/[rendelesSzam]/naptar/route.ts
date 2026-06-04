@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
+import { unstable_noStore as noStore } from "next/cache";
 import { buildIcsCalendar, buildIcsFilename, type CalendarOrderData } from "@/lib/order-calendar";
 import { supabaseAdmin } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 type RendelesTetelRow = {
   datum: string;
@@ -51,6 +54,8 @@ export async function GET(
   _request: Request,
   { params }: { params: { rendelesSzam: string } }
 ) {
+  noStore();
+
   const rendelesSzam = decodeURIComponent(params.rendelesSzam);
 
   const { data, error } = await supabaseAdmin

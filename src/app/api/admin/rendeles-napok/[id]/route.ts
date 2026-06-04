@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   const body = await request.json();
 
   const { data, error } = await supabaseAdmin
@@ -22,9 +28,12 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   // Ellenőrzés: van-e rendelés erre a napra?
   const { count } = await supabaseAdmin
     .from("rendeles_tetelek")
