@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Kata Kenyere – Kézműves kovászos pékség, Pécs",
     description: siteDescription,
-    images: ["/opengraph-image"],
+    images: [defaultOpenGraphImage.url],
   },
   alternates: {
     canonical: "https://katakenyere.hu",
