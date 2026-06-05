@@ -62,7 +62,7 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
 
   return (
     <div className={`
-      overflow-hidden rounded-[1.1rem] border sm:rounded-[1.4rem]
+      flex h-full flex-col overflow-hidden rounded-[1.1rem] border sm:rounded-[1.4rem]
       transition-[transform,box-shadow,border-color] duration-300
       hover:-translate-y-1
       ${isSelected ? "border-gold shadow-[0_20px_40px_rgba(61,35,20,0.16)]" : "border-gold/15 hover:border-gold/40 shadow-[0_14px_28px_rgba(61,35,20,0.08)]"}
@@ -83,9 +83,9 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
         )}
       </div>
 
-      <div className={`p-3 sm:p-4 ${isSelected ? "bg-gradient-to-b from-white to-cream" : "bg-white"}`}>
+      <div className={`flex flex-1 flex-col p-3 sm:p-4 ${isSelected ? "bg-gradient-to-b from-white to-cream" : "bg-white"}`}>
         <div className="mb-2.5 sm:mb-3">
-          <p className="font-serif text-[0.9rem] font-semibold leading-tight text-brown-dark sm:text-base">
+          <p className="min-h-[2.25rem] break-words font-serif text-[0.9rem] font-semibold leading-tight text-brown-dark sm:min-h-[2.5rem] sm:text-base">
             {termek.nev}
           </p>
           <div className="mt-1 flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
@@ -95,11 +95,11 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
             </p>
           </div>
         </div>
-        <p className="line-clamp-2 min-h-[2.45rem] font-sans text-[0.7rem] leading-relaxed text-brown/55 sm:min-h-[2.5rem] sm:text-xs">
+        <p className="font-sans text-[0.7rem] leading-relaxed text-brown/55 sm:text-xs">
           {termek.leiras?.trim() || "Kézműves péksütemény, frissen készítve az átvételi napodra."}
         </p>
 
-        <div className="mt-3 flex items-center justify-between sm:mt-4">
+        <div className="mt-auto flex items-center justify-between pt-3 sm:pt-4">
           <span className="font-sans text-[10px] leading-snug text-brown/40 sm:text-[11px]">
             {qty > 0 ? `Kosárban: ${qty} db` : "Egy kattintással hozzáadható"}
           </span>

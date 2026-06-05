@@ -74,9 +74,9 @@ export default async function TermekekPage() {
                 <div className="h-px flex-1 bg-[#d0af77]/30" />
               </div>
             </ScrollReveal>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 xl:grid-cols-4">
+            <div className="grid auto-rows-fr grid-cols-2 items-stretch gap-3 md:grid-cols-3 md:gap-5 xl:grid-cols-4">
               {termekLista.map((termek, i) => (
-                <ScrollReveal key={termek.id} variant="up" delay={i * 60}>
+                <ScrollReveal key={termek.id} variant="up" delay={i * 60} className="h-full">
                   <TrackedLink
                     href="/elorendeles"
                     trackingEvent="product_preorder_clicked"
@@ -88,7 +88,7 @@ export default async function TermekekPage() {
                       item_category: termek.kategoria,
                       cta_location: "products_listing",
                     }}
-                    className="group block overflow-hidden rounded-[20px] border border-[#ede8df] bg-white transition-all duration-300 hover:-translate-y-1.5 hover:border-[#c79a66]/50 hover:shadow-[0_16px_36px_rgba(91,56,38,0.10)]"
+                    className="group flex h-full flex-col overflow-hidden rounded-[20px] border border-[#ede8df] bg-white transition-all duration-300 hover:-translate-y-1.5 hover:border-[#c79a66]/50 hover:shadow-[0_16px_36px_rgba(91,56,38,0.10)]"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image
@@ -100,16 +100,16 @@ export default async function TermekekPage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[rgba(40,20,10,0.32)] via-transparent to-transparent" />
                     </div>
-                    <div className="p-3 md:p-4">
+                    <div className="flex flex-1 flex-col p-3 md:p-4">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="font-serif text-[0.875rem] leading-snug text-[#4b2e1f] md:text-[0.975rem]">{termek.nev}</p>
+                        <p className="min-h-[2.15rem] break-words font-serif text-[0.875rem] leading-snug text-[#4b2e1f] md:min-h-[2.45rem] md:text-[0.975rem]">{termek.nev}</p>
                         <p className="shrink-0 font-sans text-xs font-semibold text-[#5b3826] md:text-sm">{formatAr(termek.ar)}</p>
                       </div>
                       {termek.egyseg && (
                         <p className="mt-0.5 font-sans text-[10px] uppercase tracking-[0.14em] text-[#9d7f63] md:text-[11px]">{termek.egyseg}</p>
                       )}
                       {termek.leiras && (
-                        <p className="mt-1.5 font-sans text-[0.75rem] leading-relaxed text-[#7c5a46] line-clamp-2 md:mt-2 md:text-[0.8rem]">{termek.leiras}</p>
+                        <p className="mt-1.5 font-sans text-[0.75rem] leading-relaxed text-[#7c5a46] md:mt-2 md:text-[0.8rem]">{termek.leiras}</p>
                       )}
                     </div>
                   </TrackedLink>
