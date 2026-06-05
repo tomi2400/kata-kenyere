@@ -64,15 +64,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", type: "image/x-icon", sizes: "16x16 32x32 48x48" },
-      { url: "/icon.png", type: "image/png", sizes: "1000x1000" },
-      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
-      { url: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+      { url: "/kata-favicon.ico?v=20260605b", type: "image/x-icon", sizes: "16x16 32x32 48x48" },
+      { url: "/kata-icon.png?v=20260605b", type: "image/png", sizes: "1000x1000" },
+      { url: "/favicon-32x32.png?v=20260605b", type: "image/png", sizes: "32x32" },
+      { url: "/favicon-16x16.png?v=20260605b", type: "image/png", sizes: "16x16" },
     ],
-    shortcut: "/favicon.ico",
+    shortcut: "/kata-favicon.ico?v=20260605b",
     apple: [
-      { url: "/apple-icon.png", type: "image/png", sizes: "1000x1000" },
-      { url: "/apple-touch-icon.png", type: "image/png", sizes: "1000x1000" },
+      { url: "/kata-apple-touch-icon.png?v=20260605b", type: "image/png", sizes: "1000x1000" },
+      { url: "/apple-touch-icon.png?v=20260605b", type: "image/png", sizes: "1000x1000" },
     ],
   },
   robots: {
