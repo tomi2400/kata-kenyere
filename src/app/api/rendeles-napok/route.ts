@@ -16,7 +16,7 @@ export async function GET() {
     .eq("nyitott", true)
     .gte("datum", now.toISOString().split("T")[0])
     .order("datum")
-    .limit(4);
+    .limit(90);
 
   if (error) {
     return NextResponse.json({ error: "Hiba a napok lekérésekor" }, { status: 500 });

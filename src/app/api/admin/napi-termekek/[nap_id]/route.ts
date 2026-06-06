@@ -35,8 +35,43 @@ export async function PUT(
   const authError = await requireAdmin(request);
   if (authError) return authError;
 
-  const body = await request.json();
-  const { termek_ids }: { termek_ids: string[] } = body;
+  const body = await request.json().catch(() => null);
+  const rawTermekIds = body?.termek_ids;
+
+  if (!Array.isArray(rawTermekIds) || rawTermekIds.some((id) => typeof id !== "string")) {
+    return NextResponse.json({ error: "Érvénytelen terméklista." }, { status: 400 });
+  }
+
+  const termek_ids = Array.from(new Set(rawTermekIds));
+
+  const { data: day, error: dayError } = await supabaseAdmin
+    .from("rendeles_napok")
+    .select("id")
+    .eq("id", params.nap_id)
+    .maybeSingle();
+
+  if (dayError) {
+    return NextResponse.json({ error: dayError.message }, { status: 500 });
+  }
+
+  if (!day) {
+    return NextResponse.json({ error: "A rendelési nap nem található." }, { status: 404 });
+  }
+
+  if (termek_ids.length > 0) {
+    const { data: products, error: productsError } = await supabaseAdmin
+      .from("termekek")
+      .select("id")
+      .in("id", termek_ids);
+
+    if (productsError) {
+      return NextResponse.json({ error: productsError.message }, { status: 500 });
+    }
+
+    if ((products ?? []).length !== termek_ids.length) {
+      return NextResponse.json({ error: "A terméklista ismeretlen terméket tartalmaz." }, { status: 400 });
+    }
+  }
 
   // Először töröljük a meglévő beállításokat
   const { error: delError } = await supabaseAdmin

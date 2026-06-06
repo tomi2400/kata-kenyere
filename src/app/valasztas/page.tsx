@@ -9,6 +9,12 @@ import ProductCard from "@/components/ProductCard";
 import DayProgress from "@/components/DayProgress";
 import { pushDataLayerEvent } from "@/lib/tracking";
 
+type FreshOrderDay = {
+  nap: string;
+  datum: string;
+  korlatozott_termek_ids?: string[];
+};
+
 export default function TermekekPage() {
   const router = useRouter();
   const { selectedDays, carts, getDayTotal, getTotal, currentStep, setCurrentStep } = useCartStore();
@@ -18,11 +24,64 @@ export default function TermekekPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     setMounted(true);
-    fetch("/api/termekek", { cache: "no-store" })
-      .then((res) => res.json())
-      .then((data) => { setTermekek(data.termekek); setKategoriak(data.kategoriak); setLoading(false); })
-      .catch(() => setLoading(false));
+    Promise.all([
+      fetch("/api/termekek", { cache: "no-store", signal: controller.signal }),
+      fetch("/api/rendeles-napok", { cache: "no-store", signal: controller.signal }),
+    ])
+      .then(async ([productsResponse, daysResponse]) => {
+        if (!productsResponse.ok || !daysResponse.ok) {
+          throw new Error("Nem sikerült frissíteni a rendelhető termékeket.");
+        }
+
+        const [productsData, daysData] = await Promise.all([
+          productsResponse.json(),
+          daysResponse.json(),
+        ]);
+        const products = (productsData.termekek ?? []) as Termek[];
+        const freshDays: FreshOrderDay[] = Array.isArray(daysData) ? daysData : [];
+        const freshDaysByDate = new Map(freshDays.map((day) => [day.datum, day]));
+        const productBySlug = new Map(products.map((product) => [product.slug, product]));
+        const store = useCartStore.getState();
+        const refreshedSelectedDays = store.selectedDays
+          .map((day) => {
+            const freshDay = freshDaysByDate.get(day.datum);
+            if (!freshDay) return null;
+
+            return {
+              nap: freshDay.nap,
+              datum: freshDay.datum,
+              korlatozott_termek_ids: freshDay.korlatozott_termek_ids ?? [],
+            };
+          })
+          .filter((day): day is NonNullable<typeof day> => day !== null);
+
+        store.setSelectedDays(refreshedSelectedDays);
+
+        for (const day of refreshedSelectedDays) {
+          const allowedIds = day.korlatozott_termek_ids ?? [];
+          for (const item of store.carts[day.datum] ?? []) {
+            const product = productBySlug.get(item.termekId);
+            const unavailable = !product || (allowedIds.length > 0 && !allowedIds.includes(product.id));
+
+            if (unavailable) {
+              store.setQuantity(day.datum, item, 0);
+            }
+          }
+        }
+
+        setTermekek(products);
+        setKategoriak(productsData.kategoriak ?? []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        if (error instanceof Error && error.name === "AbortError") return;
+        setLoading(false);
+      });
+
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {

@@ -77,6 +77,8 @@ export default function NapokPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState("");
   const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedRef = useRef<{ id: string; nyitott: boolean; hatarido: string } | null>(null);
 
@@ -133,6 +135,8 @@ export default function NapokPage() {
       hatarido: hataridoValue,
     };
     setDeleteError("");
+    setSaveError("");
+    setSaveSuccess("");
   };
 
   const closeEditor = async () => {
@@ -140,6 +144,16 @@ export default function NapokPage() {
     setEditNap(null);
     setNapiTermekIds(null);
     setDeleteError("");
+    setSaveError("");
+    setSaveSuccess("");
+  };
+
+  const clearEditor = () => {
+    setEditNap(null);
+    setNapiTermekIds(null);
+    setDeleteError("");
+    setSaveError("");
+    setSaveSuccess("");
   };
 
   const createDay = async (datum: string) => {
@@ -170,23 +184,36 @@ export default function NapokPage() {
     if (unchanged) return;
 
     if (!options?.silent) setSaving(true);
-    const hatarisoISO = editHatarido
-      ? new Date(editHatarido).toISOString()
-      : null;
 
-    await adminFetch(`/api/admin/rendeles-napok/${editNap.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nyitott: editNyitott, hatarido: hatarisoISO }),
-      keepalive: options?.keepalive,
-    });
-    lastSavedRef.current = {
-      id: editNap.id,
-      nyitott: editNyitott,
-      hatarido: editHatarido,
-    };
-    if (!options?.silent) setSaving(false);
-    fetchNapok();
+    try {
+      const hatarisoISO = editHatarido
+        ? new Date(editHatarido).toISOString()
+        : null;
+
+      const response = await adminFetch(`/api/admin/rendeles-napok/${editNap.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nyitott: editNyitott, hatarido: hatarisoISO }),
+        keepalive: options?.keepalive,
+      });
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Nem sikerült menteni a rendelési napot.");
+      }
+
+      lastSavedRef.current = {
+        id: editNap.id,
+        nyitott: editNyitott,
+        hatarido: editHatarido,
+      };
+      fetchNapok();
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Nem sikerült menteni a rendelési napot.");
+      throw error;
+    } finally {
+      if (!options?.silent) setSaving(false);
+    }
   }, [editNap, editNyitott, editHatarido, fetchNapok]);
 
   const deleteDay = async () => {
@@ -197,23 +224,57 @@ export default function NapokPage() {
     const data = await res.json();
     setDeleting(false);
     if (res.ok) {
-      closeEditor();
+      clearEditor();
       fetchNapok();
     } else {
       setDeleteError(data.error ?? "Hiba a törlés során.");
     }
   };
 
-  const saveTermekek = async (newIds: string[]) => {
+  const saveTermekek = async (newIds: string[], options?: { silent?: boolean }) => {
     if (!editNap) return;
-    setTermekSaving(true);
-    await adminFetch(`/api/admin/napi-termekek/${editNap.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ termek_ids: newIds }),
-    });
-    setNapiTermekIds(newIds);
-    setTermekSaving(false);
+    if (!options?.silent) setTermekSaving(true);
+    setSaveError("");
+    setSaveSuccess("");
+
+    try {
+      const response = await adminFetch(`/api/admin/napi-termekek/${editNap.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ termek_ids: newIds }),
+      });
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Nem sikerült menteni a napi terméklistát.");
+      }
+
+      setNapiTermekIds(data?.termek_ids ?? newIds);
+      setSaveSuccess("A terméklista mentve.");
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Nem sikerült menteni a napi terméklistát.");
+      throw error;
+    } finally {
+      if (!options?.silent) setTermekSaving(false);
+    }
+  };
+
+  const saveAll = async () => {
+    if (!editNap || napiTermekIds === null) return;
+
+    setSaving(true);
+    setSaveError("");
+    setSaveSuccess("");
+
+    try {
+      await saveEditor({ silent: true });
+      await saveTermekek(napiTermekIds, { silent: true });
+      setSaveSuccess("Minden módosítás mentve.");
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Nem sikerült menteni a módosításokat.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const toggleTermek = (termekId: string) => {
@@ -228,10 +289,12 @@ export default function NapokPage() {
     }
     // Ha minden be van kapcsolva → üres (minden elérhető)
     if (current.length === allTermekek.length) current = [];
-    saveTermekek(current);
+    void saveTermekek(current).catch(() => undefined);
   };
 
-  const setAllTermekekOn = () => saveTermekek([]);
+  const setAllTermekekOn = () => {
+    void saveTermekek([]).catch(() => undefined);
+  };
 
   const getEnabledIds = () => {
     if (napiTermekIds === null) return [];
@@ -248,7 +311,7 @@ export default function NapokPage() {
     }
 
     const next = Array.from(current);
-    saveTermekek(next.length === allTermekek.length ? [] : next);
+    void saveTermekek(next.length === allTermekek.length ? [] : next).catch(() => undefined);
   };
 
   const groupedTermekek = [
@@ -496,17 +559,27 @@ export default function NapokPage() {
 
               {/* Mentés gomb */}
               <button
-                onClick={() => void saveEditor()}
-                disabled={saving}
+                onClick={() => void saveAll()}
+                disabled={saving || termekSaving || napiTermekIds === null}
                 className="w-full py-2 rounded-lg font-sans text-sm font-semibold
                   bg-gold text-brown-dark hover:bg-gold-light transition-colors
                   disabled:opacity-50 cursor-pointer"
               >
-                {saving ? "Mentés..." : "Mentés most"}
+                {saving || termekSaving ? "Mentés..." : "Módosítások mentése"}
               </button>
               <p className="font-sans text-[10px] text-brown/40 -mt-2">
-                A módosítások automatikusan mentődnek.
+                A termékkapcsolók azonnal mentődnek; ez a gomb minden beállítást újrament.
               </p>
+              {saveSuccess && (
+                <p className="rounded-lg bg-green-50 px-3 py-2 font-sans text-xs text-green-700">
+                  {saveSuccess}
+                </p>
+              )}
+              {saveError && (
+                <p className="rounded-lg bg-red-50 px-3 py-2 font-sans text-xs text-red-600">
+                  {saveError}
+                </p>
+              )}
 
               {/* Termékek */}
               <div>
