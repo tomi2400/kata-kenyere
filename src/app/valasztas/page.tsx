@@ -64,7 +64,7 @@ export default function TermekekPage() {
           const allowedIds = day.korlatozott_termek_ids ?? [];
           for (const item of store.carts[day.datum] ?? []) {
             const product = productBySlug.get(item.termekId);
-            const unavailable = !product || (allowedIds.length > 0 && !allowedIds.includes(product.id));
+            const unavailable = !product || !allowedIds.includes(product.id);
 
             if (unavailable) {
               store.setQuantity(day.datum, item, 0);
@@ -104,9 +104,8 @@ export default function TermekekPage() {
   }
 
   const currentDay = selectedDays[currentStep];
-  const availableTermekek = currentDay.korlatozott_termek_ids?.length
-    ? termekek.filter((termek) => currentDay.korlatozott_termek_ids?.includes(termek.id))
-    : termekek;
+  const allowedProductIds = currentDay.korlatozott_termek_ids ?? [];
+  const availableTermekek = termekek.filter((termek) => allowedProductIds.includes(termek.id));
   const termekekByKategoria = csoportositByKategoria(availableTermekek, kategoriak);
   const isLastDay = currentStep === selectedDays.length - 1;
   const dayTotal = getDayTotal(currentDay.datum);

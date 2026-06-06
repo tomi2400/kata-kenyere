@@ -260,9 +260,11 @@ async function prepareOrderItems(
   for (const item of requestedItems) {
     const product = productBySlug.get(item.termekSlug)!;
     const nap = dayByDate.get(item.datum) ?? null;
-    const allowedProducts = nap ? allowedProductsByDayId.get(nap.id) : undefined;
+    const allowedProducts = nap
+      ? allowedProductsByDayId.get(nap.id) ?? new Set<string>()
+      : new Set<string>();
 
-    if (!isManualOrder && allowedProducts && allowedProducts.size > 0 && !allowedProducts.has(product.id)) {
+    if (!isManualOrder && !allowedProducts.has(product.id)) {
       return {
         ok: false,
         error: `${product.nev} a kiválasztott átvételi napon már nem elérhető.`,

@@ -57,7 +57,8 @@ export default async function ElorendelesPage() {
       datum: nap.datum,
       hatarido: formatHatarido(nap.hatarido),
       korlatozott_termek_ids: korlatozasokByDay.get(nap.id) ?? [],
-    }));
+    }))
+    .filter((nap) => nap.korlatozott_termek_ids.length > 0);
 
   return (
     <div className="min-h-screen bg-[#fafaf8] grain-overlay text-[#4b2e1f]">

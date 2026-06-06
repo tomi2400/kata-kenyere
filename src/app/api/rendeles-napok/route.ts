@@ -29,7 +29,7 @@ export async function GET() {
   });
 
   // Minden naphoz lekérjük az elérhető termékeket
-  const result = await Promise.all(
+  const daysWithProducts = await Promise.all(
     elérhetoNapok.map(async (nap) => {
       const { data: napiTermekek } = await supabase
         .from("napi_termekek")
@@ -41,11 +41,12 @@ export async function GET() {
         datum: nap.datum,
         nap: nap.nap,
         hatarido: nap.hatarido,
-        // Ha nincs korlátozás (üres lista), minden termék elérhető
         korlatozott_termek_ids: napiTermekek?.map((t) => t.termek_id) ?? [],
       };
     })
   );
+
+  const result = daysWithProducts.filter((nap) => nap.korlatozott_termek_ids.length > 0);
 
   return NextResponse.json(result);
 }

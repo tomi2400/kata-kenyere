@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, type ChangeEvent, type DragEvent } from "react";
 import Image from "next/image";
-import { ImagePlus, LinkIcon, Trash2, UploadCloud } from "lucide-react";
+import { ChevronDown, ChevronUp, ImagePlus, LinkIcon, Trash2, UploadCloud } from "lucide-react";
 import { adminFetch } from "@/lib/admin-api";
 import { getTermekFoto } from "@/lib/products";
 
@@ -60,6 +60,8 @@ function TermekekTab() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<Record<string, string>>({});
+  const [orderingId, setOrderingId] = useState<string | null>(null);
+  const [orderError, setOrderError] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [draggingImage, setDraggingImage] = useState(false);
@@ -246,10 +248,45 @@ function TermekekTab() {
     setDeleteError((prev) => ({ ...prev, [t.id]: d.error ?? "Hiba történt a törlés közben." }));
   };
 
+  const moveTermek = async (items: Termek[], index: number, direction: -1 | 1) => {
+    const targetIndex = index + direction;
+    if (!items[targetIndex]) return;
+
+    const reordered = [...items];
+    [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
+
+    setOrderingId(items[index].id);
+    setOrderError("");
+
+    try {
+      const response = await adminFetch("/api/admin/termekek/sorrend", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kategoria: items[index].kategoria,
+          termek_ids: reordered.map((termek) => termek.id),
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || "Nem sikerült módosítani a termékek sorrendjét.");
+      }
+
+      fetchTermekek();
+    } catch (error) {
+      setOrderError(error instanceof Error ? error.message : "Nem sikerült módosítani a termékek sorrendjét.");
+    } finally {
+      setOrderingId(null);
+    }
+  };
+
   const grouped = kategoriak
     .map((kategoria) => ({
       kategoria,
-      items: termekek.filter((t) => t.kategoria === kategoria),
+      items: termekek
+        .filter((t) => t.kategoria === kategoria)
+        .sort((a, b) => a.sorrend - b.sorrend),
     }))
     .filter(({ items }) => items.length > 0);
 
@@ -257,22 +294,32 @@ function TermekekTab() {
     .filter((kategoria) => !kategoriak.includes(kategoria))
     .map((kategoria) => ({
       kategoria,
-      items: termekek.filter((t) => t.kategoria === kategoria),
+      items: termekek
+        .filter((t) => t.kategoria === kategoria)
+        .sort((a, b) => a.sorrend - b.sorrend),
     }));
 
   const orderedGroups = [...grouped, ...extraKategoriak];
 
   return (
     <>
-      <div className="flex justify-end mb-6">
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <p className="font-sans text-sm text-brown/50">
+          A nyilakkal kategórián belül állíthatod a weboldalon látható sorrendet.
+        </p>
         <button
           onClick={openNew}
-          className="px-4 py-2 rounded-lg font-sans text-sm font-semibold
+          className="flex-shrink-0 px-4 py-2 rounded-lg font-sans text-sm font-semibold
             bg-gold text-brown-dark hover:bg-gold-light transition-colors cursor-pointer"
         >
           + Új termék
         </button>
       </div>
+      {orderError && (
+        <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 font-sans text-xs text-red-600">
+          {orderError}
+        </p>
+      )}
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -285,12 +332,35 @@ function TermekekTab() {
               {kategoria}
             </h2>
             <div className="space-y-2">
-              {items.map((t) => (
+              {items.map((t, index) => (
                 <div
                   key={t.id}
                   className={`bg-white rounded-xl border border-cream-dark p-3 ${!t.aktiv ? "opacity-50" : ""}`}
                 >
                   <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <button
+                        type="button"
+                        onClick={() => void moveTermek(items, index, -1)}
+                        disabled={index === 0 || orderingId !== null}
+                        className="p-0.5 text-brown/30 transition-colors hover:text-brown-dark disabled:cursor-default disabled:opacity-20"
+                        title="Mozgatás felfelé"
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void moveTermek(items, index, 1)}
+                        disabled={index === items.length - 1 || orderingId !== null}
+                        className="p-0.5 text-brown/30 transition-colors hover:text-brown-dark disabled:cursor-default disabled:opacity-20"
+                        title="Mozgatás lefelé"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <span className="w-5 text-center font-sans text-xs text-brown/30">
+                      {index + 1}
+                    </span>
                     <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-cream-dark flex-shrink-0">
                       <Image
                         src={getTermekFoto(t)}

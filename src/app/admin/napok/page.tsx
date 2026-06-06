@@ -279,26 +279,25 @@ export default function NapokPage() {
 
   const toggleTermek = (termekId: string) => {
     if (napiTermekIds === null) return;
-    const isAll = napiTermekIds.length === 0;
-    // Ha mind elérhető és kikapcsolunk egyet → explicitté tesszük az összes többit
-    let current = isAll ? allTermekek.map((t) => t.id) : [...napiTermekIds];
+    let current = [...napiTermekIds];
     if (current.includes(termekId)) {
       current = current.filter((id) => id !== termekId);
     } else {
       current = [...current, termekId];
     }
-    // Ha minden be van kapcsolva → üres (minden elérhető)
-    if (current.length === allTermekek.length) current = [];
     void saveTermekek(current).catch(() => undefined);
   };
 
   const setAllTermekekOn = () => {
+    void saveTermekek(allTermekek.map((termek) => termek.id)).catch(() => undefined);
+  };
+
+  const setAllTermekekOff = () => {
     void saveTermekek([]).catch(() => undefined);
   };
 
   const getEnabledIds = () => {
-    if (napiTermekIds === null) return [];
-    return napiTermekIds.length === 0 ? allTermekek.map((t) => t.id) : napiTermekIds;
+    return napiTermekIds ?? [];
   };
 
   const toggleCategory = (termekIds: string[], shouldEnable: boolean) => {
@@ -311,7 +310,7 @@ export default function NapokPage() {
     }
 
     const next = Array.from(current);
-    void saveTermekek(next.length === allTermekek.length ? [] : next).catch(() => undefined);
+    void saveTermekek(next).catch(() => undefined);
   };
 
   const groupedTermekek = [
@@ -568,7 +567,7 @@ export default function NapokPage() {
                 {saving || termekSaving ? "Mentés..." : "Módosítások mentése"}
               </button>
               <p className="font-sans text-[10px] text-brown/40 -mt-2">
-                A termékkapcsolók azonnal mentődnek; ez a gomb minden beállítást újrament.
+                Csak a bekapcsolt termékek lesznek rendelhetők. A kapcsolók azonnal mentődnek.
               </p>
               {saveSuccess && (
                 <p className="rounded-lg bg-green-50 px-3 py-2 font-sans text-xs text-green-700">
@@ -590,16 +589,30 @@ export default function NapokPage() {
                   <div className="flex items-center gap-3">
                     {napiTermekIds !== null && (
                       <span className="font-sans text-[10px] text-brown/40">
-                        {getEnabledIds().length}/{allTermekek.length} aktív
+                        {getEnabledIds().length}/{allTermekek.length} kijelölve
                       </span>
                     )}
-                    {napiTermekIds !== null && napiTermekIds.length > 0 && (
-                      <button
-                        onClick={setAllTermekekOn}
-                        className="font-sans text-[10px] text-gold hover:underline cursor-pointer"
-                      >
-                        Mind be
-                      </button>
+                    {napiTermekIds !== null && (
+                      <>
+                        {napiTermekIds.length < allTermekek.length && (
+                          <button
+                            onClick={setAllTermekekOn}
+                            disabled={termekSaving}
+                            className="font-sans text-[10px] text-gold hover:underline cursor-pointer disabled:opacity-50"
+                          >
+                            Mind be
+                          </button>
+                        )}
+                        {napiTermekIds.length > 0 && (
+                          <button
+                            onClick={setAllTermekekOff}
+                            disabled={termekSaving}
+                            className="font-sans text-[10px] text-brown/40 hover:text-red-500 hover:underline cursor-pointer disabled:opacity-50"
+                          >
+                            Mind ki
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -673,7 +686,9 @@ export default function NapokPage() {
                   </div>
                 )}
                 {napiTermekIds !== null && napiTermekIds.length === 0 && (
-                  <p className="font-sans text-[10px] text-green-600 mt-1">Minden termék elérhető</p>
+                  <p className="font-sans text-[10px] text-amber-600 mt-1">
+                    Még nincs rendelhető termék kijelölve, ezért ez a nap nem látszik a vásárlóknak.
+                  </p>
                 )}
               </div>
 

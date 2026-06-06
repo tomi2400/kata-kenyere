@@ -5,8 +5,8 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-// GET: visszaadja az engedélyezett termék ID-kat erre a napra
-// Üres tömb = minden termék elérhető (nincs korlátozás)
+// GET: visszaadja az engedélyezett termék ID-kat erre a napra.
+// Az üres tömb azt jelenti, hogy még nincs rendelhető termék kijelölve.
 export async function GET(
   request: Request,
   { params }: { params: { nap_id: string } }
@@ -29,8 +29,8 @@ export async function GET(
   return NextResponse.json({ termek_ids });
 }
 
-// PUT: beállítja az engedélyezett termékeket erre a napra
-// Üres termek_ids = minden elérhető (töröl minden korlátozást)
+// PUT: beállítja az engedélyezett termékeket erre a napra.
+// Az üres termek_ids törli a napi kínálatot.
 export async function PUT(
   request: Request,
   { params }: { params: { nap_id: string } }
