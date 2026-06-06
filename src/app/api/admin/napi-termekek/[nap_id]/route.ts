@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { unstable_noStore as noStore } from "next/cache";
 import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
@@ -10,6 +11,8 @@ export async function GET(
   request: Request,
   { params }: { params: { nap_id: string } }
 ) {
+  noStore();
+
   const authError = await requireAdmin(request);
   if (authError) return authError;
 
