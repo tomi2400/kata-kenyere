@@ -3,6 +3,8 @@ export type Termek = {
   slug: string;
   nev: string;
   leiras: string;
+  hozzavalok?: string | null;
+  allergenek?: string | null;
   kategoria: string;
   ar: number;
   egyseg: string;

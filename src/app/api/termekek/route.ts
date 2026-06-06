@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { unstable_noStore as noStore } from "next/cache";
 import { supabase } from "@/lib/supabase/client";
+import { withParsedProductDetails } from "@/lib/product-details";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,6 @@ export async function GET() {
 
   return NextResponse.json({
     kategoriak: kategoriaLista,
-    termekek: termekek ?? [],
+    termekek: (termekek ?? []).map(withParsedProductDetails),
   });
 }

@@ -11,6 +11,8 @@ type Termek = {
   slug: string;
   nev: string;
   leiras: string;
+  hozzavalok: string;
+  allergenek: string;
   kategoria: string;
   ar: number;
   egyseg: string;
@@ -29,6 +31,8 @@ type ProductFormData = {
   nev: string;
   slug: string;
   leiras: string;
+  hozzavalok: string;
+  allergenek: string;
   kategoria: string;
   ar: string;
   egyseg: string;
@@ -39,6 +43,8 @@ const emptyForm: ProductFormData = {
   nev: "",
   slug: "",
   leiras: "",
+  hozzavalok: "",
+  allergenek: "",
   kategoria: "",
   ar: "",
   egyseg: "",
@@ -99,6 +105,7 @@ function TermekekTab() {
     setEditingId(t.id);
     setForm({
       nev: t.nev, slug: t.slug, leiras: t.leiras,
+      hozzavalok: t.hozzavalok || "", allergenek: t.allergenek || "",
       kategoria: t.kategoria, ar: String(t.ar),
       egyseg: t.egyseg, foto_url: t.foto_url || "",
     });
@@ -195,6 +202,7 @@ function TermekekTab() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               nev: form.nev, slug: form.slug, leiras: form.leiras,
+              hozzavalok: form.hozzavalok, allergenek: form.allergenek,
               kategoria: form.kategoria, ar: Number(form.ar),
               egyseg: form.egyseg, foto_url: form.foto_url || null,
             }),
@@ -453,11 +461,36 @@ function TermekekTab() {
                 </div>
               </div>
               <div>
-                <label className="block font-sans text-xs text-brown/60 mb-1">Leírás</label>
+                <label className="block font-sans text-xs text-brown/60 mb-1">Rövid leírás</label>
                 <textarea value={form.leiras}
                   onChange={(e) => setForm({ ...form, leiras: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 rounded-lg border border-cream-dark font-sans text-sm bg-white focus:border-gold focus:outline-none resize-none" />
+              </div>
+              <div>
+                <label className="block font-sans text-xs text-brown/60 mb-1">Összetevők</label>
+                <textarea
+                  value={form.hozzavalok}
+                  onChange={(e) => setForm({ ...form, hozzavalok: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-lg border border-cream-dark font-sans text-sm bg-white focus:border-gold focus:outline-none resize-none"
+                  placeholder="Pl. búzaliszt, vaj, tej, tojás, cukor..."
+                />
+              </div>
+              <div>
+                <label className="block font-sans text-xs text-brown/60 mb-1">
+                  Allergének <span className="font-normal text-brown/35">(opcionális)</span>
+                </label>
+                <textarea
+                  value={form.allergenek}
+                  onChange={(e) => setForm({ ...form, allergenek: e.target.value })}
+                  rows={2}
+                  className="w-full px-3 py-2 rounded-lg border border-cream-dark font-sans text-sm bg-white focus:border-gold focus:outline-none resize-none"
+                  placeholder="Pl. glutén, tej, tojás, diófélék"
+                />
+                <p className="mt-1 font-sans text-[11px] text-brown/40">
+                  Ha üresen marad, az Allergének rész nem jelenik meg a vásárlóknak.
+                </p>
               </div>
               <div>
                 <label className="block font-sans text-xs text-brown/60 mb-1">Kép</label>
@@ -480,6 +513,8 @@ function TermekekTab() {
                           slug: "",
                           nev: form.nev || "Termékkép",
                           leiras: "",
+                          hozzavalok: "",
+                          allergenek: "",
                           kategoria: "",
                           ar: 0,
                           egyseg: "",

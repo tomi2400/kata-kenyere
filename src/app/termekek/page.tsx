@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import { ArrowRight } from "lucide-react";
-import { type Termek, getTermekFoto, formatAr, csoportositByKategoria } from "@/lib/products";
+import { type Termek, csoportositByKategoria } from "@/lib/products";
 import { supabase } from "@/lib/supabase/client";
 import Navbar from "@/components/Navbar";
 import ScrollReveal from "@/components/ScrollReveal";
 import TrackedLink from "@/components/TrackedLink";
+import CatalogProductCard from "@/components/CatalogProductCard";
 import { defaultOpenGraphImage } from "@/lib/seo";
+import { withParsedProductDetails } from "@/lib/product-details";
+import type { ProductAvailability } from "@/components/ProductDetailsModal";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +26,21 @@ export const metadata: Metadata = {
   },
 };
 
+function getBudapestDateInput() {
+  const parts = new Intl.DateTimeFormat("hu-HU", {
+    timeZone: "Europe/Budapest",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+
+  const year = parts.find((part) => part.type === "year")?.value ?? "0000";
+  const month = parts.find((part) => part.type === "month")?.value ?? "00";
+  const day = parts.find((part) => part.type === "day")?.value ?? "00";
+
+  return `${year}-${month}-${day}`;
+}
+
 export default async function TermekekPage() {
   noStore();
 
@@ -35,8 +52,41 @@ export default async function TermekekPage() {
     .order("sorrend");
 
   const kategoriaLista = kategoriak?.map((k) => k.nev) ?? [];
-  const termekek: Termek[] = termekekRaw ?? [];
+  const termekek: Termek[] = (termekekRaw ?? []).map(withParsedProductDetails);
   const termekekByKategoria = csoportositByKategoria(termekek, kategoriaLista);
+  const now = new Date();
+  const today = getBudapestDateInput();
+  const { data: openDays } = await supabase
+    .from("rendeles_napok")
+    .select("id, datum, nap, hatarido")
+    .eq("nyitott", true)
+    .gte("datum", today)
+    .order("datum")
+    .limit(90);
+  const availableDays = (openDays ?? []).filter(
+    (day) => day.hatarido && new Date(day.hatarido) > now
+  );
+  const dayById = new Map(availableDays.map((day) => [day.id, day]));
+  const { data: dailyProducts } = availableDays.length > 0
+    ? await supabase
+      .from("napi_termekek")
+      .select("rendeles_nap_id, termek_id")
+      .in("rendeles_nap_id", availableDays.map((day) => day.id))
+    : { data: [] };
+  const availabilityByProduct = new Map<string, ProductAvailability[]>();
+
+  for (const row of dailyProducts ?? []) {
+    const day = dayById.get(row.rendeles_nap_id);
+    if (!day) continue;
+
+    const availability = availabilityByProduct.get(row.termek_id) ?? [];
+    availability.push({ datum: day.datum, nap: day.nap });
+    availabilityByProduct.set(row.termek_id, availability);
+  }
+
+  availabilityByProduct.forEach((availability) => {
+    availability.sort((a, b) => a.datum.localeCompare(b.datum));
+  });
 
   return (
     <div className="min-h-screen bg-[#fafaf8] grain-overlay text-[#4b2e1f]">
@@ -77,42 +127,10 @@ export default async function TermekekPage() {
             <div className="grid auto-rows-fr grid-cols-2 items-stretch gap-3 md:grid-cols-3 md:gap-5 xl:grid-cols-4">
               {termekLista.map((termek, i) => (
                 <ScrollReveal key={termek.id} variant="up" delay={i * 60} className="h-full">
-                  <TrackedLink
-                    href="/elorendeles"
-                    trackingEvent="product_preorder_clicked"
-                    trackingData={{
-                      product_id: termek.slug,
-                      product_name: termek.nev,
-                      price: termek.ar,
-                      currency: "HUF",
-                      item_category: termek.kategoria,
-                      cta_location: "products_listing",
-                    }}
-                    className="group flex h-full flex-col overflow-hidden rounded-[20px] border border-[#ede8df] bg-white transition-all duration-300 hover:-translate-y-1.5 hover:border-[#c79a66]/50 hover:shadow-[0_16px_36px_rgba(91,56,38,0.10)]"
-                  >
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      <Image
-                        src={getTermekFoto(termek)}
-                        alt={termek.nev}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                        sizes="(max-width: 640px) 50vw, 25vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(40,20,10,0.32)] via-transparent to-transparent" />
-                    </div>
-                    <div className="flex flex-1 flex-col p-3 md:p-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="min-h-[2.15rem] break-words font-serif text-[0.875rem] leading-snug text-[#4b2e1f] md:min-h-[2.45rem] md:text-[0.975rem]">{termek.nev}</p>
-                        <p className="shrink-0 font-sans text-xs font-semibold text-[#5b3826] md:text-sm">{formatAr(termek.ar)}</p>
-                      </div>
-                      {termek.egyseg && (
-                        <p className="mt-0.5 font-sans text-[10px] uppercase tracking-[0.14em] text-[#9d7f63] md:text-[11px]">{termek.egyseg}</p>
-                      )}
-                      {termek.leiras && (
-                        <p className="mt-1.5 font-sans text-[0.75rem] leading-relaxed text-[#7c5a46] md:mt-2 md:text-[0.8rem]">{termek.leiras}</p>
-                      )}
-                    </div>
-                  </TrackedLink>
+                  <CatalogProductCard
+                    termek={termek}
+                    availability={availabilityByProduct.get(termek.id) ?? []}
+                  />
                 </ScrollReveal>
               ))}
             </div>

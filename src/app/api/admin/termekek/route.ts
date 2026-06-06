@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { serializeProductDetails, withParsedProductDetails } from "@/lib/product-details";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({
-    termekek: termekek ?? [],
+    termekek: (termekek ?? []).map(withParsedProductDetails),
     kategoriak: kategoriak?.map((k) => k.nev) ?? [],
   });
 }
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
   if (authError) return authError;
 
   const body = await request.json();
-  const { nev, slug, leiras, kategoria, ar, egyseg, foto_url } = body;
+  const { nev, slug, leiras, hozzavalok, allergenek, kategoria, ar, egyseg, foto_url } = body;
 
   if (!nev || !slug || !kategoria || !ar || !egyseg) {
     return NextResponse.json({ error: "Hianyzo mezok" }, { status: 400 });
@@ -55,7 +56,11 @@ export async function POST(request: Request) {
     .insert({
       nev,
       slug,
-      leiras: leiras || "",
+      leiras: serializeProductDetails({
+        leiras: typeof leiras === "string" ? leiras : "",
+        hozzavalok: typeof hozzavalok === "string" ? hozzavalok : "",
+        allergenek: typeof allergenek === "string" ? allergenek : "",
+      }),
       kategoria,
       ar: Number(ar),
       egyseg,
