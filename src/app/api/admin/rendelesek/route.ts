@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 type TetelRow = {
   id: string;
+  termek_id: string | null;
   datum: string;
   nap: string;
   termek_nev: string;
@@ -41,7 +42,7 @@ export async function GET(request: Request) {
     .from("rendelesek")
     .select(`
       id, rendeles_szam, nev, email, telefon, megjegyzes, vegosszeg, allapot, created_at,
-      rendeles_tetelek (id, datum, nap, termek_nev, mennyiseg, egysegar, reszosszeg, allapot)
+      rendeles_tetelek (id, termek_id, datum, nap, termek_nev, mennyiseg, egysegar, reszosszeg, allapot)
     `)
     .order("created_at", { ascending: false });
 

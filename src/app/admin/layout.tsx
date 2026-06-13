@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase/client";
 
 const NAV_ITEMS = [
   { href: "/admin/muhely", label: "Műhely", icon: "clipboard" },
+  { href: "/admin/muhely-v2", label: "Műhely V2", icon: "grid" },
   { href: "/admin/termekek", label: "Termékek", icon: "bread" },
   { href: "/admin/napok", label: "Napok", icon: "calendar" },
   { href: "/admin/statisztika", label: "Statisztika", icon: "chart" },
@@ -26,6 +27,12 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
       return (
         <svg className={cn} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+      );
+    case "grid":
+      return (
+        <svg className={cn} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 5.25A.75.75 0 015.25 4.5h5.25a.75.75 0 01.75.75v5.25a.75.75 0 01-.75.75H5.25a.75.75 0 01-.75-.75V5.25zm8.25 0a.75.75 0 01.75-.75h5.25a.75.75 0 01.75.75v5.25a.75.75 0 01-.75.75H13.5a.75.75 0 01-.75-.75V5.25zm-8.25 8.25a.75.75 0 01.75-.75h5.25a.75.75 0 01.75.75v5.25a.75.75 0 01-.75.75H5.25a.75.75 0 01-.75-.75V13.5zm8.25 0a.75.75 0 01.75-.75h5.25a.75.75 0 01.75.75v5.25a.75.75 0 01-.75.75H13.5a.75.75 0 01-.75-.75V13.5z" />
         </svg>
       );
     case "bread":
@@ -142,7 +149,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Nav items */}
         <nav className="flex-1 py-4">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
               <Link
                 key={item.href}
@@ -194,7 +201,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-brown-dark border-t border-cream/10 safe-area-pb">
         <div className="flex items-center justify-around py-2">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
               <Link
                 key={item.href}
