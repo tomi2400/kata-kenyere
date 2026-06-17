@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/store";
+import { FACEBOOK_URL } from "@/lib/social";
 import { pushDataLayerEvent } from "@/lib/tracking";
 
 type Day = {
@@ -17,6 +18,15 @@ const HU_MONTHS = [
   "Július", "Augusztus", "Szeptember", "Október", "November", "December",
 ];
 const HU_DAYS = ["H", "K", "Sz", "Cs", "P", "Sz", "V"];
+
+function getTodayDateString(): string {
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Budapest",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
 
 function buildCalendarCells(year: number, month: number): (string | null)[] {
   const firstDay = new Date(year, month, 1);
@@ -39,8 +49,15 @@ export default function DaySelector({
   days: Day[];
   redirectTo?: string;
 }) {
-  const [selected, setSelected] = useState<string[]>([]);
-  const { setSelectedDays } = useCartStore();
+  const storedSelectedDays = useCartStore((state) => state.selectedDays);
+  const setSelectedDays = useCartStore((state) => state.setSelectedDays);
+  const [selected, setSelected] = useState<string[]>(() => {
+    const availableDates = new Set(days.map((day) => day.datum));
+    return useCartStore
+      .getState()
+      .selectedDays.map((day) => day.datum)
+      .filter((datum) => availableDates.has(datum));
+  });
   const router = useRouter();
 
   // Elérhető napok map-je
@@ -48,6 +65,24 @@ export default function DaySelector({
     () => new Map(days.map((d) => [d.datum, d])),
     [days]
   );
+
+  useEffect(() => {
+    const availableDates = new Set(days.map((day) => day.datum));
+    const stillAvailableStoredDates = storedSelectedDays
+      .map((day) => day.datum)
+      .filter((datum) => availableDates.has(datum));
+
+    setSelected((current) => {
+      if (
+        current.length === stillAvailableStoredDates.length &&
+        current.every((datum, index) => datum === stillAvailableStoredDates[index])
+      ) {
+        return current;
+      }
+
+      return stillAvailableStoredDates;
+    });
+  }, [days, storedSelectedDays]);
 
   // Elérhető hónapok
   const availableMonths = useMemo(() => {
@@ -67,7 +102,7 @@ export default function DaySelector({
   };
 
   const cells = buildCalendarCells(currentMonth.year, currentMonth.month);
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayDateString();
 
   const toggle = (datum: string) => {
     if (!availableMap.has(datum)) return;
@@ -111,7 +146,16 @@ export default function DaySelector({
           Éppen nincs nyitott rendelési időszak.
         </p>
         <p className="text-brown/70 text-sm">
-          Kövesd Instagram oldalunkat a legfrissebb infókért!
+          Kövesd{" "}
+          <a
+            href={FACEBOOK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-brown-dark underline decoration-gold/50 underline-offset-4 transition-colors hover:text-gold"
+          >
+            Facebook oldalunkat
+          </a>{" "}
+          a legfrissebb infókért!
         </p>
       </div>
     );

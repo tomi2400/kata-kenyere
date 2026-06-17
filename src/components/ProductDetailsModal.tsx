@@ -15,7 +15,7 @@ import {
   Wheat,
   X,
 } from "lucide-react";
-import { formatAr, getTermekFoto, type Termek } from "@/lib/products";
+import { PRODUCT_IMAGE_NOTICE, formatAr, getTermekFoto, type Termek } from "@/lib/products";
 import { pushDataLayerEvent } from "@/lib/tracking";
 
 export type ProductAvailability = {
@@ -151,6 +151,13 @@ export default function ProductDetailsModal(props: ProductDetailsModalProps) {
               {termek.leiras.trim()}
             </p>
           )}
+
+          <div className="mt-5 flex gap-2 rounded-xl border border-[#eadfd2] bg-[#faf4eb] px-4 py-3 text-[#80634f]">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#c79a66]" />
+            <p className="font-sans text-xs leading-5 sm:text-sm">
+              {PRODUCT_IMAGE_NOTICE}
+            </p>
+          </div>
 
           {(hasIngredients || hasAllergens) && (
             <div className="mt-6 space-y-4 border-t border-[#eadfd2] pt-5">

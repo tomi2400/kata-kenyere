@@ -13,6 +13,9 @@ export type Termek = {
 
 const TERMEK_PLACEHOLDER_FOTO = "/images/termek-placeholder.jpg";
 
+export const PRODUCT_IMAGE_NOTICE =
+  "A fotók illusztrációk. Kézzel formázott pékáruink megjelenése sütésenként eltérhet; kenyereink formáját az adott napi készítéshez igazíthatjuk.";
+
 function isSupportedImageSrc(src: string): boolean {
   if (src.startsWith("/")) return true;
 

@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { useCartStore } from "@/lib/store";
-import { formatAr } from "@/lib/products";
+import { PRODUCT_IMAGE_NOTICE, formatAr } from "@/lib/products";
 import { getStoredMarketingAttribution, pushDataLayerEvent } from "@/lib/tracking";
 
 function formatDatum(datum: string): string {
@@ -22,6 +22,7 @@ export default function OsszesitesPage() {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ nev: "", email: "", telefon: "", megjegyzes: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { if (mounted && selectedDays.length === 0 && !submitted) router.replace("/"); }, [mounted, selectedDays, submitted, router]);
@@ -82,13 +83,20 @@ export default function OsszesitesPage() {
 
   const handleSubmit = async () => {
     if (!validate()) return;
-    setLoading(true);
     const rendelesek = selectedDayCarts.flatMap((day) =>
       day.items.map((item) => ({
         nap: day.nap, datum: day.datum, termekId: item.termekId,
         nev: item.nev, mennyiseg: item.mennyiseg, egysegar: item.ar, reszosszeg: item.ar * item.mennyiseg,
       }))
     );
+
+    if (rendelesek.length === 0) {
+      setSubmitError("Legalább egy terméket válassz valamelyik átvételi napra.");
+      return;
+    }
+
+    setSubmitError("");
+    setLoading(true);
     const marketingAttribution = getStoredMarketingAttribution();
     const orderTrackingPayload = buildOrderTrackingPayload();
 
@@ -133,8 +141,14 @@ export default function OsszesitesPage() {
         }
         clearCart();
         router.push("/koszonjuk");
-      } else { alert("Hiba történt, kérlek próbáld újra!"); }
-    } catch { alert("Hiba történt, kérlek próbáld újra!"); }
+      } else {
+        setSubmitError(
+          typeof data?.error === "string"
+            ? data.error
+            : "Hiba történt, kérlek próbáld újra!"
+        );
+      }
+    } catch { setSubmitError("Hiba történt, kérlek próbáld újra!"); }
     finally { setLoading(false); }
   };
 
@@ -157,6 +171,9 @@ export default function OsszesitesPage() {
           <h1 className="mt-1 font-serif text-[1.8rem] text-[#3d2314]">Rendelés összesítése</h1>
           <p className="mt-2 font-sans text-sm leading-relaxed text-[#7c5a46]">
             Nézd át nyugodtan a napokra bontott kosarat, aztán add meg az adataidat.
+          </p>
+          <p className="mt-4 rounded-[14px] border border-[#eadfd2] bg-[#faf4eb] px-4 py-3 font-sans text-xs leading-5 text-[#80634f]">
+            {PRODUCT_IMAGE_NOTICE}
           </p>
         </section>
 
@@ -257,6 +274,11 @@ export default function OsszesitesPage() {
         </section>
 
         {/* Submit */}
+        {submitError && (
+          <p role="alert" className="rounded-[14px] border border-red-200 bg-red-50 px-4 py-3 font-sans text-sm text-red-700">
+            {submitError}
+          </p>
+        )}
         <button
           onClick={handleSubmit}
           disabled={loading}
