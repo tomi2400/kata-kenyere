@@ -178,6 +178,10 @@ function numberValue(value: string) {
   return Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed) : 0;
 }
 
+function totalProducedValue(orderedQuantity: number, extraQuantity: string) {
+  return String(orderedQuantity + numberValue(extraQuantity));
+}
+
 function getTetelAllapot(tetel: Pick<Tetel, "allapot">) {
   return tetel.allapot === "kesz" ? "uj" : tetel.allapot || "uj";
 }
@@ -749,7 +753,11 @@ export default function MuhelyPage() {
                             disabled={!data?.stockTrackingReady}
                             onChange={(event) => setStockDrafts((prev) => ({
                               ...prev,
-                              [key]: { ...draft, extra_mennyiseg: event.target.value },
+                              [key]: {
+                                ...(prev[key] ?? draft),
+                                extra_mennyiseg: event.target.value,
+                                elkeszult_mennyiseg: totalProducedValue(product.elorendelve, event.target.value),
+                              },
                             }))}
                             className="mt-2 h-11 w-full rounded-lg border border-cream-dark bg-white px-3 text-center font-sans text-xl font-bold normal-case tracking-normal text-brown-dark outline-none focus:border-gold disabled:bg-cream-dark/40"
                           />

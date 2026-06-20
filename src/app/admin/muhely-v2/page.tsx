@@ -148,6 +148,10 @@ function quantityValue(value: string) {
   return Number.isFinite(number) && number >= 0 ? Math.round(number) : 0;
 }
 
+function totalProducedValue(orderedQuantity: number, extraQuantity: string) {
+  return String(orderedQuantity + quantityValue(extraQuantity));
+}
+
 function formatFt(value: number) {
   return `${value.toLocaleString("hu-HU")} Ft`;
 }
@@ -435,7 +439,14 @@ export default function MuhelyV2Page() {
     if (!stockTrackingReady) return false;
 
     const currentDraft = stockDrafts[productId] ?? { produced: "0", walkInSales: "0" };
-    const nextDraft = { ...currentDraft, ...override };
+    const orderedQuantity = orderedProducts.find((product) => product.id === productId)?.total ?? 0;
+    const nextOverride = override && "walkInSales" in override && !("produced" in override)
+      ? {
+          ...override,
+          produced: totalProducedValue(orderedQuantity, override.walkInSales ?? currentDraft.walkInSales),
+        }
+      : override;
+    const nextDraft = { ...currentDraft, ...nextOverride };
     const produced = quantityValue(nextDraft.produced);
     const walkInSales = quantityValue(nextDraft.walkInSales);
 
@@ -941,7 +952,11 @@ export default function MuhelyV2Page() {
                             onFocus={(event) => event.currentTarget.select()}
                             onChange={(event) => setStockDrafts((current) => ({
                               ...current,
-                              [product.id]: { ...draft, walkInSales: event.target.value },
+                              [product.id]: {
+                                ...(current[product.id] ?? draft),
+                                walkInSales: event.target.value,
+                                produced: totalProducedValue(product.total, event.target.value),
+                              },
                             }))}
                             onBlur={() => void saveStock(product.id)}
                             onKeyDown={(event) => {
