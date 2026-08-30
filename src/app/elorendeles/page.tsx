@@ -93,13 +93,6 @@ export default async function ElorendelesPage() {
           </p>
         </section>
 
-        <section className="mb-8 rounded-[20px] border border-[#d0af77]/35 bg-[#fff8ed] px-5 py-5 md:px-6" aria-label="Nyári szabadság">
-          <p className="font-serif text-lg text-[#3d2314]">Augusztus 25-ig szabadságon vagyunk.</p>
-          <p className="mt-1.5 font-sans text-sm leading-relaxed text-[#7c5a46]">
-            Augusztus 21-től már újra leadhatod a rendelésedet. Addig is szép, kellemes nyarat kívánunk! ☀️
-          </p>
-        </section>
-
         {/* Lépések */}
         <div className="mb-8 grid grid-cols-1 gap-3 md:grid-cols-3">
           {[
