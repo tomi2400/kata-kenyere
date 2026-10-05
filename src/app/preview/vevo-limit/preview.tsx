@@ -4,29 +4,51 @@ import { useState } from "react";
 import DayProductAvailabilityRow from "@/components/DayProductAvailabilityRow";
 import ProductCard from "@/components/ProductCard";
 import type { Termek } from "@/lib/products";
+import { countsTowardBreadLimit } from "@/lib/bread-limit";
 
 const day = { datum: "2026-10-09", nap: "Péntek" };
 
 const product: Termek = {
   id: "preview-bread",
-  slug: "preview-kovaszos-kenyer",
-  nev: "Kovászos kenyér",
-  leiras: "Frissen sült, hosszú érlelésű kovászos kenyér.",
-  kategoria: "Kenyerek",
+  slug: "preview-feher-1kg",
+  nev: "Fehér kenyér",
+  leiras: "Frissen sült, hosszú érlelésű kovászos fehér kenyér.",
+  kategoria: "Kovászos kenyerek",
   ar: 2500,
   egyseg: "1 kg",
   foto_url: "/images/DSC00045.JPG",
 };
 
-const secondProduct = { id: "preview-white-bread", nev: "Fehér kenyér", egyseg: "750 g" };
+const secondProduct: Termek = {
+  ...product,
+  id: "preview-white-bread",
+  slug: "preview-feher-750g",
+  egyseg: "750 g",
+  ar: 2000,
+};
+const baguette: Termek = {
+  ...product,
+  id: "preview-baguette",
+  slug: "preview-bagett",
+  nev: "Bagett",
+  leiras: "Ropogós, friss bagett.",
+  egyseg: "300 g",
+  ar: 950,
+};
+const previewProducts = [product, secondProduct, baguette];
 
 export default function CustomerLimitPreview() {
-  const [limits, setLimits] = useState<Record<string, number>>({ [product.id]: 3 });
-  const [drafts, setDrafts] = useState<Record<string, string>>({ [product.id]: "3", [secondProduct.id]: "" });
-  const [enabledIds, setEnabledIds] = useState<string[]>([product.id, secondProduct.id]);
-  const [quantity, setQuantity] = useState(0);
+  const [limits, setLimits] = useState<Record<string, number>>({});
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [breadLimit, setBreadLimit] = useState<number | null>(3);
+  const [breadDraft, setBreadDraft] = useState("3");
+  const [enabledIds, setEnabledIds] = useState<string[]>(previewProducts.map((item) => item.id));
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const breadUsed = previewProducts.reduce((sum, item) => sum + (
+    countsTowardBreadLimit(item) ? quantities[item.id] ?? 0 : 0
+  ), 0);
 
   const save = () => {
     const nextLimits: Record<string, number> = {};
@@ -40,14 +62,31 @@ export default function CustomerLimitPreview() {
       }
       nextLimits[id] = maximum;
     }
+    const nextBreadLimit = breadDraft.trim() === "" ? null : Number(breadDraft.trim());
+    if (nextBreadLimit !== null && (!Number.isInteger(nextBreadLimit) || nextBreadLimit < 1 || nextBreadLimit > 99)) {
+      setError("A közös kenyérmaximum 1 és 99 közötti egész szám lehet.");
+      return;
+    }
     setError("");
     setLimits(nextLimits);
-    setQuantity((current) => Math.min(current, nextLimits[product.id] ?? 99));
+    setBreadLimit(nextBreadLimit);
+    setQuantities((current) => {
+      const next = { ...current };
+      let remaining = nextBreadLimit ?? 99;
+      for (const item of previewProducts) {
+        const productMaximum = nextLimits[item.id] ?? 99;
+        const breadMaximum = countsTowardBreadLimit(item) ? remaining : 99;
+        next[item.id] = Math.min(next[item.id] ?? 0, productMaximum, breadMaximum);
+        if (countsTowardBreadLimit(item)) remaining -= next[item.id];
+      }
+      return next;
+    });
     setSaved(true);
   };
 
   const toggle = (id: string) => {
     setEnabledIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+    setQuantities((current) => ({ ...current, [id]: 0 }));
   };
 
   const changeDraft = (id: string, value: string) => {
@@ -62,9 +101,9 @@ export default function CustomerLimitPreview() {
         <span className="rounded-full border border-gold/40 bg-white px-3 py-1 font-sans text-xs font-semibold uppercase tracking-[0.12em] text-brown-dark">
           Interaktív preview
         </span>
-        <h1 className="mt-5 font-serif text-3xl text-brown-dark">Vevőnkénti napi maximum</h1>
+        <h1 className="mt-5 font-serif text-3xl text-brown-dark">Közös pénteki kenyérkeret</h1>
         <p className="mt-3 max-w-2xl font-sans text-sm leading-6 text-brown/70">
-          Próbáld ki, hogyan jelenik meg a pénteki kenyérlimit a Rendelési napok adminfelületen és a vásárló előtt.
+          Próbáld ki, hogyan számítódik együtt a pénteki kenyérmennyiség a Rendelési napok adminfelületen és a vásárló előtt.
           Ez a bemutató mintaadatokat használ: nem ment beállítást, és nem küld rendelést.
         </p>
 
@@ -82,6 +121,27 @@ export default function CustomerLimitPreview() {
                 <br />
                 Az adott nap minden termékénél külön állítható a maximum. Üres mezőnél nincs külön limit.
               </p>
+              <div className="mt-3 rounded-lg border border-gold/30 bg-cream/50 p-3">
+                <label htmlFor="preview-bread-limit" className="block font-sans text-xs font-semibold text-brown-dark">
+                  Kenyerek együtt – maximum vevőnként
+                </label>
+                <p className="mt-1 font-sans text-[10px] text-brown/55">
+                  A pénteki kenyerek egy közös keretbe számítanak. A bagett nem. Üresen nincs közös limit.
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    id="preview-bread-limit"
+                    type="number"
+                    min={1}
+                    max={99}
+                    step={1}
+                    value={breadDraft}
+                    onChange={(event) => { setBreadDraft(event.target.value); setSaved(false); }}
+                    className="w-20 rounded-lg border border-cream-dark bg-white px-2 py-1.5 font-sans text-xs focus:border-gold focus:outline-none"
+                  />
+                  <span className="font-sans text-xs text-brown/55">db / vevő</span>
+                </div>
+              </div>
               {error && <p className="mt-2 font-sans text-xs text-red-600">{error}</p>}
               {saved && <p className="mt-2 font-sans text-xs text-green-700">Minden módosítás mentve.</p>}
               <div className="mt-4 border-t border-cream-dark pt-3">
@@ -89,7 +149,7 @@ export default function CustomerLimitPreview() {
                 <div className="mt-2 rounded-xl border border-cream-dark bg-cream/40 p-3">
                   <p className="mb-2 font-sans text-xs font-semibold text-brown-dark">Kovászos kenyerek</p>
                   <div className="space-y-1.5">
-                    {[product, secondProduct].map((item) => (
+                    {previewProducts.map((item) => (
                       <DayProductAvailabilityRow
                         key={item.id}
                         id={item.id}
@@ -106,26 +166,35 @@ export default function CustomerLimitPreview() {
               </div>
             </div>
             <p className="mt-4 font-sans text-xs leading-5 text-brown/60">
-              Állítsd be a két termék maximumát külön-külön, majd a Módosítások mentése gombbal próbáld ki a változást. A vásárlói kártya a kovászos kenyérhez tartozik.
+              Próbáld ki: 1 db fehér 1 kg + 2 db fehér 750 g után a kenyérkeret betelik. A bagett ettől függetlenül hozzáadható.
             </p>
           </section>
 
           <section>
             <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-brown/50">Vásárlói rendelési felület · péntek</p>
-            {enabledIds.includes(product.id) ? (
-              <div className="mt-3 max-w-sm">
-                <ProductCard
-                  termek={product}
-                  datum={day.datum}
-                  maxVevonkent={limits[product.id] ?? null}
-                  preview={{ quantity, onChange: setQuantity }}
-                />
+            {breadLimit !== null && (
+              <div className="mt-3 rounded-xl bg-cream px-3 py-2 font-sans text-xs text-brown-dark">
+                <p className="font-semibold">Közös kenyérkeret: {breadUsed}/{breadLimit} db. A bagett nem számít bele.</p>
+                <p className="mt-1 text-brown/60">Az azonos e-mail-címmel korábban leadott rendelések is beleszámítanak.</p>
               </div>
-            ) : (
-              <p className="mt-3 rounded-xl border border-cream-dark bg-white p-4 font-sans text-sm text-brown/60">
-                A kovászos kenyér most ki van kapcsolva, ezért a vásárlók nem rendelhetik.
-              </p>
             )}
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              {previewProducts.filter((item) => enabledIds.includes(item.id)).map((item) => (
+                <ProductCard
+                  key={item.id}
+                  termek={item}
+                  datum={day.datum}
+                  maxVevonkent={limits[item.id] ?? null}
+                  breadGroup={breadLimit !== null && countsTowardBreadLimit(item)
+                    ? { limit: breadLimit, used: breadUsed }
+                    : null}
+                  preview={{
+                    quantity: quantities[item.id] ?? 0,
+                    onChange: (quantity) => setQuantities((current) => ({ ...current, [item.id]: quantity })),
+                  }}
+                />
+              ))}
+            </div>
           </section>
         </div>
       </div>

@@ -12,6 +12,7 @@ type Day = {
   hatarido: string;
   korlatozott_termek_ids?: string[];
   max_vevonkent?: Record<string, number>;
+  kenyer_max_vevonkent?: number | null;
 };
 
 const HU_MONTHS = [
@@ -121,6 +122,7 @@ export default function DaySelector({
         datum: d.datum,
         korlatozott_termek_ids: d.korlatozott_termek_ids ?? [],
         max_vevonkent: d.max_vevonkent ?? {},
+        kenyer_max_vevonkent: d.kenyer_max_vevonkent ?? null,
       }));
 
     pushDataLayerEvent("preorder_started", {

@@ -38,6 +38,7 @@ type ProductDetailsModalProps = {
       onQuantityChange: (delta: number) => void;
       maxQuantity: number;
       customerLimit: number | null;
+      breadGroup?: { limit: number; used: number } | null;
     }
 );
 
@@ -251,9 +252,10 @@ export default function ProductDetailsModal(props: ProductDetailsModalProps) {
                 <button
                   type="button"
                   onClick={() => props.onQuantityChange(1)}
-                  className="w-full rounded-xl bg-[#4b2e1f] px-4 py-3 font-sans text-sm font-semibold text-[#fff9f0] transition-colors hover:bg-[#68432d]"
+                  disabled={props.maxQuantity === 0}
+                  className="w-full rounded-xl bg-[#4b2e1f] px-4 py-3 font-sans text-sm font-semibold text-[#fff9f0] transition-colors hover:bg-[#68432d] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  + Kosárba teszem
+                  {props.maxQuantity === 0 ? "A kenyérkeret betelt" : "+ Kosárba teszem"}
                 </button>
               ) : (
                 <div className="flex items-center justify-between rounded-xl border border-[#d8b98c]/45 bg-[#faf4eb] p-2">
@@ -282,6 +284,11 @@ export default function ProductDetailsModal(props: ProductDetailsModalProps) {
               {props.customerLimit !== null && (
                 <p className="mt-2 font-sans text-xs text-[#7b593f]">
                   Maximum rendelhető vevőnként: {props.customerLimit} db erre a napra.
+                </p>
+              )}
+              {props.breadGroup && (
+                <p className="mt-2 font-sans text-xs text-[#7b593f]">
+                  Közös kenyérkeret: {props.breadGroup.used}/{props.breadGroup.limit} db. A bagett nem számít bele.
                 </p>
               )}
             </div>

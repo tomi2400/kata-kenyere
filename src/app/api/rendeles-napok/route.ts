@@ -30,13 +30,25 @@ export async function GET() {
   });
 
   const dayIds = elérhetoNapok.map((nap) => nap.id);
-  const { data: limitRows, error: limitError } = dayIds.length
-    ? await supabaseAdmin.from("napi_termek_vevo_limit").select("rendeles_nap_id, termek_id, max_vevonkent").in("rendeles_nap_id", dayIds)
-    : { data: [], error: null };
+  const [productLimitResult, breadLimitResult] = await Promise.all([
+    dayIds.length
+      ? supabaseAdmin.from("napi_termek_vevo_limit").select("rendeles_nap_id, termek_id, max_vevonkent").in("rendeles_nap_id", dayIds)
+      : Promise.resolve({ data: [], error: null }),
+    dayIds.length
+      ? supabaseAdmin.from("napi_kenyer_vevo_limit").select("rendeles_nap_id, max_vevonkent").in("rendeles_nap_id", dayIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  const { data: limitRows, error: limitError } = productLimitResult;
+  const { data: breadLimitRows, error: breadLimitError } = breadLimitResult;
   const missingPreviewTable = process.env.VERCEL_ENV === "preview" &&
     (limitError?.code === "42P01" || limitError?.code === "PGRST205");
   if (limitError && !missingPreviewTable) {
     return NextResponse.json({ error: "Hiba a rendelési limitek lekérésekor" }, { status: 500 });
+  }
+  const missingPreviewBreadTable = process.env.VERCEL_ENV === "preview" &&
+    (breadLimitError?.code === "42P01" || breadLimitError?.code === "PGRST205");
+  if (breadLimitError && !missingPreviewBreadTable) {
+    return NextResponse.json({ error: "Hiba a közös kenyérkeret lekérésekor" }, { status: 500 });
   }
   const limitsByDay = new Map<string, Record<string, number>>();
   for (const row of limitRows ?? []) {
@@ -44,6 +56,7 @@ export async function GET() {
     limits[row.termek_id] = row.max_vevonkent;
     limitsByDay.set(row.rendeles_nap_id, limits);
   }
+  const breadLimitByDay = new Map((breadLimitRows ?? []).map((row) => [row.rendeles_nap_id, row.max_vevonkent]));
 
   // Minden naphoz lekérjük az elérhető termékeket
   const daysWithProducts = await Promise.all(
@@ -60,6 +73,7 @@ export async function GET() {
         hatarido: nap.hatarido,
         korlatozott_termek_ids: napiTermekek?.map((t) => t.termek_id) ?? [],
         max_vevonkent: limitsByDay.get(nap.id) ?? {},
+        kenyer_max_vevonkent: breadLimitByDay.get(nap.id) ?? null,
       };
     })
   );

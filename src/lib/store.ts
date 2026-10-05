@@ -21,6 +21,7 @@ export type SelectedOrderDay = {
   datum: string;
   korlatozott_termek_ids?: string[];
   max_vevonkent?: Record<string, number>;
+  kenyer_max_vevonkent?: number | null;
 };
 
 type CartStore = {

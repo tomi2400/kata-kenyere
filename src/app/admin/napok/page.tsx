@@ -92,6 +92,8 @@ export default function NapokPage() {
   const [limitDrafts, setLimitDrafts] = useState<Record<string, string>>({});
   const [limitLoading, setLimitLoading] = useState(false);
   const [limitError, setLimitError] = useState("");
+  const [breadLimitValue, setBreadLimitValue] = useState<number | null>(null);
+  const [breadLimitDraft, setBreadLimitDraft] = useState("");
 
   const fetchNapok = useCallback(() => {
     setLoading(true);
@@ -127,19 +129,27 @@ export default function NapokPage() {
     setLimitLoading(true);
     setLimitValues({});
     setLimitDrafts({});
+    setBreadLimitValue(null);
+    setBreadLimitDraft("");
     setLimitError("");
     Promise.all([
       adminFetch(`/api/admin/napi-termekek/${editNap.id}`),
       adminFetch(`/api/admin/rendeles-napok/${editNap.id}/vevo-limitek`),
+      adminFetch(`/api/admin/rendeles-napok/${editNap.id}/kenyer-limit`),
     ])
-      .then(async ([productsResponse, limitsResponse]) => {
-        const [productsData, limitsData] = await Promise.all([productsResponse.json(), limitsResponse.json()]);
+      .then(async ([productsResponse, limitsResponse, breadResponse]) => {
+        const [productsData, limitsData, breadData] = await Promise.all([
+          productsResponse.json(), limitsResponse.json(), breadResponse.json(),
+        ]);
         if (!productsResponse.ok) throw new Error(productsData.error || "Nem sikerült betölteni a napi termékeket.");
         setNapiTermekIds(productsData.termek_ids ?? []);
         if (!limitsResponse.ok) throw new Error(limitsData.error || "Nem sikerült betölteni a napi limiteket.");
+        if (!breadResponse.ok) throw new Error(breadData.error || "Nem sikerült betölteni a közös kenyérkeretet.");
         const values = (limitsData.max_vevonkent ?? {}) as Record<string, number>;
         setLimitValues(values);
         setLimitDrafts(Object.fromEntries(Object.entries(values).map(([id, value]) => [id, String(value)])));
+        setBreadLimitValue(breadData.max_vevonkent ?? null);
+        setBreadLimitDraft(breadData.max_vevonkent == null ? "" : String(breadData.max_vevonkent));
       })
       .catch((error) => setLimitError(error instanceof Error ? error.message : "Nem sikerült betölteni a napi limiteket."))
       .finally(() => setLimitLoading(false));
@@ -164,6 +174,7 @@ export default function NapokPage() {
     try {
       await saveEditor({ silent: true, keepalive: true });
       await saveChangedLimits();
+      await saveChangedBreadLimit();
     } catch {
       return;
     }
@@ -326,6 +337,29 @@ export default function NapokPage() {
     }
   };
 
+  const saveChangedBreadLimit = async () => {
+    if (!editNap || breadLimitDraft.trim() === (breadLimitValue === null ? "" : String(breadLimitValue))) return;
+    const value = breadLimitDraft.trim();
+    const maximum = value === "" ? null : Number(value);
+    if (maximum !== null && (!Number.isInteger(maximum) || maximum < 1 || maximum > 99)) {
+      const message = "A közös kenyérmaximum 1 és 99 közötti egész szám lehet.";
+      setLimitError(message);
+      throw new Error(message);
+    }
+    const response = await adminFetch(`/api/admin/rendeles-napok/${editNap.id}/kenyer-limit`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ max_vevonkent: maximum }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const message = data.error || "Nem sikerült menteni a közös kenyérkeretet.";
+      setLimitError(message);
+      throw new Error(message);
+    }
+    setBreadLimitValue(maximum);
+  };
+
   const saveAll = async () => {
     if (!editNap || napiTermekIds === null) return;
 
@@ -337,6 +371,7 @@ export default function NapokPage() {
       await saveEditor({ silent: true });
       await saveTermekek(napiTermekIds, { silent: true });
       await saveChangedLimits();
+      await saveChangedBreadLimit();
       setSaveSuccess("Minden módosítás mentve.");
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : "Nem sikerült menteni a módosításokat.");
@@ -639,6 +674,34 @@ export default function NapokPage() {
                 <br />
                 Az adott nap minden termékénél külön állítható a maximum. Üres mezőnél nincs külön limit.
               </p>
+              <div className="rounded-lg border border-gold/30 bg-cream/50 p-3">
+                <label htmlFor="bread-day-limit" className="block font-sans text-xs font-semibold text-brown-dark">
+                  Kenyerek együtt – maximum vevőnként
+                </label>
+                <p className="mt-1 font-sans text-[10px] leading-4 text-brown/55">
+                  A nap összes kenyérfajtája egy közös keretbe számít, a korábbi rendelésekben is. A bagett nem számít bele. Üresen nincs közös limit.
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    id="bread-day-limit"
+                    type="number"
+                    min={1}
+                    max={99}
+                    step={1}
+                    inputMode="numeric"
+                    value={breadLimitDraft}
+                    onChange={(event) => {
+                      setBreadLimitDraft(event.target.value);
+                      setLimitError("");
+                      setSaveSuccess("");
+                    }}
+                    disabled={limitLoading || saving}
+                    placeholder="Nincs"
+                    className="w-20 rounded-lg border border-cream-dark bg-white px-2 py-1.5 font-sans text-xs focus:border-gold focus:outline-none disabled:opacity-50"
+                  />
+                  <span className="font-sans text-xs text-brown/55">db / vevő</span>
+                </div>
+              </div>
               {limitError && (
                 <p className="rounded-lg bg-red-50 px-3 py-2 font-sans text-xs text-red-600">{limitError}</p>
               )}

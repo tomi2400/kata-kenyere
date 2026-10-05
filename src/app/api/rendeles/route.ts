@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { sendOrderConfirmationEmail } from "@/lib/order-email";
 import { getPrimaryMarketingTouch, sanitizeMarketingAttribution } from "@/lib/tracking";
+import { countsTowardBreadLimit } from "@/lib/bread-limit";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -37,6 +38,7 @@ type ProductRow = {
   id: string;
   slug: string;
   nev: string;
+  kategoria: string;
   ar: number;
   egyseg: string;
 };
@@ -189,7 +191,7 @@ async function prepareOrderItems(
 
   const { data: termekek, error: termekError } = await supabaseAdmin
     .from("termekek")
-    .select("id, slug, nev, ar, egyseg")
+    .select("id, slug, nev, kategoria, ar, egyseg")
     .eq("aktiv", true)
     .in("slug", slugok);
 
@@ -255,11 +257,21 @@ async function prepareOrderItems(
     allowedProductsByDayId.set(row.rendeles_nap_id, current);
   }
 
-  const { data: limitRows, error: limitError } = napIds.length
-    ? await supabaseAdmin.from("napi_termek_vevo_limit").select("rendeles_nap_id, termek_id, max_vevonkent").in("rendeles_nap_id", napIds)
-    : { data: [], error: null };
+  const [productLimitResult, breadLimitResult] = await Promise.all([
+    napIds.length
+      ? supabaseAdmin.from("napi_termek_vevo_limit").select("rendeles_nap_id, termek_id, max_vevonkent").in("rendeles_nap_id", napIds)
+      : Promise.resolve({ data: [], error: null }),
+    napIds.length
+      ? supabaseAdmin.from("napi_kenyer_vevo_limit").select("rendeles_nap_id, max_vevonkent").in("rendeles_nap_id", napIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  const { data: limitRows, error: limitError } = productLimitResult;
+  const { data: breadLimitRows, error: breadLimitError } = breadLimitResult;
   if (limitError) return { ok: false, error: "Hiba a rendelési limitek ellenőrzésekor.", status: 500 };
+  if (breadLimitError) return { ok: false, error: "Hiba a közös kenyérkeret ellenőrzésekor.", status: 500 };
   const limits = new Map((limitRows ?? []).map((row) => [`${row.rendeles_nap_id}:${row.termek_id}`, row.max_vevonkent]));
+  const breadLimits = new Map((breadLimitRows ?? []).map((row) => [row.rendeles_nap_id, row.max_vevonkent]));
+  const breadTotals = new Map<string, number>();
 
   const items: PreparedOrderItem[] = [];
 
@@ -281,6 +293,15 @@ async function prepareOrderItems(
     const maximum = nap ? limits.get(`${nap.id}:${product.id}`) : undefined;
     if (maximum !== undefined && item.mennyiseg > maximum) {
       return { ok: false, error: `${product.nev}: maximum rendelhető vevőnként ${maximum} db erre a napra.`, status: 409 };
+    }
+
+    if (nap && countsTowardBreadLimit(product)) {
+      const nextTotal = (breadTotals.get(nap.id) ?? 0) + item.mennyiseg;
+      breadTotals.set(nap.id, nextTotal);
+      const breadMaximum = breadLimits.get(nap.id);
+      if (breadMaximum !== undefined && nextTotal > breadMaximum) {
+        return { ok: false, error: `Erre a napra a kenyerekből együtt legfeljebb ${breadMaximum} db rendelhető vevőnként. A bagett nem számít bele.`, status: 409 };
+      }
     }
 
     items.push({
@@ -417,9 +438,15 @@ export async function POST(request: Request) {
       allapot: "uj",
     }));
 
+    // A párhuzamos rendeléseknél az adatbázis zárait minden kérés ugyanabban a sorrendben vegye fel.
+    const orderedTetelek = [...tetelek].sort((left, right) =>
+      (left.rendeles_nap_id ?? "").localeCompare(right.rendeles_nap_id ?? "") ||
+      (left.termek_id ?? "").localeCompare(right.termek_id ?? "")
+    );
+
     const { error: tetelError } = await supabaseAdmin
       .from("rendeles_tetelek")
-      .insert(tetelek);
+      .insert(orderedTetelek);
 
     if (tetelError) {
       await supabaseAdmin
@@ -429,6 +456,9 @@ export async function POST(request: Request) {
       console.error("Tétel mentési hiba:", tetelError);
       if (tetelError.message?.includes("customer_product_limit_exceeded")) {
         return NextResponse.json({ error: "Ebből a termékből erre a napra az e-mail címeddel már elérted a vevőnként rendelhető maximumot. Kérlek, módosítsd a kosarat." }, { status: 409 });
+      }
+      if (tetelError.message?.includes("customer_bread_limit_exceeded")) {
+        return NextResponse.json({ error: "Erre a napra az e-mail címeddel már elérted a közös kenyérkeretet. A bagett nem számít bele. Kérlek, módosítsd a kosarat." }, { status: 409 });
       }
       return NextResponse.json({ error: "Hiba a tételek mentésekor" }, { status: 500 });
     }

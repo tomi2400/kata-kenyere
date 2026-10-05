@@ -7,13 +7,15 @@ import { useCartStore } from "@/lib/store";
 import { formatAr, getTermekFoto, type Termek } from "@/lib/products";
 import { pushDataLayerEvent } from "@/lib/tracking";
 import ProductDetailsModal from "@/components/ProductDetailsModal";
+import { maxQuantityWithinBreadLimit } from "@/lib/bread-limit";
 
 const MAX_ITEM_QUANTITY = 99;
 
-export default function ProductCard({ termek, datum, maxVevonkent, preview }: {
+export default function ProductCard({ termek, datum, maxVevonkent, breadGroup, preview }: {
   termek: Termek;
   datum: string;
   maxVevonkent: number | null;
+  breadGroup?: { limit: number; used: number } | null;
   preview?: { quantity: number; onChange: (quantity: number) => void };
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -21,7 +23,10 @@ export default function ProductCard({ termek, datum, maxVevonkent, preview }: {
   const dayItems = carts[datum] ?? [];
   const item = dayItems.find((i) => i.termekId === termek.slug);
   const qty = preview ? preview.quantity : item?.mennyiseg ?? 0;
-  const maxQuantity = Math.min(MAX_ITEM_QUANTITY, maxVevonkent ?? MAX_ITEM_QUANTITY);
+  const breadQuantityLimit = breadGroup
+    ? maxQuantityWithinBreadLimit(breadGroup.limit, breadGroup.used, qty)
+    : MAX_ITEM_QUANTITY;
+  const maxQuantity = Math.min(MAX_ITEM_QUANTITY, maxVevonkent ?? MAX_ITEM_QUANTITY, breadQuantityLimit);
 
   const change = (delta: number) => {
     const newQty = Math.min(maxQuantity, Math.max(0, qty + delta));
@@ -139,15 +144,21 @@ export default function ProductCard({ termek, datum, maxVevonkent, preview }: {
               Maximum rendelhető vevőnként: {maxVevonkent} db erre a napra.
             </p>
           )}
+          {breadGroup && (
+            <p className="mt-1 font-sans text-[10px] text-brown/60 sm:text-[11px]">
+              Közös kenyérkeret: {breadGroup.used}/{breadGroup.limit} db. A bagett nem számít bele.
+            </p>
+          )}
 
           <div className="mt-3 flex items-center justify-between">
             {qty === 0 ? (
               <button
                 type="button"
                 onClick={() => change(1)}
-                className="w-full cursor-pointer rounded-xl bg-brown-dark px-2 py-2.5 font-sans text-[0.7rem] font-semibold text-cream shadow-sm transition-colors hover:bg-brown sm:text-xs"
+                disabled={maxQuantity === 0}
+                className="w-full cursor-pointer rounded-xl bg-brown-dark px-2 py-2.5 font-sans text-[0.7rem] font-semibold text-cream shadow-sm transition-colors hover:bg-brown disabled:cursor-not-allowed disabled:opacity-40 sm:text-xs"
               >
-                + Hozzáadom
+                {maxQuantity === 0 ? "A kenyérkeret betelt" : "+ Hozzáadom"}
               </button>
             ) : (
               <div className="flex w-full items-center justify-between gap-1.5 rounded-xl border border-gold/20 bg-cream px-1.5 py-1.5 sm:gap-2 sm:px-2 sm:py-2">
@@ -184,6 +195,7 @@ export default function ProductCard({ termek, datum, maxVevonkent, preview }: {
         onQuantityChange={change}
         maxQuantity={maxQuantity}
         customerLimit={maxVevonkent}
+        breadGroup={breadGroup}
       />
     </>
   );

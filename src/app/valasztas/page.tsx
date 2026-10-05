@@ -8,12 +8,14 @@ import { type Termek, csoportositByKategoria, formatAr } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import DayProgress from "@/components/DayProgress";
 import { pushDataLayerEvent } from "@/lib/tracking";
+import { countsTowardBreadLimit } from "@/lib/bread-limit";
 
 type FreshOrderDay = {
   nap: string;
   datum: string;
   korlatozott_termek_ids?: string[];
   max_vevonkent?: Record<string, number>;
+  kenyer_max_vevonkent?: number | null;
 };
 
 export default function TermekekPage() {
@@ -56,6 +58,7 @@ export default function TermekekPage() {
               datum: freshDay.datum,
               korlatozott_termek_ids: freshDay.korlatozott_termek_ids ?? [],
               max_vevonkent: freshDay.max_vevonkent ?? {},
+              kenyer_max_vevonkent: freshDay.kenyer_max_vevonkent ?? null,
             };
           })
           .filter((day): day is NonNullable<typeof day> => day !== null);
@@ -73,6 +76,18 @@ export default function TermekekPage() {
             } else {
               const maximum = freshDaysByDate.get(day.datum)?.max_vevonkent?.[product.id];
               if (maximum && item.mennyiseg > maximum) store.setQuantity(day.datum, item, maximum);
+            }
+          }
+
+          const breadMaximum = day.kenyer_max_vevonkent;
+          if (breadMaximum !== null) {
+            let remaining = breadMaximum;
+            for (const item of useCartStore.getState().carts[day.datum] ?? []) {
+              const product = productBySlug.get(item.termekId);
+              if (!product || !countsTowardBreadLimit(product)) continue;
+              const allowed = Math.min(item.mennyiseg, Math.max(0, remaining));
+              if (allowed < item.mennyiseg) store.setQuantity(day.datum, item, allowed);
+              remaining -= allowed;
             }
           }
         }
@@ -111,6 +126,12 @@ export default function TermekekPage() {
   const currentDay = selectedDays[currentStep];
   const allowedProductIds = currentDay.korlatozott_termek_ids ?? [];
   const availableTermekek = termekek.filter((termek) => allowedProductIds.includes(termek.id));
+  const productBySlug = new Map(termekek.map((termek) => [termek.slug, termek]));
+  const breadUsed = (carts[currentDay.datum] ?? []).reduce((sum, item) => {
+    const product = productBySlug.get(item.termekId);
+    return sum + (product && countsTowardBreadLimit(product) ? item.mennyiseg : 0);
+  }, 0);
+  const breadMaximum = currentDay.kenyer_max_vevonkent ?? null;
   const termekekByKategoria = csoportositByKategoria(availableTermekek, kategoriak);
   const isLastDay = currentStep === selectedDays.length - 1;
   const dayTotal = getDayTotal(currentDay.datum);
@@ -180,6 +201,12 @@ export default function TermekekPage() {
           <p className="mt-2 font-sans text-sm leading-relaxed text-[#7c5a46]">
             Állítsd össze erre a napra a kosarat. A mennyiségek külön ennél az átvételi napnál számolódnak.
           </p>
+          {breadMaximum !== null && (
+            <div className="mt-3 rounded-xl bg-cream px-3 py-2 font-sans text-xs text-brown-dark">
+              <p className="font-semibold">Közös kenyérkeret: {breadUsed}/{breadMaximum} db. A bagett nem számít bele.</p>
+              <p className="mt-1 text-brown/60">Az azonos e-mail-címmel korábban leadott rendelések is beleszámítanak.</p>
+            </div>
+          )}
         </section>
 
         {Object.entries(termekekByKategoria).map(([kategoria, termekek]) => (
@@ -194,7 +221,15 @@ export default function TermekekPage() {
             </p>
             <div className="grid auto-rows-fr grid-cols-2 items-stretch gap-3 sm:gap-4">
               {termekek.map((termek) => (
-                <ProductCard key={termek.id} termek={termek} datum={currentDay.datum} maxVevonkent={currentDay.max_vevonkent?.[termek.id] ?? null} />
+                <ProductCard
+                  key={termek.id}
+                  termek={termek}
+                  datum={currentDay.datum}
+                  maxVevonkent={currentDay.max_vevonkent?.[termek.id] ?? null}
+                  breadGroup={breadMaximum !== null && countsTowardBreadLimit(termek)
+                    ? { limit: breadMaximum, used: breadUsed }
+                    : null}
+                />
               ))}
             </div>
           </section>
