@@ -1,4 +1,4 @@
-create table public.napi_termek_vevo_limit (
+create table if not exists public.napi_termek_vevo_limit (
   rendeles_nap_id uuid not null references public.rendeles_napok(id) on delete cascade,
   termek_id uuid not null references public.termekek(id) on delete cascade,
   max_vevonkent integer not null check (max_vevonkent between 1 and 99),
@@ -62,7 +62,18 @@ begin
 end;
 $$;
 
-create trigger ellenoriz_napi_vevo_limit_trigger
-before insert or update of mennyiseg, termek_id, rendeles_nap_id, allapot
-on public.rendeles_tetelek
-for each row execute function public.ellenoriz_napi_vevo_limit();
+do $$
+begin
+  if not exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.rendeles_tetelek'::regclass
+      and tgname = 'ellenoriz_napi_vevo_limit_trigger'
+      and not tgisinternal
+  ) then
+    create trigger ellenoriz_napi_vevo_limit_trigger
+    before insert or update of mennyiseg, termek_id, rendeles_nap_id, allapot
+    on public.rendeles_tetelek
+    for each row execute function public.ellenoriz_napi_vevo_limit();
+  end if;
+end;
+$$;
