@@ -172,12 +172,12 @@ export default function CustomerLimitPreview() {
 
           <section>
             <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-brown/50">Vásárlói rendelési felület · péntek</p>
-            {breadLimit !== null && (
+            {breadLimit !== null ? (
               <div className="mt-3 rounded-xl bg-cream px-3 py-2 font-sans text-xs text-brown-dark">
-                <p className="font-semibold">Közös kenyérkeret: {breadUsed}/{breadLimit} db. A bagett nem számít bele.</p>
-                <p className="mt-1 text-brown/60">Az azonos e-mail-címmel korábban leadott rendelések is beleszámítanak.</p>
+                <p className="font-semibold">Hogy minden kenyerünket a megszokott gondossággal készíthessük el, erre a napra legfeljebb {breadLimit} db-ot rendelhetsz.</p>
+                <p className="mt-1 text-brown/60">A kosaradban: {breadUsed}/{breadLimit} db.</p>
               </div>
-            )}
+            ) : null}
             <div className="mt-3 grid grid-cols-2 gap-3">
               {previewProducts.filter((item) => enabledIds.includes(item.id)).map((item) => (
                 <ProductCard

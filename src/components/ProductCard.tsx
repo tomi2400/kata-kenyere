@@ -146,7 +146,7 @@ export default function ProductCard({ termek, datum, maxVevonkent, breadGroup, p
           )}
           {breadGroup && (
             <p className="mt-1 font-sans text-[10px] text-brown/60 sm:text-[11px]">
-              Közös kenyérkeret: {breadGroup.used}/{breadGroup.limit} db. A bagett nem számít bele.
+              A kosaradban: {breadGroup.used}/{breadGroup.limit} db kenyér.
             </p>
           )}
 

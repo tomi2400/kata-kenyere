@@ -201,12 +201,12 @@ export default function TermekekPage() {
           <p className="mt-2 font-sans text-sm leading-relaxed text-[#7c5a46]">
             Állítsd össze erre a napra a kosarat. A mennyiségek külön ennél az átvételi napnál számolódnak.
           </p>
-          {breadMaximum !== null && (
+          {breadMaximum !== null ? (
             <div className="mt-3 rounded-xl bg-cream px-3 py-2 font-sans text-xs text-brown-dark">
-              <p className="font-semibold">Közös kenyérkeret: {breadUsed}/{breadMaximum} db. A bagett nem számít bele.</p>
-              <p className="mt-1 text-brown/60">Az azonos e-mail-címmel korábban leadott rendelések is beleszámítanak.</p>
+              <p className="font-semibold">Hogy minden kenyerünket a megszokott gondossággal készíthessük el, erre a napra legfeljebb {breadMaximum} db-ot rendelhetsz.</p>
+              <p className="mt-1 text-brown/60">A kosaradban: {breadUsed}/{breadMaximum} db.</p>
             </div>
-          )}
+          ) : null}
         </section>
 
         {Object.entries(termekekByKategoria).map(([kategoria, termekek]) => (

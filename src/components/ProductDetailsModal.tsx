@@ -288,7 +288,7 @@ export default function ProductDetailsModal(props: ProductDetailsModalProps) {
               )}
               {props.breadGroup && (
                 <p className="mt-2 font-sans text-xs text-[#7b593f]">
-                  Közös kenyérkeret: {props.breadGroup.used}/{props.breadGroup.limit} db. A bagett nem számít bele.
+                  A kosaradban: {props.breadGroup.used}/{props.breadGroup.limit} db kenyér.
                 </p>
               )}
             </div>
