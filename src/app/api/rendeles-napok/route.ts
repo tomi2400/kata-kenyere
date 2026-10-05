@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { unstable_noStore as noStore } from "next/cache";
 import { supabase } from "@/lib/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,18 @@ export async function GET() {
     return hatarido > now;
   });
 
+  const dayIds = elérhetoNapok.map((nap) => nap.id);
+  const { data: limitRows, error: limitError } = dayIds.length
+    ? await supabaseAdmin.from("napi_termek_vevo_limit").select("rendeles_nap_id, termek_id, max_vevonkent").in("rendeles_nap_id", dayIds)
+    : { data: [], error: null };
+  if (limitError) return NextResponse.json({ error: "Hiba a rendelési limitek lekérésekor" }, { status: 500 });
+  const limitsByDay = new Map<string, Record<string, number>>();
+  for (const row of limitRows ?? []) {
+    const limits = limitsByDay.get(row.rendeles_nap_id) ?? {};
+    limits[row.termek_id] = row.max_vevonkent;
+    limitsByDay.set(row.rendeles_nap_id, limits);
+  }
+
   // Minden naphoz lekérjük az elérhető termékeket
   const daysWithProducts = await Promise.all(
     elérhetoNapok.map(async (nap) => {
@@ -42,6 +55,7 @@ export async function GET() {
         nap: nap.nap,
         hatarido: nap.hatarido,
         korlatozott_termek_ids: napiTermekek?.map((t) => t.termek_id) ?? [],
+        max_vevonkent: limitsByDay.get(nap.id) ?? {},
       };
     })
   );

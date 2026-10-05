@@ -20,6 +20,7 @@ export type SelectedOrderDay = {
   nap: string;
   datum: string;
   korlatozott_termek_ids?: string[];
+  max_vevonkent?: Record<string, number>;
 };
 
 type CartStore = {

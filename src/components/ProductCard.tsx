@@ -10,15 +10,16 @@ import ProductDetailsModal from "@/components/ProductDetailsModal";
 
 const MAX_ITEM_QUANTITY = 99;
 
-export default function ProductCard({ termek, datum }: { termek: Termek; datum: string }) {
+export default function ProductCard({ termek, datum, maxVevonkent }: { termek: Termek; datum: string; maxVevonkent: number | null }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { carts, setQuantity } = useCartStore();
   const dayItems = carts[datum] ?? [];
   const item = dayItems.find((i) => i.termekId === termek.slug);
   const qty = item?.mennyiseg ?? 0;
+  const maxQuantity = Math.min(MAX_ITEM_QUANTITY, maxVevonkent ?? MAX_ITEM_QUANTITY);
 
   const change = (delta: number) => {
-    const newQty = Math.min(MAX_ITEM_QUANTITY, Math.max(0, qty + delta));
+    const newQty = Math.min(maxQuantity, Math.max(0, qty + delta));
     if (newQty === qty) return;
 
     const eventName = delta > 0 ? "product_added" : "product_quantity_changed";
@@ -124,6 +125,11 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
               {qty > 0 ? `Kosárban: ${qty} db` : "Egy kattintással hozzáadható"}
             </span>
           </div>
+          {maxVevonkent !== null && (
+            <p className="mt-1 font-sans text-[10px] text-brown/60 sm:text-[11px]">
+              Maximum rendelhető vevőnként: {maxVevonkent} db erre a napra.
+            </p>
+          )}
 
           <div className="mt-3 flex items-center justify-between">
             {qty === 0 ? (
@@ -148,8 +154,8 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
                 <button
                   type="button"
                   onClick={() => change(1)}
-                  disabled={qty >= MAX_ITEM_QUANTITY}
-                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-brown-dark text-sm font-bold text-cream transition-colors hover:bg-brown sm:h-9 sm:w-9 sm:text-base"
+                  disabled={qty >= maxQuantity}
+                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-brown-dark text-sm font-bold text-cream transition-colors hover:bg-brown disabled:cursor-not-allowed disabled:opacity-40 sm:h-9 sm:w-9 sm:text-base"
                   aria-label="Több"
                 >
                   +
@@ -167,7 +173,8 @@ export default function ProductCard({ termek, datum }: { termek: Termek; datum: 
         mode="order"
         quantity={qty}
         onQuantityChange={change}
-        maxQuantity={MAX_ITEM_QUANTITY}
+        maxQuantity={maxQuantity}
+        customerLimit={maxVevonkent}
       />
     </>
   );

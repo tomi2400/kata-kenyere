@@ -255,6 +255,12 @@ async function prepareOrderItems(
     allowedProductsByDayId.set(row.rendeles_nap_id, current);
   }
 
+  const { data: limitRows, error: limitError } = napIds.length
+    ? await supabaseAdmin.from("napi_termek_vevo_limit").select("rendeles_nap_id, termek_id, max_vevonkent").in("rendeles_nap_id", napIds)
+    : { data: [], error: null };
+  if (limitError) return { ok: false, error: "Hiba a rendelési limitek ellenőrzésekor.", status: 500 };
+  const limits = new Map((limitRows ?? []).map((row) => [`${row.rendeles_nap_id}:${row.termek_id}`, row.max_vevonkent]));
+
   const items: PreparedOrderItem[] = [];
 
   for (const item of requestedItems) {
@@ -270,6 +276,11 @@ async function prepareOrderItems(
         error: `${product.nev} a kiválasztott átvételi napon már nem elérhető.`,
         status: 400,
       };
+    }
+
+    const maximum = nap ? limits.get(`${nap.id}:${product.id}`) : undefined;
+    if (maximum !== undefined && item.mennyiseg > maximum) {
+      return { ok: false, error: `${product.nev}: maximum rendelhető vevőnként ${maximum} db erre a napra.`, status: 409 };
     }
 
     items.push({
@@ -416,6 +427,9 @@ export async function POST(request: Request) {
         .delete()
         .eq("id", rendeles.id);
       console.error("Tétel mentési hiba:", tetelError);
+      if (tetelError.message?.includes("customer_product_limit_exceeded")) {
+        return NextResponse.json({ error: "Ebből a termékből erre a napra az e-mail címeddel már elérted a vevőnként rendelhető maximumot. Kérlek, módosítsd a kosarat." }, { status: 409 });
+      }
       return NextResponse.json({ error: "Hiba a tételek mentésekor" }, { status: 500 });
     }
 

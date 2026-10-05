@@ -37,6 +37,7 @@ type ProductDetailsModalProps = {
       quantity: number;
       onQuantityChange: (delta: number) => void;
       maxQuantity: number;
+      customerLimit: number | null;
     }
 );
 
@@ -277,6 +278,11 @@ export default function ProductDetailsModal(props: ProductDetailsModalProps) {
                     <Plus className="h-4 w-4" />
                   </button>
                 </div>
+              )}
+              {props.customerLimit !== null && (
+                <p className="mt-2 font-sans text-xs text-[#7b593f]">
+                  Maximum rendelhető vevőnként: {props.customerLimit} db erre a napra.
+                </p>
               )}
             </div>
           )}

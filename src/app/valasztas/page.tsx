@@ -13,6 +13,7 @@ type FreshOrderDay = {
   nap: string;
   datum: string;
   korlatozott_termek_ids?: string[];
+  max_vevonkent?: Record<string, number>;
 };
 
 export default function TermekekPage() {
@@ -54,6 +55,7 @@ export default function TermekekPage() {
               nap: freshDay.nap,
               datum: freshDay.datum,
               korlatozott_termek_ids: freshDay.korlatozott_termek_ids ?? [],
+              max_vevonkent: freshDay.max_vevonkent ?? {},
             };
           })
           .filter((day): day is NonNullable<typeof day> => day !== null);
@@ -68,6 +70,9 @@ export default function TermekekPage() {
 
             if (unavailable) {
               store.setQuantity(day.datum, item, 0);
+            } else {
+              const maximum = freshDaysByDate.get(day.datum)?.max_vevonkent?.[product.id];
+              if (maximum && item.mennyiseg > maximum) store.setQuantity(day.datum, item, maximum);
             }
           }
         }
@@ -189,7 +194,7 @@ export default function TermekekPage() {
             </p>
             <div className="grid auto-rows-fr grid-cols-2 items-stretch gap-3 sm:gap-4">
               {termekek.map((termek) => (
-                <ProductCard key={termek.id} termek={termek} datum={currentDay.datum} />
+                <ProductCard key={termek.id} termek={termek} datum={currentDay.datum} maxVevonkent={currentDay.max_vevonkent?.[termek.id] ?? null} />
               ))}
             </div>
           </section>
