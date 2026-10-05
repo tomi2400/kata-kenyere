@@ -10,17 +10,26 @@ import ProductDetailsModal from "@/components/ProductDetailsModal";
 
 const MAX_ITEM_QUANTITY = 99;
 
-export default function ProductCard({ termek, datum, maxVevonkent }: { termek: Termek; datum: string; maxVevonkent: number | null }) {
+export default function ProductCard({ termek, datum, maxVevonkent, preview }: {
+  termek: Termek;
+  datum: string;
+  maxVevonkent: number | null;
+  preview?: { quantity: number; onChange: (quantity: number) => void };
+}) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { carts, setQuantity } = useCartStore();
   const dayItems = carts[datum] ?? [];
   const item = dayItems.find((i) => i.termekId === termek.slug);
-  const qty = item?.mennyiseg ?? 0;
+  const qty = preview ? preview.quantity : item?.mennyiseg ?? 0;
   const maxQuantity = Math.min(MAX_ITEM_QUANTITY, maxVevonkent ?? MAX_ITEM_QUANTITY);
 
   const change = (delta: number) => {
     const newQty = Math.min(maxQuantity, Math.max(0, qty + delta));
     if (newQty === qty) return;
+    if (preview) {
+      preview.onChange(newQty);
+      return;
+    }
 
     const eventName = delta > 0 ? "product_added" : "product_quantity_changed";
 

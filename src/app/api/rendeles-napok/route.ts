@@ -33,7 +33,11 @@ export async function GET() {
   const { data: limitRows, error: limitError } = dayIds.length
     ? await supabaseAdmin.from("napi_termek_vevo_limit").select("rendeles_nap_id, termek_id, max_vevonkent").in("rendeles_nap_id", dayIds)
     : { data: [], error: null };
-  if (limitError) return NextResponse.json({ error: "Hiba a rendelési limitek lekérésekor" }, { status: 500 });
+  const missingPreviewTable = process.env.VERCEL_ENV === "preview" &&
+    (limitError?.code === "42P01" || limitError?.code === "PGRST205");
+  if (limitError && !missingPreviewTable) {
+    return NextResponse.json({ error: "Hiba a rendelési limitek lekérésekor" }, { status: 500 });
+  }
   const limitsByDay = new Map<string, Record<string, number>>();
   for (const row of limitRows ?? []) {
     const limits = limitsByDay.get(row.rendeles_nap_id) ?? {};

@@ -27,13 +27,6 @@ type Kategoria = {
   sorrend: number;
 };
 
-type LimitDay = {
-  id: string;
-  datum: string;
-  nap: string;
-  max_vevonkent: number | null;
-};
-
 type ProductFormData = {
   nev: string;
   slug: string;
@@ -79,12 +72,6 @@ function TermekekTab() {
   const [uploadError, setUploadError] = useState("");
   const [draggingImage, setDraggingImage] = useState(false);
   const [pendingUploadPath, setPendingUploadPath] = useState<string | null>(null);
-  const [limitDays, setLimitDays] = useState<LimitDay[]>([]);
-  const [limitDrafts, setLimitDrafts] = useState<Record<string, string>>({});
-  const [limitLoading, setLimitLoading] = useState(false);
-  const [limitSavingId, setLimitSavingId] = useState<string | null>(null);
-  const [limitError, setLimitError] = useState("");
-  const [limitSuccessId, setLimitSuccessId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchTermekek = () => {
@@ -106,8 +93,6 @@ function TermekekTab() {
     setDraggingImage(false);
     setPendingUploadPath(null);
     setEditingId(null);
-    setLimitDays([]);
-    setLimitError("");
     setForm({ ...emptyForm, kategoria: kategoriak[0] || "" });
     setShowForm(true);
   };
@@ -118,21 +103,6 @@ function TermekekTab() {
     setPendingUploadPath(null);
     setDeleteError((prev) => ({ ...prev, [t.id]: "" }));
     setEditingId(t.id);
-    setLimitDays([]);
-    setLimitDrafts({});
-    setLimitError("");
-    setLimitSuccessId(null);
-    setLimitLoading(true);
-    adminFetch(`/api/admin/termekek/${t.id}/vevo-limitek`)
-      .then(async (response) => {
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Nem sikerült betölteni a napi limiteket.");
-        const days = (data.napok ?? []) as LimitDay[];
-        setLimitDays(days);
-        setLimitDrafts(Object.fromEntries(days.map((day) => [day.id, day.max_vevonkent === null ? "" : String(day.max_vevonkent)])));
-      })
-      .catch((error) => setLimitError(error instanceof Error ? error.message : "Nem sikerült betölteni a napi limiteket."))
-      .finally(() => setLimitLoading(false));
     setForm({
       nev: t.nev, slug: t.slug, leiras: t.leiras,
       hozzavalok: t.hozzavalok || "", allergenek: t.allergenek || "",
@@ -140,34 +110,6 @@ function TermekekTab() {
       egyseg: t.egyseg, foto_url: t.foto_url || "",
     });
     setShowForm(true);
-  };
-
-  const saveLimit = async (day: LimitDay) => {
-    if (!editingId) return;
-    const value = limitDrafts[day.id]?.trim() ?? "";
-    const maximum = value === "" ? null : Number(value);
-    if (maximum !== null && (!Number.isInteger(maximum) || maximum < 1 || maximum > 99)) {
-      setLimitError("A maximum 1 és 99 közötti egész szám lehet.");
-      return;
-    }
-    setLimitSavingId(day.id);
-    setLimitError("");
-    setLimitSuccessId(null);
-    try {
-      const response = await adminFetch(`/api/admin/termekek/${editingId}/vevo-limitek`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rendeles_nap_id: day.id, max_vevonkent: maximum }),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || "Nem sikerült menteni a limitet.");
-      setLimitDays((current) => current.map((item) => item.id === day.id ? { ...item, max_vevonkent: maximum } : item));
-      setLimitSuccessId(day.id);
-    } catch (error) {
-      setLimitError(error instanceof Error ? error.message : "Nem sikerült menteni a limitet.");
-    } finally {
-      setLimitSavingId(null);
-    }
   };
 
   const deleteUploadedImage = async (path: string) => {
@@ -254,17 +196,6 @@ function TermekekTab() {
     setUploadError("");
 
     try {
-      const changedLimits = editingId
-        ? limitDays.filter((day) => (limitDrafts[day.id]?.trim() ?? "") !== (day.max_vevonkent === null ? "" : String(day.max_vevonkent)))
-        : [];
-      for (const day of changedLimits) {
-        const value = limitDrafts[day.id].trim();
-        const maximum = value === "" ? null : Number(value);
-        if (maximum !== null && (!Number.isInteger(maximum) || maximum < 1 || maximum > 99)) {
-          throw new Error(`${day.datum}: a maximum 1 és 99 közötti egész szám lehet.`);
-        }
-      }
-
       const response = editingId
         ? await adminFetch(`/api/admin/termekek/${editingId}`, {
             method: "PATCH",
@@ -285,19 +216,6 @@ function TermekekTab() {
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data.error || "Nem sikerült menteni a terméket.");
-      }
-
-      for (const day of changedLimits) {
-        const value = limitDrafts[day.id].trim();
-        const limitResponse = await adminFetch(`/api/admin/termekek/${editingId}/vevo-limitek`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ rendeles_nap_id: day.id, max_vevonkent: value === "" ? null : Number(value) }),
-        });
-        if (!limitResponse.ok) {
-          const data = await limitResponse.json().catch(() => ({}));
-          throw new Error(data.error || `${day.datum}: nem sikerült menteni a napi limitet.`);
-        }
       }
 
       setPendingUploadPath(null);
@@ -542,48 +460,6 @@ function TermekekTab() {
                     placeholder="pl. 1 kg, db" />
                 </div>
               </div>
-              {editingId && (
-                <div className="rounded-xl border border-gold/25 bg-white p-3">
-                  <p className="font-sans text-sm font-semibold text-brown-dark">Maximum rendelhető vevőnként</p>
-                  <p className="mt-1 font-sans text-xs text-brown/55">Átvételi naponként állítható. Üres mezőnél nincs külön limit. Az azonos e-mail címmel leadott rendelések összeadódnak. A nap melletti gombbal azonnal, az alsó Mentés gombbal az összes változást mentheted.</p>
-                  {limitLoading ? <p className="mt-3 font-sans text-xs text-brown/50">Napok betöltése...</p> : limitDays.length === 0 ? <p className="mt-3 font-sans text-xs text-brown/50">Még nincs létrehozott rendelési nap.</p> : (
-                    <div className="mt-3 max-h-48 space-y-2 overflow-y-auto">
-                      {limitDays.map((day) => (
-                        <div key={day.id} className="flex items-center gap-2">
-                          <label htmlFor={`limit-${day.id}`} className="min-w-0 flex-1 font-sans text-xs text-brown-dark">
-                            {day.datum} · {day.nap}
-                          </label>
-                          <input
-                            id={`limit-${day.id}`}
-                            type="number"
-                            min={1}
-                            max={99}
-                            step={1}
-                            value={limitDrafts[day.id] ?? ""}
-                            onChange={(event) => { setLimitDrafts((current) => ({ ...current, [day.id]: event.target.value })); setLimitSuccessId(null); }}
-                            placeholder="Nincs"
-                            className="w-20 rounded-lg border border-cream-dark px-2 py-1.5 font-sans text-xs focus:border-gold focus:outline-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => void saveLimit(day)}
-                            disabled={saving || limitSavingId !== null || (limitDrafts[day.id] ?? "") === (day.max_vevonkent === null ? "" : String(day.max_vevonkent))}
-                            className="rounded-lg bg-gold px-2 py-1.5 font-sans text-xs font-semibold text-brown-dark disabled:opacity-40"
-                          >
-                            {limitSavingId === day.id ? "..." : limitSuccessId === day.id ? "Mentve" : "Mentés"}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {limitError && <p className="mt-2 font-sans text-xs text-red-600">{limitError}</p>}
-                </div>
-              )}
-              {!editingId && (
-                <p className="font-sans text-xs text-brown/55">
-                  A vevőnkénti napi maximumot a termék létrehozása után, a Szerkesztés gombbal állíthatod be.
-                </p>
-              )}
               <div>
                 <label className="block font-sans text-xs text-brown/60 mb-1">Rövid leírás</label>
                 <textarea value={form.leiras}

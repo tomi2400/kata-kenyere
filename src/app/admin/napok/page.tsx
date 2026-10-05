@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { adminFetch } from "@/lib/admin-api";
+import DayProductLimitEditor from "@/components/DayProductLimitEditor";
 
 type RendelesNap = {
   id: string;
@@ -87,6 +88,12 @@ export default function NapokPage() {
   const [kategoriak, setKategoriak] = useState<string[]>([]);
   const [napiTermekIds, setNapiTermekIds] = useState<string[] | null>(null); // null = betöltés alatt
   const [termekSaving, setTermekSaving] = useState(false);
+  const [limitValues, setLimitValues] = useState<Record<string, number>>({});
+  const [limitDrafts, setLimitDrafts] = useState<Record<string, string>>({});
+  const [limitLoading, setLimitLoading] = useState(false);
+  const [limitSavingId, setLimitSavingId] = useState<string | null>(null);
+  const [limitError, setLimitError] = useState("");
+  const [limitSuccessId, setLimitSuccessId] = useState<string | null>(null);
 
   const fetchNapok = useCallback(() => {
     setLoading(true);
@@ -119,9 +126,25 @@ export default function NapokPage() {
   useEffect(() => {
     if (!editNap) return;
     setNapiTermekIds(null);
-    adminFetch(`/api/admin/napi-termekek/${editNap.id}`)
-      .then((r) => r.json())
-      .then((d) => setNapiTermekIds(d.termek_ids ?? []));
+    setLimitLoading(true);
+    setLimitValues({});
+    setLimitDrafts({});
+    setLimitError("");
+    Promise.all([
+      adminFetch(`/api/admin/napi-termekek/${editNap.id}`),
+      adminFetch(`/api/admin/rendeles-napok/${editNap.id}/vevo-limitek`),
+    ])
+      .then(async ([productsResponse, limitsResponse]) => {
+        const [productsData, limitsData] = await Promise.all([productsResponse.json(), limitsResponse.json()]);
+        if (!productsResponse.ok) throw new Error(productsData.error || "Nem sikerült betölteni a napi termékeket.");
+        setNapiTermekIds(productsData.termek_ids ?? []);
+        if (!limitsResponse.ok) throw new Error(limitsData.error || "Nem sikerült betölteni a napi limiteket.");
+        const values = (limitsData.max_vevonkent ?? {}) as Record<string, number>;
+        setLimitValues(values);
+        setLimitDrafts(Object.fromEntries(Object.entries(values).map(([id, value]) => [id, String(value)])));
+      })
+      .catch((error) => setLimitError(error instanceof Error ? error.message : "Nem sikerült betölteni a napi limiteket."))
+      .finally(() => setLimitLoading(false));
   }, [editNap]);
 
   const openEditor = (nap: RendelesNap) => {
@@ -140,7 +163,12 @@ export default function NapokPage() {
   };
 
   const closeEditor = async () => {
-    await saveEditor({ silent: true, keepalive: true });
+    try {
+      await saveEditor({ silent: true, keepalive: true });
+      await saveChangedLimits();
+    } catch {
+      return;
+    }
     setEditNap(null);
     setNapiTermekIds(null);
     setDeleteError("");
@@ -259,6 +287,61 @@ export default function NapokPage() {
     }
   };
 
+  const persistLimit = async (productId: string, maximum: number | null) => {
+    if (!editNap) return;
+    const response = await adminFetch(`/api/admin/rendeles-napok/${editNap.id}/vevo-limitek`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ termek_id: productId, max_vevonkent: maximum }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Nem sikerült menteni a napi limitet.");
+    setLimitValues((current) => {
+      const next = { ...current };
+      if (maximum === null) delete next[productId];
+      else next[productId] = maximum;
+      return next;
+    });
+  };
+
+  const parsedLimit = (productId: string) => {
+    const value = limitDrafts[productId]?.trim() ?? "";
+    const maximum = value === "" ? null : Number(value);
+    if (maximum !== null && (!Number.isInteger(maximum) || maximum < 1 || maximum > 99)) {
+      throw new Error("A maximum 1 és 99 közötti egész szám lehet.");
+    }
+    return maximum;
+  };
+
+  const saveChangedLimits = async () => {
+    const changedIds = Object.keys(limitDrafts).filter((id) =>
+      limitDrafts[id].trim() !== (limitValues[id] === undefined ? "" : String(limitValues[id]))
+    );
+    for (const productId of changedIds) {
+      try {
+        await persistLimit(productId, parsedLimit(productId));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Nem sikerült menteni a napi limitet.";
+        setLimitError(message);
+        throw error;
+      }
+    }
+  };
+
+  const saveOneLimit = async (productId: string) => {
+    setLimitSavingId(productId);
+    setLimitError("");
+    setLimitSuccessId(null);
+    try {
+      await persistLimit(productId, parsedLimit(productId));
+      setLimitSuccessId(productId);
+    } catch (error) {
+      setLimitError(error instanceof Error ? error.message : "Nem sikerült menteni a napi limitet.");
+    } finally {
+      setLimitSavingId(null);
+    }
+  };
+
   const saveAll = async () => {
     if (!editNap || napiTermekIds === null) return;
 
@@ -269,6 +352,7 @@ export default function NapokPage() {
     try {
       await saveEditor({ silent: true });
       await saveTermekek(napiTermekIds, { silent: true });
+      await saveChangedLimits();
       setSaveSuccess("Minden módosítás mentve.");
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : "Nem sikerült menteni a módosításokat.");
@@ -559,7 +643,7 @@ export default function NapokPage() {
               {/* Mentés gomb */}
               <button
                 onClick={() => void saveAll()}
-                disabled={saving || termekSaving || napiTermekIds === null}
+                disabled={saving || termekSaving || limitSavingId !== null || napiTermekIds === null || limitLoading}
                 className="w-full py-2 rounded-lg font-sans text-sm font-semibold
                   bg-gold text-brown-dark hover:bg-gold-light transition-colors
                   disabled:opacity-50 cursor-pointer"
@@ -691,6 +775,22 @@ export default function NapokPage() {
                   </p>
                 )}
               </div>
+
+              <DayProductLimitEditor
+                products={allTermekek.filter((product) => napiTermekIds?.includes(product.id))}
+                limits={limitValues}
+                drafts={limitDrafts}
+                loading={limitLoading}
+                saving={saving}
+                savingId={limitSavingId}
+                successId={limitSuccessId}
+                error={limitError}
+                onChange={(productId, value) => {
+                  setLimitDrafts((current) => ({ ...current, [productId]: value }));
+                  setLimitSuccessId(null);
+                }}
+                onSave={(product) => void saveOneLimit(product.id)}
+              />
 
               {/* Nap törlése */}
               <div className="pt-1 border-t border-cream-dark">
