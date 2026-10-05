@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { adminFetch } from "@/lib/admin-api";
-import DayProductLimitEditor from "@/components/DayProductLimitEditor";
+import DayProductAvailabilityRow from "@/components/DayProductAvailabilityRow";
 
 type RendelesNap = {
   id: string;
@@ -91,9 +91,7 @@ export default function NapokPage() {
   const [limitValues, setLimitValues] = useState<Record<string, number>>({});
   const [limitDrafts, setLimitDrafts] = useState<Record<string, string>>({});
   const [limitLoading, setLimitLoading] = useState(false);
-  const [limitSavingId, setLimitSavingId] = useState<string | null>(null);
   const [limitError, setLimitError] = useState("");
-  const [limitSuccessId, setLimitSuccessId] = useState<string | null>(null);
 
   const fetchNapok = useCallback(() => {
     setLoading(true);
@@ -325,20 +323,6 @@ export default function NapokPage() {
         setLimitError(message);
         throw error;
       }
-    }
-  };
-
-  const saveOneLimit = async (productId: string) => {
-    setLimitSavingId(productId);
-    setLimitError("");
-    setLimitSuccessId(null);
-    try {
-      await persistLimit(productId, parsedLimit(productId));
-      setLimitSuccessId(productId);
-    } catch (error) {
-      setLimitError(error instanceof Error ? error.message : "Nem sikerült menteni a napi limitet.");
-    } finally {
-      setLimitSavingId(null);
     }
   };
 
@@ -643,7 +627,7 @@ export default function NapokPage() {
               {/* Mentés gomb */}
               <button
                 onClick={() => void saveAll()}
-                disabled={saving || termekSaving || limitSavingId !== null || napiTermekIds === null || limitLoading}
+                disabled={saving || termekSaving || napiTermekIds === null || limitLoading}
                 className="w-full py-2 rounded-lg font-sans text-sm font-semibold
                   bg-gold text-brown-dark hover:bg-gold-light transition-colors
                   disabled:opacity-50 cursor-pointer"
@@ -652,7 +636,12 @@ export default function NapokPage() {
               </button>
               <p className="font-sans text-[10px] text-brown/40 -mt-2">
                 Csak a bekapcsolt termékek lesznek rendelhetők. A kapcsolók azonnal mentődnek.
+                <br />
+                Az adott nap minden termékénél külön állítható a maximum. Üres mezőnél nincs külön limit.
               </p>
+              {limitError && (
+                <p className="rounded-lg bg-red-50 px-3 py-2 font-sans text-xs text-red-600">{limitError}</p>
+              )}
               {saveSuccess && (
                 <p className="rounded-lg bg-green-50 px-3 py-2 font-sans text-xs text-green-700">
                   {saveSuccess}
@@ -736,31 +725,21 @@ export default function NapokPage() {
                             {items.map((t) => {
                               const isOn = enabledIds.includes(t.id);
                               return (
-                                <div
+                                <DayProductAvailabilityRow
                                   key={t.id}
-                                  className={`flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 transition-colors ${
-                                    isOn ? "bg-white" : "bg-transparent"
-                                  }`}
-                                >
-                                  <div className="min-w-0">
-                                    <p className={`font-sans text-xs truncate ${isOn ? "text-brown-dark font-medium" : "text-brown/50"}`}>
-                                      {t.nev}
-                                    </p>
-                                    <p className={`font-sans text-[10px] ${isOn ? "text-brown/50" : "text-brown/30"}`}>
-                                      {t.egyseg}
-                                    </p>
-                                  </div>
-                                  <button
-                                    onClick={() => toggleTermek(t.id)}
-                                    disabled={termekSaving}
-                                    className={`flex-shrink-0 w-8 h-5 rounded-full transition-colors cursor-pointer relative
-                                      ${isOn ? "bg-green-500" : "bg-gray-300"}
-                                      disabled:opacity-50`}
-                                  >
-                                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform
-                                      ${isOn ? "left-[14px]" : "left-0.5"}`} />
-                                  </button>
-                                </div>
+                                  id={t.id}
+                                  name={t.nev}
+                                  unit={t.egyseg}
+                                  enabled={isOn}
+                                  limitDraft={limitDrafts[t.id] ?? ""}
+                                  disabled={termekSaving || limitLoading || saving}
+                                  onToggle={() => toggleTermek(t.id)}
+                                  onLimitChange={(value) => {
+                                    setLimitDrafts((current) => ({ ...current, [t.id]: value }));
+                                    setLimitError("");
+                                    setSaveSuccess("");
+                                  }}
+                                />
                               );
                             })}
                           </div>
@@ -775,22 +754,6 @@ export default function NapokPage() {
                   </p>
                 )}
               </div>
-
-              <DayProductLimitEditor
-                products={allTermekek.filter((product) => napiTermekIds?.includes(product.id))}
-                limits={limitValues}
-                drafts={limitDrafts}
-                loading={limitLoading}
-                saving={saving}
-                savingId={limitSavingId}
-                successId={limitSuccessId}
-                error={limitError}
-                onChange={(productId, value) => {
-                  setLimitDrafts((current) => ({ ...current, [productId]: value }));
-                  setLimitSuccessId(null);
-                }}
-                onSave={(product) => void saveOneLimit(product.id)}
-              />
 
               {/* Nap törlése */}
               <div className="pt-1 border-t border-cream-dark">
