@@ -1,14 +1,22 @@
 import { NextResponse } from "next/server";
 import { unstable_noStore as noStore } from "next/cache";
+import { getAdminAuth } from "@/lib/admin-auth";
+import { isCustomerLimitExemptAdminEmail } from "@/lib/customer-limit-exemption";
 import { supabase } from "@/lib/supabase/client";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   noStore();
 
   const now = new Date();
+  let bypassCustomerLimits = false;
+
+  if (request.headers.has("authorization")) {
+    const adminAuth = await getAdminAuth(request);
+    bypassCustomerLimits = adminAuth.ok && isCustomerLimitExemptAdminEmail(adminAuth.auth.user.email);
+  }
 
   // Nyitott, jövőbeli napok lekérése
   const { data: napok, error } = await supabase
@@ -31,10 +39,10 @@ export async function GET() {
 
   const dayIds = elérhetoNapok.map((nap) => nap.id);
   const [productLimitResult, breadLimitResult] = await Promise.all([
-    dayIds.length
+    !bypassCustomerLimits && dayIds.length
       ? supabaseAdmin.from("napi_termek_vevo_limit").select("rendeles_nap_id, termek_id, max_vevonkent").in("rendeles_nap_id", dayIds)
       : Promise.resolve({ data: [], error: null }),
-    dayIds.length
+    !bypassCustomerLimits && dayIds.length
       ? supabaseAdmin.from("napi_kenyer_vevo_limit").select("rendeles_nap_id, max_vevonkent").in("rendeles_nap_id", dayIds)
       : Promise.resolve({ data: [], error: null }),
   ]);

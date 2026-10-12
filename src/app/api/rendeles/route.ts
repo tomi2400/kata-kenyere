@@ -1,10 +1,11 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { getAdminAuth } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { sendOrderConfirmationEmail } from "@/lib/order-email";
 import { getPrimaryMarketingTouch, sanitizeMarketingAttribution } from "@/lib/tracking";
 import { countsTowardBreadLimit } from "@/lib/bread-limit";
+import { isCustomerLimitExemptAdminEmail } from "@/lib/customer-limit-exemption";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -144,7 +145,8 @@ function isSubmittedOrderItem(item: unknown): item is SubmittedOrderItem {
 
 async function prepareOrderItems(
   submittedItems: SubmittedOrderItem[],
-  isManualOrder: boolean
+  isManualOrder: boolean,
+  bypassCustomerLimits: boolean
 ): Promise<
   | { ok: true; items: PreparedOrderItem[]; total: number }
   | { ok: false; error: string; status: number }
@@ -258,10 +260,10 @@ async function prepareOrderItems(
   }
 
   const [productLimitResult, breadLimitResult] = await Promise.all([
-    napIds.length
+    !bypassCustomerLimits && napIds.length
       ? supabaseAdmin.from("napi_termek_vevo_limit").select("rendeles_nap_id, termek_id, max_vevonkent").in("rendeles_nap_id", napIds)
       : Promise.resolve({ data: [], error: null }),
-    napIds.length
+    !bypassCustomerLimits && napIds.length
       ? supabaseAdmin.from("napi_kenyer_vevo_limit").select("rendeles_nap_id, max_vevonkent").in("rendeles_nap_id", napIds)
       : Promise.resolve({ data: [], error: null }),
   ]);
@@ -336,11 +338,17 @@ export async function POST(request: Request) {
     const submittedRendelesek = Array.isArray(rendelesek) ? rendelesek.filter(isSubmittedOrderItem) : [];
     const marketingAttribution = sanitizeMarketingAttribution(body.marketingAttribution);
     const primaryMarketingTouch = getPrimaryMarketingTouch(marketingAttribution);
+    let authenticatedAdminGetsLimitExemption = false;
 
-    if (isManualOrder) {
-      const authError = await requireAdmin(request);
-      if (authError) return authError;
+    if (isManualOrder || request.headers.has("authorization")) {
+      const adminAuth = await getAdminAuth(request);
+      if (!adminAuth.ok && isManualOrder) return adminAuth.response;
+      if (adminAuth.ok) {
+        authenticatedAdminGetsLimitExemption = isCustomerLimitExemptAdminEmail(adminAuth.auth.user.email);
+      }
     }
+
+    const bypassCustomerLimits = isManualOrder || authenticatedAdminGetsLimitExemption;
 
     // Validáció
     if (!isManualOrder && !vevoNev) {
@@ -356,7 +364,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Legalább egy tétel szükséges" }, { status: 400 });
     }
 
-    const preparedOrder = await prepareOrderItems(submittedRendelesek, isManualOrder);
+    const preparedOrder = await prepareOrderItems(submittedRendelesek, isManualOrder, bypassCustomerLimits);
 
     if (!preparedOrder.ok) {
       return NextResponse.json({ error: preparedOrder.error }, { status: preparedOrder.status });
@@ -396,6 +404,9 @@ export async function POST(request: Request) {
         megjegyzes: vevoMegjegyzes,
         vegosszeg: szamoltVegosszeg,
         allapot: "uj",
+        // Kizárólag hitelesített admin kérésnél igaz: a pék így a viszonteladói
+        // rendeléseket a vásárlói darabkorlátoktól függetlenül rögzítheti.
+        vevo_limit_kivetel: bypassCustomerLimits,
       };
 
       let insertResult = await supabaseAdmin

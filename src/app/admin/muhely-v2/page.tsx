@@ -1296,7 +1296,7 @@ export default function MuhelyV2Page() {
             <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-cream-dark bg-white px-4 py-4 sm:px-5">
               <div>
                 <h2 className="font-serif text-xl text-brown-dark">Új rendelés</h2>
-                <p className="font-sans text-xs text-brown/45">Helyben vagy telefonon leadott rendelés rögzítése.</p>
+                <p className="font-sans text-xs text-brown/45">Helyben vagy telefonon leadott rendelés rögzítése. A vevőnkénti limitek itt nem érvényesek.</p>
               </div>
               <button
                 type="button"

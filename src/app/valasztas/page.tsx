@@ -9,6 +9,7 @@ import ProductCard from "@/components/ProductCard";
 import DayProgress from "@/components/DayProgress";
 import { pushDataLayerEvent } from "@/lib/tracking";
 import { countsTowardBreadLimit } from "@/lib/bread-limit";
+import { supabase } from "@/lib/supabase/client";
 
 type FreshOrderDay = {
   nap: string;
@@ -30,10 +31,17 @@ export default function TermekekPage() {
     const controller = new AbortController();
 
     setMounted(true);
-    Promise.all([
-      fetch("/api/termekek", { cache: "no-store", signal: controller.signal }),
-      fetch("/api/rendeles-napok", { cache: "no-store", signal: controller.signal }),
-    ])
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        const headers = session?.access_token
+          ? { Authorization: `Bearer ${session.access_token}` }
+          : undefined;
+
+        return Promise.all([
+          fetch("/api/termekek", { cache: "no-store", signal: controller.signal }),
+          fetch("/api/rendeles-napok", { cache: "no-store", signal: controller.signal, headers }),
+        ]);
+      })
       .then(async ([productsResponse, daysResponse]) => {
         if (!productsResponse.ok || !daysResponse.ok) {
           throw new Error("Nem sikerült frissíteni a rendelhető termékeket.");

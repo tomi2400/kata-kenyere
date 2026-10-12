@@ -8,6 +8,7 @@ import { MapPin } from "lucide-react";
 import { useCartStore } from "@/lib/store";
 import { PRODUCT_IMAGE_NOTICE, formatAr } from "@/lib/products";
 import { getStoredMarketingAttribution, pushDataLayerEvent } from "@/lib/tracking";
+import { supabase } from "@/lib/supabase/client";
 
 function formatDatum(datum: string): string {
   const d = new Date(datum);
@@ -103,9 +104,13 @@ export default function OsszesitesPage() {
     pushDataLayerEvent("order_submitted", orderTrackingPayload);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+
       const res = await fetch("/api/rendeles", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ ...form, rendelesek, vegosszeg: total, marketingAttribution }),
       });
       const data = await res.json().catch(() => null);

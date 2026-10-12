@@ -1066,7 +1066,7 @@ export default function MuhelyPage() {
           <div className="flex items-start justify-between gap-4 border-b border-cream-dark px-5 py-4">
             <div>
               <h2 className="font-serif text-xl text-brown-dark">Új kézi rendelés</h2>
-              <p className="font-sans text-xs text-brown/45">Helyben vagy telefonon kért rendelés rögzítése ugyanabba a rendszerbe.</p>
+              <p className="font-sans text-xs text-brown/45">Helyben vagy telefonon kért rendelés rögzítése ugyanabba a rendszerbe. A vevőnkénti limitek itt nem érvényesek.</p>
             </div>
             <button onClick={() => setShowManualOrder(false)} className="rounded-lg p-1 text-brown/40 hover:bg-cream-dark hover:text-brown-dark">
               <X className="h-5 w-5" />
